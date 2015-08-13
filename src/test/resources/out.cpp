@@ -1,0 +1,1 @@
+	extern jint getInt();
