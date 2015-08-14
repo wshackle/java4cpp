@@ -10,6 +10,11 @@ int main(int argc, const char **argv) {
     
     //SetDebugJ4Cpp(true);
     Test t;
+    A a;
+    t.setClassObjectA(a);
+    A b = t.getClassObjectA();
+    PrintObject("b=",b);
+    
     jint i  = t.getI();
     cout << "i = " << i << endl;
     jstring str = t.funcReturningString();

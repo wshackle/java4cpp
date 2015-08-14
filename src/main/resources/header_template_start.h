@@ -7,6 +7,7 @@
 #define %HEADER_DEFINE%
 
 #include <jni.h>
+#include "%FORWARD_HEADER%"
 
 namespace %NAMESPACE% {
 
@@ -16,14 +17,14 @@ namespace %NAMESPACE% {
     extern void DebugPrintJObject(const char *file, int lineno, const char *prefix, jobject jobj);
     extern void SetDebugJ4Cpp(bool debug);
     extern bool GetDebugJ4Cpp();
+    extern void PrintObject(const char *prefix, const ::%NAMESPACE%::java::lang::Object &objref);
     
     namespace java {
         namespace lang {
 
             class Object {
-            protected:
-                jobject jthis;
             public:
+                jobject jthis;
                 Object();
                 Object(jobject _jthis, bool copy);
                 Object(const Object &ref);
@@ -32,6 +33,8 @@ namespace %NAMESPACE% {
             };
         }
     }
+    
+    
     
     
 

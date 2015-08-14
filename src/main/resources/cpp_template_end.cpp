@@ -131,6 +131,9 @@
         env->ReleaseStringUTFChars(jobjstr,cstr);
     }
     
+    void PrintObject(const char *prefix, const ::%NAMESPACE%::java::lang::Object &objref) {
+        PrintJObject(prefix,objref.jthis);
+    }
     
     extern void SetDebugJ4Cpp(bool debug) {
         debug_j4cpp = debug;

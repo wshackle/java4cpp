@@ -25,13 +25,15 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.Stack;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -97,20 +99,37 @@ public class J4CppMain {
         }
     }
 
+    public static String namespace = "initial_namespace";
+
+    private static String getModifiedClassName(Class cls) {
+        Class enclosingClass = cls.getEnclosingClass();
+        if (null != enclosingClass) {
+            String en = enclosingClass.getCanonicalName();
+            return en + cls.getCanonicalName().substring(en.length() + 1);
+        }
+        return cls.getCanonicalName();
+    }
+
     private static String getCppRelativeName(Class<?> cls, Class<?> relClass) {
-        String basepackages[] = cls.getCanonicalName().split("\\.");
+        String basepackages[] = getModifiedClassName(cls).split("\\.");
         String packages[] = relClass.getCanonicalName().split("\\.");
         int i = 0;
         int index = 0;
+        boolean match = true;
         for (i = 0; i < basepackages.length - 1 && i < packages.length - 1; i++) {
             if (!packages[i].equals(basepackages[i])) {
+                match = false;
                 break;
             }
             index += packages[i].length() + 1;
         }
-        return cls
-                .getCanonicalName()
-                .substring(index)
+        if (match) {
+            return getModifiedClassName(cls)
+                    .substring(index).replace(".", "::");
+        }
+
+        return "::" + namespace + "::"
+                + getModifiedClassName(cls)
                 .replace(".", "::");
     }
 
@@ -142,18 +161,39 @@ public class J4CppMain {
         return out;
     }
 
+    private static String addRefIndicator(Class c) {
+        if (!c.isPrimitive()
+                && !String.class.isAssignableFrom(c)
+                && !c.isArray()) {
+            return " &";
+        }
+        return "";
+    }
+
     private static String classToParamNameDecl(Class<?> c, int index) {
         if (c.isArray()) {
             return classToParamName(c.getComponentType()) + "Array_" + index;
         }
-        return c.getSimpleName().substring(0, 1).toLowerCase() + c.getSimpleName().substring(1) + "_" + index;
+        return addRefIndicator(c)
+                + c.getSimpleName().substring(0, 1).toLowerCase() + c.getSimpleName().substring(1) + "_" + index;
     }
 
+    private static String addCppJThis(Class c) {
+        if(c.isPrimitive() 
+                || c.isArray()
+                || String.class.isAssignableFrom(c)) {
+            return "";
+        } else {
+            return ".jthis";
+        }
+    }
+    
     private static String classToParamName(Class<?> c) {
         if (c.isArray()) {
             return classToParamName(c.getComponentType()) + "Array";
         }
-        return c.getSimpleName().substring(0, 1).toLowerCase() + c.getSimpleName().substring(1);
+        return c.getSimpleName().substring(0, 1).toLowerCase() 
+                + c.getSimpleName().substring(1);
     }
 
     private static String classToJNISignature(Class<?> clss) {
@@ -195,7 +235,7 @@ public class J4CppMain {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < clsses.length; i++) {
             Class<?> clsse = clsses[i];
-            String name = classToParamName(clsse) + "_" + i;
+            String name = classToParamName(clsse) + "_" + i + addCppJThis(clsse);
             sb.append(name);
             if (i < clsses.length - 1) {
                 sb.append(",");
@@ -229,7 +269,8 @@ public class J4CppMain {
         Set<String> badNamesSet = new HashSet<>();
         badNamesSet.addAll(Arrays.asList("and", "and_eq", "bitand",
                 "bitor", "compl", "not", "not_eq", "or",
-                "not_eq", "or", "or_eq", "xor", "xor_eq"));
+                "not_eq", "or", "or_eq", "xor", "xor_eq",
+                "delete", "namespace"));
         return badNamesSet;
     }
 
@@ -450,7 +491,7 @@ public class J4CppMain {
             System.err.println("str=" + str);
             System.err.println("key=" + key);
             System.err.println("val=" + val);
-            System.err.println("map="+map);
+            System.err.println("map=" + map);
             t.printStackTrace();
             throw new RuntimeException(t);
         }
@@ -471,6 +512,7 @@ public class J4CppMain {
     private static boolean checkClass(Class<?> clss, List<Class> classes) {
         Class<?> componentClass = clss.getComponentType();
         return String.class.isAssignableFrom(clss)
+                || clss.equals(Object.class)
                 || clss.isPrimitive()
                 || (clss.isArray()
                 && null != componentClass
@@ -493,7 +535,8 @@ public class J4CppMain {
             return false;
         }
         if (!Modifier.isPublic(m.getModifiers())
-                || Modifier.isAbstract(m.getModifiers())) {
+//                || Modifier.isAbstract(m.getModifiers())
+                ) {
             return false;
         }
         if (!checkClass(m.getReturnType(), classes)) {
@@ -506,6 +549,12 @@ public class J4CppMain {
         if (clss.isArray() || clss.isSynthetic() || clss.isAnnotation() || clss.isPrimitive()) {
             return false;
         }
+//        if(clss.getCanonicalName().contains("Dialog") || clss.getName().contains("ModalExlusionType")) {
+//            System.out.println("clss = " + clss);
+//        }
+        if (clss.getEnclosingClass() != null) {
+            return false;
+        }
         String canonicalName = null;
         try {
             canonicalName = clss.getCanonicalName();
@@ -515,8 +564,15 @@ public class J4CppMain {
         if (null == canonicalName) {
             return false;
         }
-        if(canonicalName.indexOf('$') >= 0) {
+        if (canonicalName.indexOf('$') >= 0) {
             return false;
+        }
+        String pkgNames[] = clss.getCanonicalName().split("\\.");
+        for (int i = 0; i < pkgNames.length; i++) {
+            String pkgName = pkgNames[i];
+            if (badNames.contains(pkgName)) {
+                return false;
+            }
         }
         Method ma[] = null;
         try {
@@ -528,6 +584,20 @@ public class J4CppMain {
             return false;
         }
         return !excludedClasses.contains(clss);
+    }
+
+    private static String getCppClassName(Class clss) {
+        String clssName = clss.getCanonicalName();
+        String pkgs[] = clssName.split("\\.");
+        String clssOnlyName = pkgs[pkgs.length - 1];
+        Class enclosingClass = clss.getEnclosingClass();
+        if (enclosingClass != null) {
+            String enclosingClassName = enclosingClass.getCanonicalName();
+            String enclosingPkgs[] = enclosingClassName.split("\\.");
+            String enclosingName = enclosingPkgs[enclosingPkgs.length - 1];
+            clssOnlyName = enclosingName + clssOnlyName;
+        }
+        return clssOnlyName;
     }
 
     public static void main(String[] args) {
@@ -544,6 +614,16 @@ public class J4CppMain {
                     .desc("C++ namespace for newly generated classes.")
                     .longOpt("namespace")
                     .build());
+            options.addOption(Option.builder("c")
+                    .hasArg()
+                    .desc("Single Java class to extract.")
+                    .longOpt("class")
+                    .build());
+            options.addOption(Option.builder("p")
+                    .hasArg()
+                    .desc("Java Package prefix to extract")
+                    .longOpt("package")
+                    .build());
             options.addOption(Option.builder("o")
                     .hasArg()
                     .desc("Output C++ source file.")
@@ -559,10 +639,18 @@ public class J4CppMain {
                     .desc("Output C++ header file.")
                     .longOpt("header")
                     .build());
-            String namespace = null;
+            options.addOption(Option.builder("l")
+                    .hasArg()
+                    .desc("Maximum limit on classes to extract from jars.[default=200]")
+                    .longOpt("limit")
+                    .build());
             String output = null;
             String header = null;
             String jar = null;
+            String classname = null;
+            String packageprefix = null;
+            int limit = DEFAULT_LIMIT;
+            String limitstring = Integer.toString(limit);
 
             try {
                 // parse the command line arguments
@@ -609,6 +697,16 @@ public class J4CppMain {
                 } else {
                     header = "out.h";
                 }
+                if (line.hasOption("class")) {
+                    classname = line.getOptionValue("class");
+                }
+                if (line.hasOption("package")) {
+                    packageprefix = line.getOptionValue("package");
+                }
+                if (line.hasOption("limit")) {
+                    limitstring = line.getOptionValue("limit", Integer.toString(DEFAULT_LIMIT));
+                    limit = Integer.valueOf(limitstring);
+                }
                 if (line.hasOption("help")) {
                     printHelpAndExit(options);
                 }
@@ -628,35 +726,71 @@ public class J4CppMain {
             excludedClasses.add(void.class);
             excludedClasses.add(Void.class);
             excludedClasses.add(Class.class);
+            Set<String> packagesSet = new TreeSet<>();
             for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
                 if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
                     // This ZipEntry represents a class. Now, what class does it represent?
                     String entryName = entry.getName();
-                    if(entryName.indexOf('$') >= 0) {
+                    if (entryName.indexOf('$') >= 0) {
                         continue;
                     }
                     String classFileName = entry.getName()
                             .replace('/', '.');
                     String className = classFileName
                             .substring(0, classFileName.length() - ".class".length());
+                    if (classname != null
+                            && classname.length() > 0
+                            && !classname.equals(className)) {
+                        continue;
+                    }
                     Class clss = cl.loadClass(className);
+                    if (packageprefix != null
+                            && packageprefix.length() > 0
+                            && !clss.getPackage().getName().startsWith(packageprefix)) {
+                        continue;
+                    }
+                    Package p = clss.getPackage();
+                    if(null != p) {
+                        packagesSet.add(clss.getPackage().getName());
+                    }
                     if (!classes.contains(clss)
                             && isAddableClass(clss, excludedClasses)) {
                         System.out.println("clss = " + clss);
                         classes.add(clss);
-                        Class superClass = clss.getSuperclass();
-                        while (null != superClass
-                                && !classes.contains(superClass)
-                                && isAddableClass(superClass, excludedClasses)) {
-                            classes.add(superClass);
-                            superClass = superClass.getSuperclass();
-                        }
+//                        Class superClass = clss.getSuperclass();
+//                        while (null != superClass
+//                                && !classes.contains(superClass)
+//                                && isAddableClass(superClass, excludedClasses)) {
+//                            classes.add(superClass);
+//                            superClass = superClass.getSuperclass();
+//                        }
                     }
                 }
+            }
+            if (null != classname && classname.length() > 0 && classes.size() == 0) {
+                Class c = ClassLoader.getSystemClassLoader().loadClass(classname);
+                if (null != c) {
+                    classes.add(c);
+                }
+            }
+            System.out.println("Classes found = " + classes.size());
+            if (classes.size() > limit) {
+                System.err.println("limit=" + limit);
+                System.err.println("Too many classes please use -c or -p options to limit classes or -l to increase limit.");
+                System.out.println("packagesSet = " + packagesSet);
+                System.exit(1);
             }
             List<Class> newClasses = new ArrayList<Class>();
             for (Class clss : classes) {
                 try {
+                    Class superClass = clss.getSuperclass();
+                    while (null != superClass
+                            && !classes.contains(superClass)
+                            && !newClasses.contains(superClass)
+                            && isAddableClass(superClass, excludedClasses)) {
+                        newClasses.add(superClass);
+                        superClass = superClass.getSuperclass();
+                    }
                     for (Method m : clss.getDeclaredMethods()) {
                         if (m.isSynthetic()) {
                             continue;
@@ -676,12 +810,10 @@ public class J4CppMain {
                             continue;
                         }
                         if (!classes.contains(retType)
-                                && !excludedClasses.contains(retType)
                                 && !newClasses.contains(retType)
-                                && !retType.isArray()
-                                && !retType.isPrimitive()) {
+                                && isAddableClass(retType, excludedClasses)) {
                             newClasses.add(retType);
-                            Class superClass = retType.getSuperclass();
+                            superClass = retType.getSuperclass();
                             ma = null;
                             try {
                                 ma = clss.getDeclaredMethods();
@@ -694,7 +826,7 @@ public class J4CppMain {
                             while (null != superClass
                                     && !classes.contains(superClass)
                                     && !newClasses.contains(superClass)
-                                    && !excludedClasses.contains(superClass)) {
+                                    && isAddableClass(superClass, excludedClasses)) {
                                 ma = null;
                                 try {
                                     ma = superClass.getDeclaredMethods();
@@ -710,12 +842,10 @@ public class J4CppMain {
                         }
                         for (Class paramType : m.getParameterTypes()) {
                             if (!classes.contains(paramType)
-                                    && !excludedClasses.contains(paramType)
                                     && !newClasses.contains(paramType)
-                                    && !paramType.isArray()
-                                    && !paramType.isPrimitive()) {
+                                    && isAddableClass(paramType, excludedClasses)) {
                                 newClasses.add(paramType);
-                                Class superClass = paramType.getSuperclass();
+                                superClass = paramType.getSuperclass();
                                 while (null != superClass
                                         && !classes.contains(superClass)
                                         && !newClasses.contains(superClass)
@@ -731,65 +861,158 @@ public class J4CppMain {
                 }
             }
             classes.addAll(newClasses);
-            Map<Class, Integer> classMap = new HashMap<>();
+            List<Class> newOrderClasses = new ArrayList<>();
             for (Class clss : classes) {
-                classMap.put(clss, 0);
-            }
-            for (Class clss : classes) {
+                if (newOrderClasses.contains(clss)) {
+                    continue;
+                }
                 Class superClass = clss.getSuperclass();
-                while (null != superClass && classMap.containsKey(superClass)) {
-                    classMap.put(superClass, classMap.get(superClass) - 1);
+                Stack<Class> stack = new Stack<>();
+                while (null != superClass
+                        && !newOrderClasses.contains(superClass)
+                        && !superClass.equals(java.lang.Object.class)) {
+                    stack.push(superClass);
                     superClass = superClass.getSuperclass();
                 }
-            }
-            Collections.sort(classes, new Comparator<Class>() {
-
-                @Override
-                public int compare(Class o1, Class o2) {
-                    if (o1 == null || classMap.get(o1) == null) {
-                        System.out.println("bad o1=" + o1);
-                    }
-                    if (o2 == null || classMap.get(o2) == null) {
-                        System.out.println("bad o1=" + o1);
-                    }
-                    return classMap.get(o1) - classMap.get(o2);
+                while (!stack.empty()) {
+                    newOrderClasses.add(stack.pop());
                 }
-            });
+                newOrderClasses.add(clss);
+            }
+            classes = newOrderClasses;
+//            Map<String, Integer> classMap = new HashMap<>();
+//            Map<String, Integer> packageMap = new HashMap<>();
+//            for (Class clss : classes) {
+//                classMap.put(clss.getCanonicalName(), 0);
+//            }
+//            for (Class clss : classes) {
+//                packageMap.put(clss.getPackage().getName(), 0);
+//            }
+//            int minval = 0;
+//            for (Class clss : classes) {
+//                Class superClass = clss.getSuperclass();
+//                int val = -1;
+//                int pval = -1;
+//                while (null != superClass && classMap.containsKey(superClass.getCanonicalName())) {
+//                    if(classMap.get(superClass.getCanonicalName()) > val) {
+//                        classMap.put(superClass.getCanonicalName(), val);
+//                    }
+//                    if(!clss.getPackage().getName().equals(superClass.getPackage().getName())) {
+//                        if(packageMap.get(superClass.getPackage().getName()) > pval) {
+//                            packageMap.put(superClass.getPackage().getName(), pval);
+//                        }
+//                        pval--;
+//                    }
+//                    clss = superClass;
+//                    superClass = superClass.getSuperclass();
+//                    val--;
+//                    if(val < minval) {
+//                        minval = val;
+//                    }
+//                }
+//            }
+//            Map<String,Integer> finalClassMap = new HashMap<>();
+//            for (Class clss : classes) {
+//                finalClassMap.put(clss.getCanonicalName(), classMap.get(clss.getCanonicalName()) - 
+//                        (minval-1)*packageMap.get(clss.getPackage().getName()));
+//            }
+//            java.awt.Rectangle r;
+//            List<Class> classesToRemove = new ArrayList<>();
+//            for (Class clss : classes) {
+//                Class superClass = clss.getSuperclass();
+//                if(null != superClass && classes.contains(superClass)) {
+//                    int superVal = finalClassMap.get(superClass.getCanonicalName());
+//                    int myVal = finalClassMap.get(clss.getCanonicalName());
+//                    if(superVal >= myVal) {
+////                        classesToRemove.add(clss);
+////                        System.err.println("Removing "+clss +" superVal="+superVal+", myVal="+myVal);
+//                        finalClassMap.put(clss.getCanonicalName(), superVal-1);
+//                    }
+//                }
+//            }
+////            classes.removeAll(classesToRemove);
+//            Collections.sort(classes, new Comparator<Class>() {
+//
+//                @Override
+//                public int compare(Class o1, Class o2) {
+//                    if (o1 == null || classMap.get(o1.getCanonicalName()) == null) {
+//                        System.out.println("bad o1=" + o1);
+//                    }
+//                    if (o2 == null || classMap.get(o2.getCanonicalName()) == null) {
+//                        System.out.println("bad o2=" + o2);
+//                    }
+//                    if (o1 == null || packageMap.get(o1.getPackage().getName()) == null) {
+//                        System.out.println("bad o1=" + o1);
+//                    }
+//                    if (o2 == null || packageMap.get(o2.getPackage().getName()) == null) {
+//                        System.out.println("bad o2=" + o2);
+//                    }
+////                    if(!o1.getPackage().getName().equals(o2.getPackage().getName())) {
+////                        return packageMap.get(o1.getPackage().getName()) - packageMap.get(o2.getPackage().getName());
+////                    }
+//                    int diff = finalClassMap.get(o1.getCanonicalName()) - finalClassMap.get(o2.getCanonicalName());
+////                    if(!o1.isAssignableFrom(o2) && !o2.isAssignableFrom(o1)
+////                            && !o1.getPackage().getName().equals(o2.getPackage().getName())) {
+////                        diff = 0;
+////                    }
+////                    if(diff == 0) {
+////                        return o1.getCanonicalName().compareTo(o2.getCanonicalName());
+////                    }
+//                    return diff;
+//                }
+//            });
+            String forward_header = header.substring(0,header.lastIndexOf('.')) + "_fwd.h";
             Map<String, String> map = new HashMap<>();
             map.put(JAR, jar);
-            map.put(HEADER, header);
+            map.put("%FORWARD_HEADER%", forward_header);
+            map.put("%HEADER%", header);
             map.put("%PATH_SEPERATOR%", File.pathSeparator);
-            String headerDefine = header
+            String tabs = "";
+            String headerDefine = forward_header
+                    .substring(Math.max(0, forward_header.indexOf(File.separator)))
+                    .replace(".", "_");
+            map.put(HEADER_DEFINE, headerDefine);
+            map.put(NAMESPACE, namespace);
+            try (PrintWriter pw = new PrintWriter(new FileWriter(forward_header))) {
+                processTemplate(pw, map, "header_fwd_template_start.h", tabs);
+                Class lastClass = null;
+                for (int class_index = 0; class_index < classes.size(); class_index++) {
+                    Class clss = classes.get(class_index);
+                    String clssOnlyName = getCppClassName(clss);
+                    tabs = openClassNamespace(clss, pw, tabs, lastClass);
+                    tabs += TAB_STRING;
+                    pw.println(tabs + "class " + clssOnlyName + ";");
+////"+classMap.get(clss.getCanonicalName())
+//                            +","+packageMap.get(clss.getPackage().getName())
+//                            + ","+finalClassMap.get(clss.getCanonicalName()));
+                    tabs = tabs.substring(0, tabs.length() - 1);
+                    Class nextClass = (class_index < (classes.size() - 1))
+                            ? classes.get(class_index + 1) : null;
+                    tabs = closeClassNamespace(clss, pw, tabs, nextClass);
+                    lastClass = clss;
+                }
+                processTemplate(pw, map, "header_fwd_template_end.h", tabs);
+            } catch (Exception ex) {
+                Logger.getLogger(J4CppMain.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            headerDefine = header
                     .substring(Math.max(0, header.indexOf(File.separator)))
                     .replace(".", "_");
             map.put(HEADER_DEFINE, headerDefine);
             map.put(NAMESPACE, namespace);
-            String tabs = "";
             try (PrintWriter pw = new PrintWriter(new FileWriter(header))) {
                 processTemplate(pw, map, HEADER_TEMPLATE_STARTH, tabs);
                 Class lastClass = null;
                 for (int class_index = 0; class_index < classes.size(); class_index++) {
                     Class clss = classes.get(class_index);
                     String clssName = clss.getCanonicalName();
-                    String pkgs[] = clssName.split("\\.");
-                    tabs = openClassNamespace(pkgs, pw, tabs);
-                    String clssOnlyName = pkgs[pkgs.length - 1];
-                    tabs += "\t";
-                    pw.println(tabs + "class " + clssOnlyName + ";");
-                    tabs = tabs.substring(0, tabs.length() - 1);
-                    tabs = closeClassNamespace(pkgs, pw, tabs);
-                    lastClass = clss;
-                }
-                for (Class clss : classes) {
-                    String clssName = clss.getCanonicalName();
-                    String pkgs[] = clssName.split("\\.");
-                    tabs = openClassNamespace(pkgs, pw, tabs);
-                    String clssOnlyName = pkgs[pkgs.length - 1];
+                    tabs = openClassNamespace(clss, pw, tabs, lastClass);
+                    String clssOnlyName = getCppClassName(clss);
                     map.put(CLASS_NAME, clssOnlyName);
                     map.put("%BASE_CLASS_FULL_NAME%", classToCppBase(clss));
-                    tabs += "\t";
+                    tabs += TAB_STRING;
                     processTemplate(pw, map, HEADER_CLASS_STARTH, tabs);
-                    tabs += "\t";
+                    tabs += TAB_STRING;
                     Constructor constructors[] = clss.getDeclaredConstructors();
                     if (constructors.length < 1) {
                         pw.println(tabs + clssOnlyName + "();");
@@ -798,13 +1021,20 @@ public class J4CppMain {
                             if (Modifier.PUBLIC != (c.getModifiers() & Modifier.PUBLIC)) {
                                 continue;
                             }
+                            if (c.getParameterTypes().length == 1) {
+                                if (c.getParameterTypes()[0].getName().equals(clss.getName())) {
+//                                    System.out.println("skipping constructor.");
+                                    continue;
+                                }
+                            }
+
                             if (!checkParameters(c.getParameterTypes(), classes)) {
                                 continue;
                             }
                             pw.println(tabs + clssOnlyName + getCppParamDeclarations(c.getParameterTypes(), clss) + ";");
                         }
                     }
-                    pw.println(tabs + "virtual ~" + clssOnlyName + "();");
+                    pw.println(tabs + "~" + clssOnlyName + "();");
                     Method methods[] = clss.getDeclaredMethods();
                     for (int j = 0; j < methods.length; j++) {
                         Method method = methods[j];
@@ -817,15 +1047,18 @@ public class J4CppMain {
                         if (isArrayStringMethod(method)) {
                             pw.println(tabs + getCppModifiers(method)
                                     + getCppType(method.getReturnType(), clss) + " "
-                                    + method.getName()
+                                    + fixMethodName(method.getName())
                                     + "(int argc,const char **argv);");
                         }
                     }
                     tabs = tabs.substring(0, tabs.length() - 1);
                     pw.println(tabs + "}; // end class " + clssOnlyName);
                     tabs = tabs.substring(0, tabs.length() - 1);
-                    tabs = closeClassNamespace(pkgs, pw, tabs);
+                    Class nextClass = (class_index < (classes.size() - 1))
+                            ? classes.get(class_index + 1) : null;
+                    tabs = closeClassNamespace(clss, pw, tabs, nextClass);
                     pw.println();
+                    lastClass = clss;
                 }
                 processTemplate(pw, map, HEADER_TEMPLATE_ENDH, tabs);
             } catch (Exception ex) {
@@ -834,13 +1067,16 @@ public class J4CppMain {
 
             try (PrintWriter pw = new PrintWriter(new FileWriter(output))) {
                 processTemplate(pw, map, CPP_TEMPLATE_STARTCPP, tabs);
-                for (Class clss : classes) {
+                Class lastClass = null;
+                for (int class_index = 0; class_index < classes.size(); class_index++) {
+                    Class clss = classes.get(class_index);
                     String clssName = clss.getCanonicalName();
-                    String pkgs[] = clssName.split("\\.");
-                    tabs = "\t";
-                    tabs = openClassNamespace(pkgs, pw, tabs);
-                    String clssOnlyName = pkgs[pkgs.length - 1];
+                    tabs = TAB_STRING;
+                    tabs = openClassNamespace(clss, pw, tabs, lastClass);
+                    String clssOnlyName = getCppClassName(clss);
                     map.put(CLASS_NAME, clssOnlyName);
+                    map.put("%BASE_CLASS_FULL_NAME%", classToCppBase(clss));
+                    
                     map.put(FULL_CLASS_NAME, clssName);
                     map.put(FULL_CLASS_JNI_SIGNATURE, clssName.replace(".", "/"));
                     map.put(OBJECT_CLASS_FULL_NAME, getCppRelativeName(Object.class, clss));
@@ -863,7 +1099,7 @@ public class J4CppMain {
                             }
                             Class[] paramClasses = c.getParameterTypes();
                             pw.println(tabs + clssOnlyName + "::" + clssOnlyName + getCppParamDeclarations(paramClasses, clss) + " {");
-                            tabs = tabs + "\t";
+                            tabs = tabs + TAB_STRING;
                             map.put(JNI_SIGNATURE, "(" + getJNIParamSignature(paramClasses) + ")V");
                             map.put(CONSTRUCTOR_ARGS, (paramClasses.length > 0 ? "," : "") + getCppParamNames(paramClasses));
                             processTemplate(pw, map, CPP_NEWCPP, tabs);
@@ -887,7 +1123,7 @@ public class J4CppMain {
                         int modifiers = method.getModifiers();
                         if (Modifier.isPublic(modifiers) && !Modifier.isAbstract(modifiers)) {
                             pw.println(getCppMethodDefinitionStart(tabs, clssOnlyName, method, clss));
-                            map.put(METHOD_NAME, method.getName());
+                            map.put(METHOD_NAME, fixMethodName(method.getName()));
                             Class[] paramClasses = method.getParameterTypes();
                             map.put(METHOD_ARGS, (paramClasses.length > 0 ? "," : "") + getCppParamNames(paramClasses));
                             Class returnClass = method.getReturnType();
@@ -913,9 +1149,11 @@ public class J4CppMain {
                         }
                     }
                     processTemplate(pw, map, CPP_END_CLASSCPP, tabs);
-
                     tabs = tabs.substring(0, tabs.length() - 1);
-                    tabs = closeClassNamespace(pkgs, pw, tabs);
+                    Class nextClass = (class_index < (classes.size() - 1))
+                            ? classes.get(class_index + 1) : null;
+                    tabs = closeClassNamespace(clss, pw, tabs, nextClass);
+                    lastClass = clss;
                 }
 //                pw.println();
 //                pw.println("// end namespace " + namespace);
@@ -937,12 +1175,14 @@ public class J4CppMain {
         }
 
     }
+    private static final int DEFAULT_LIMIT = 200;
+    private static final String TAB_STRING = " "; // used to be "\t"
     private static final String OBJECT_CLASS_FULL_NAME = "%OBJECT_CLASS_FULL_NAME%";
 
     private static String getMethodReturnGet(String tabs, Class returnClass, Class relClass) {
         if (!returnClass.isArray() && !returnClass.isPrimitive()
                 && !String.class.isAssignableFrom(returnClass)) {
-            tabs += "\t";
+            tabs += TAB_STRING;
             return tabs + "\n"
                     + tabs + "jobjectRefType ref = env->GetObjectRefType(retVal);\n"
                     + tabs + "std::cout << \"ref=\" << ref << std::endl;\n"
@@ -986,19 +1226,81 @@ public class J4CppMain {
     private static final String HEADER_DEFINE = "%HEADER_DEFINE%";
     private static final String HEADER = "%HEADER%";
 
-    private static String closeClassNamespace(String[] pkgs, final PrintWriter pw, String tabs) {
-        for (int i = 0; i < pkgs.length - 1; i++) {
+    private static boolean pkgMatch(String pkgs1[], String pkgs2[], int level) {
+        if (pkgs1.length < level + 1) {
+            return false;
+        }
+        if (pkgs2.length < level + 1) {
+            return false;
+        }
+        for (int i = 0; i <= level; i++) {
+            String pkgFrom1 = pkgs1[i];
+            String pkgFrom2 = pkgs2[i];
+            if (!pkgFrom1.equals(pkgFrom2)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     *
+     * @param clss the value of clss
+     * @param pw the value of pw
+     * @param tabs the value of tabs
+     * @param nextClass the value of nextClass
+     */
+    private static String closeClassNamespace(Class clss, final PrintWriter pw, String tabs, Class nextClass) {
+        String pkgs[] = classToPackages(clss);
+        String nextPkgs[] = classToPackages(nextClass);
+        boolean line_printed = false;
+        if(pkgs.length < 1) {
+            return tabs;
+        }
+        for (int i = pkgs.length - 1; i >= 0; i--) {
             String pkg = pkgs[i];
-            pw.println(tabs + "} // end namespace " + pkg);
+            if(pkg.length() < 1) {
+                break;
+            }
+            if (!pkgMatch(pkgs, nextPkgs, i)) {
+                pw.println(tabs + "} // end namespace " + pkg);
+                line_printed = true;
+            }
             tabs = tabs.substring(0, tabs.length() - 1);
+        }
+        if (line_printed) {
+            pw.println();
         }
         return tabs;
     }
 
-    private static String openClassNamespace(String[] pkgs, final PrintWriter pw, String tabs) {
-        for (int i = 0; i < pkgs.length - 1; i++) {
+    private static final String[] emptypkgs = {};
+
+    private static String[] classToPackages(Class clss) {
+        return Optional.ofNullable(clss)
+                .map(Class::getPackage)
+                .map(Package::getName)
+                .map(s -> s.split("\\."))
+                .orElse(emptypkgs);
+    }
+    
+    /**
+     *
+     * @param clss the value of clss
+     * @param pw the value of pw
+     * @param tabs the value of tabs
+     * @param lastClass the value of lastClass
+     */
+    private static String openClassNamespace(Class clss, final PrintWriter pw, String tabs, Class lastClass) {
+        
+        String pkgs[] = classToPackages(clss);
+        String lastpkgs[] = classToPackages(lastClass);
+        for (int i = 0; i < pkgs.length; i++) {
             String pkg = pkgs[i];
-            tabs += "\t";
+            tabs += TAB_STRING;
+            if (pkgMatch(pkgs, lastpkgs, i)) {
+                continue;
+            }
             pw.println(tabs + "namespace " + pkg + "{");
         }
         return tabs;
@@ -1019,6 +1321,7 @@ public class J4CppMain {
                 = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream(resourceName), StandardCharsets.UTF_8))) {
             br.lines()
                     .filter(s -> !s.trim().startsWith(TEMPLATE_COMMENT_MARK))
+                    .map(l -> l.replace("\t", TAB_STRING))
                     .forEach(l -> pw.println(tabs + replaceVars(map, l)));
         }
     }
