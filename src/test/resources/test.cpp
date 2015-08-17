@@ -128,21 +128,12 @@ namespace test {
  }
  jint ClassInDefaultPackage::getI() {
 
-         if(jthis == NULL) {
-             std::cerr << "Call of method getI of ClassInDefaultPackage with jthis == NULL." << std::endl;
-             return (jint) -1;
-         }
-         JNIEnv *env =getEnv();
-         jclass cls = env->GetObjectClass(jthis);
- //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
- //        std::cout << "ClassInDefaultPackage ref0=" << ref0 << std::endl;
- //        std::cout << "ClassInDefaultPackage jthis=" << jthis << std::endl;
- //        std::cout << "ClassInDefaultPackage GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
- //        std::cout << "ClassInDefaultPackage getClassInDefaultPackageClass()=" << cls << std::endl;
- //        std::cout << "ClassInDefaultPackage isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
- //        std::cout << "ClassInDefaultPackage isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
- //        std::cout << "ClassInDefaultPackage isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
- //    
+ if(jthis == NULL) {
+     std::cerr << "Call of method getI of ClassInDefaultPackage with jthis == NULL." << std::endl;
+     return (jint) -1;
+ }
+ JNIEnv *env =getEnv();
+ jclass cls = env->GetObjectClass(jthis);
  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," ClassInDefaultPackage::getI jthis=",jthis);
  jint retVal= (jint) -1;
  if (cls != NULL) {
@@ -236,21 +227,12 @@ namespace test {
   }
   Test A::getTestNonStatic() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getTestNonStatic of testpackage.A with jthis == NULL." << std::endl;
-              Test nullObject((jobject)NULL,false); return nullObject;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "A ref0=" << ref0 << std::endl;
-  //        std::cout << "A jthis=" << jthis << std::endl;
-  //        std::cout << "A GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "A getAClass()=" << cls << std::endl;
-  //        std::cout << "A isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "A isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "A isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getTestNonStatic of testpackage.A with jthis == NULL." << std::endl;
+      Test nullObject((jobject)NULL,false); return nullObject;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," A::getTestNonStatic jthis=",jthis);
   jobject retVal=NULL;
   if (cls != NULL) {
@@ -378,6 +360,28 @@ namespace test {
   	// Place-holder for later extensibility.
   }
 
+  jint Test::getI() {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method getI of testpackage.Test with jthis == NULL." << std::endl;
+      return (jint) -1;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getI jthis=",jthis);
+  jint retVal= (jint) -1;
+  if (cls != NULL) {
+      static jmethodID mid = env->GetMethodID(cls, "getI", "()I");
+      if (NULL == mid) {
+          std::cerr << "Class testpackage.Test has no method named getI with signature ()I." << std::endl;
+          return (jint) -1;
+      } else {
+          retVal= (jint)  env->CallIntMethod(jthis, mid  );
+      }
+  }
+  releaseEnv(env);
+  return retVal;
+  }
   Test Test::getTestStatic() {
 
   JNIEnv *env =getEnv();
@@ -400,54 +404,14 @@ namespace test {
    Test retObject(retVal,false);
    return retObject;
   }
-  jint Test::getI() {
-
-          if(jthis == NULL) {
-              std::cerr << "Call of method getI of testpackage.Test with jthis == NULL." << std::endl;
-              return (jint) -1;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
-  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getI jthis=",jthis);
-  jint retVal= (jint) -1;
-  if (cls != NULL) {
-      static jmethodID mid = env->GetMethodID(cls, "getI", "()I");
-      if (NULL == mid) {
-          std::cerr << "Class testpackage.Test has no method named getI with signature ()I." << std::endl;
-          return (jint) -1;
-      } else {
-          retVal= (jint)  env->CallIntMethod(jthis, mid  );
-      }
-  }
-  releaseEnv(env);
-  return retVal;
-  }
   ::test::java::util::List Test::getListOfStrings() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getListOfStrings of testpackage.Test with jthis == NULL." << std::endl;
-              ::test::java::util::List nullObject((jobject)NULL,false); return nullObject;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getListOfStrings of testpackage.Test with jthis == NULL." << std::endl;
+      ::test::java::util::List nullObject((jobject)NULL,false); return nullObject;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getListOfStrings jthis=",jthis);
   jobject retVal=NULL;
   if (cls != NULL) {
@@ -469,21 +433,12 @@ namespace test {
   }
   void Test::setListOfStrings(::test::java::util::List  &list_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setListOfStrings of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setListOfStrings of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setListOfStrings jthis=",jthis);
   
   if (cls != NULL) {
@@ -500,21 +455,12 @@ namespace test {
   }
   A Test::getClassObjectA() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getClassObjectA of testpackage.Test with jthis == NULL." << std::endl;
-              A nullObject((jobject)NULL,false); return nullObject;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getClassObjectA of testpackage.Test with jthis == NULL." << std::endl;
+      A nullObject((jobject)NULL,false); return nullObject;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getClassObjectA jthis=",jthis);
   jobject retVal=NULL;
   if (cls != NULL) {
@@ -536,21 +482,12 @@ namespace test {
   }
   void Test::setClassObjectA(A  &a_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setClassObjectA of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setClassObjectA of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setClassObjectA jthis=",jthis);
   
   if (cls != NULL) {
@@ -567,21 +504,12 @@ namespace test {
   }
   jbyteArray Test::getByteArrayProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getByteArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              return NULL;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getByteArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return NULL;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getByteArrayProp jthis=",jthis);
   jbyteArray retVal=NULL;
   if (cls != NULL) {
@@ -598,21 +526,12 @@ namespace test {
   }
   void Test::setByteArrayProp(jbyteArray byteArray_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setByteArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setByteArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setByteArrayProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -627,23 +546,35 @@ namespace test {
   releaseEnv(env);
   
   }
+  void Test::setByteArrayProp(jbyte * easyArg_0,jsize easyArg_0_length) {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method setByteArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setByteArrayProp jthis=",jthis);
+  jbyteArray byteArray_0= env->NewByteArray(easyArg_0_length);
+  env->SetByteArrayRegion(byteArray_0,0,easyArg_0_length,easyArg_0);
+  setByteArrayProp(byteArray_0);
+  env->GetByteArrayRegion(byteArray_0,0,easyArg_0_length,easyArg_0);
+  jobjectRefType ref_0 = env->GetObjectRefType(byteArray_0);
+  if(ref_0 == JNIGlobalRefType) {
+   env->DeleteGlobalRef(byteArray_0);
+  }
+  
+  releaseEnv(env);
+  
+  }
   jbyte Test::getByteProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getByteProp of testpackage.Test with jthis == NULL." << std::endl;
-              return (jbyte) -1;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getByteProp of testpackage.Test with jthis == NULL." << std::endl;
+      return (jbyte) -1;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getByteProp jthis=",jthis);
   jbyte retVal= (jbyte) -1;
   if (cls != NULL) {
@@ -660,21 +591,12 @@ namespace test {
   }
   void Test::setByteProp(jbyte byte_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setByteProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setByteProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setByteProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -691,21 +613,12 @@ namespace test {
   }
   jcharArray Test::getCharArrayProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getCharArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              return NULL;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getCharArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return NULL;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getCharArrayProp jthis=",jthis);
   jcharArray retVal=NULL;
   if (cls != NULL) {
@@ -722,21 +635,12 @@ namespace test {
   }
   void Test::setCharArrayProp(jcharArray charArray_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setCharArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setCharArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setCharArrayProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -751,23 +655,35 @@ namespace test {
   releaseEnv(env);
   
   }
+  void Test::setCharArrayProp(jchar * easyArg_0,jsize easyArg_0_length) {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method setCharArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setCharArrayProp jthis=",jthis);
+  jcharArray charArray_0= env->NewCharArray(easyArg_0_length);
+  env->SetCharArrayRegion(charArray_0,0,easyArg_0_length,easyArg_0);
+  setCharArrayProp(charArray_0);
+  env->GetCharArrayRegion(charArray_0,0,easyArg_0_length,easyArg_0);
+  jobjectRefType ref_0 = env->GetObjectRefType(charArray_0);
+  if(ref_0 == JNIGlobalRefType) {
+   env->DeleteGlobalRef(charArray_0);
+  }
+  
+  releaseEnv(env);
+  
+  }
   jchar Test::getCharProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getCharProp of testpackage.Test with jthis == NULL." << std::endl;
-              return (jchar) -1;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getCharProp of testpackage.Test with jthis == NULL." << std::endl;
+      return (jchar) -1;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getCharProp jthis=",jthis);
   jchar retVal= (jchar) -1;
   if (cls != NULL) {
@@ -784,21 +700,12 @@ namespace test {
   }
   jshort Test::getShortProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getShortProp of testpackage.Test with jthis == NULL." << std::endl;
-              return (jshort) -1;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getShortProp of testpackage.Test with jthis == NULL." << std::endl;
+      return (jshort) -1;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getShortProp jthis=",jthis);
   jshort retVal=(jshort) -1;
   if (cls != NULL) {
@@ -815,21 +722,12 @@ namespace test {
   }
   void Test::setShortProp(jshort short_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setShortProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setShortProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setShortProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -846,21 +744,12 @@ namespace test {
   }
   jshortArray Test::getShortArrayProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getShortArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              return NULL;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getShortArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return NULL;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getShortArrayProp jthis=",jthis);
   jshortArray retVal=NULL;
   if (cls != NULL) {
@@ -877,21 +766,12 @@ namespace test {
   }
   jint Test::getIntProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getIntProp of testpackage.Test with jthis == NULL." << std::endl;
-              return (jint) -1;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getIntProp of testpackage.Test with jthis == NULL." << std::endl;
+      return (jint) -1;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getIntProp jthis=",jthis);
   jint retVal= (jint) -1;
   if (cls != NULL) {
@@ -908,21 +788,12 @@ namespace test {
   }
   void Test::setIntProp(jint int_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setIntProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setIntProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setIntProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -939,21 +810,12 @@ namespace test {
   }
   jintArray Test::getIntArrayProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getIntArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              return NULL;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getIntArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return NULL;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getIntArrayProp jthis=",jthis);
   jintArray retVal=NULL;
   if (cls != NULL) {
@@ -970,21 +832,12 @@ namespace test {
   }
   void Test::setIntArrayProp(jintArray intArray_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setIntArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setIntArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setIntArrayProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -999,23 +852,35 @@ namespace test {
   releaseEnv(env);
   
   }
+  void Test::setIntArrayProp(jint * easyArg_0,jsize easyArg_0_length) {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method setIntArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setIntArrayProp jthis=",jthis);
+  jintArray intArray_0= env->NewIntArray(easyArg_0_length);
+  env->SetIntArrayRegion(intArray_0,0,easyArg_0_length,easyArg_0);
+  setIntArrayProp(intArray_0);
+  env->GetIntArrayRegion(intArray_0,0,easyArg_0_length,easyArg_0);
+  jobjectRefType ref_0 = env->GetObjectRefType(intArray_0);
+  if(ref_0 == JNIGlobalRefType) {
+   env->DeleteGlobalRef(intArray_0);
+  }
+  
+  releaseEnv(env);
+  
+  }
   jlong Test::getLongProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getLongProp of testpackage.Test with jthis == NULL." << std::endl;
-              return (jlong) -1;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getLongProp of testpackage.Test with jthis == NULL." << std::endl;
+      return (jlong) -1;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getLongProp jthis=",jthis);
   jlong retVal= (jlong) -1;
   if (cls != NULL) {
@@ -1032,21 +897,12 @@ namespace test {
   }
   void Test::setLongProp(jlong long_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setLongProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setLongProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setLongProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -1063,21 +919,12 @@ namespace test {
   }
   jlongArray Test::getLongArrayProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getLongArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              return NULL;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getLongArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return NULL;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getLongArrayProp jthis=",jthis);
   jlongArray retVal=NULL;
   if (cls != NULL) {
@@ -1094,21 +941,12 @@ namespace test {
   }
   void Test::setLongArrayProp(jlongArray longArray_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setLongArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setLongArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setLongArrayProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -1123,23 +961,35 @@ namespace test {
   releaseEnv(env);
   
   }
+  void Test::setLongArrayProp(jlong * easyArg_0,jsize easyArg_0_length) {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method setLongArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setLongArrayProp jthis=",jthis);
+  jlongArray longArray_0= env->NewLongArray(easyArg_0_length);
+  env->SetLongArrayRegion(longArray_0,0,easyArg_0_length,easyArg_0);
+  setLongArrayProp(longArray_0);
+  env->GetLongArrayRegion(longArray_0,0,easyArg_0_length,easyArg_0);
+  jobjectRefType ref_0 = env->GetObjectRefType(longArray_0);
+  if(ref_0 == JNIGlobalRefType) {
+   env->DeleteGlobalRef(longArray_0);
+  }
+  
+  releaseEnv(env);
+  
+  }
   jfloat Test::getFloatProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getFloatProp of testpackage.Test with jthis == NULL." << std::endl;
-              return (jfloat) -1.0;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getFloatProp of testpackage.Test with jthis == NULL." << std::endl;
+      return (jfloat) -1.0;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getFloatProp jthis=",jthis);
   jfloat retVal= (jfloat) -1.0;
   if (cls != NULL) {
@@ -1156,21 +1006,12 @@ namespace test {
   }
   void Test::setFloatProp(jfloat float_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setFloatProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setFloatProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setFloatProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -1187,21 +1028,12 @@ namespace test {
   }
   jfloatArray Test::getFloatArrayProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getFloatArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              return NULL;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getFloatArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return NULL;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getFloatArrayProp jthis=",jthis);
   jfloatArray retVal=NULL;
   if (cls != NULL) {
@@ -1218,21 +1050,12 @@ namespace test {
   }
   void Test::setFloatArrayProp(jfloatArray floatArray_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setFloatArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setFloatArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setFloatArrayProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -1247,23 +1070,35 @@ namespace test {
   releaseEnv(env);
   
   }
+  void Test::setFloatArrayProp(jfloat * easyArg_0,jsize easyArg_0_length) {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method setFloatArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setFloatArrayProp jthis=",jthis);
+  jfloatArray floatArray_0= env->NewFloatArray(easyArg_0_length);
+  env->SetFloatArrayRegion(floatArray_0,0,easyArg_0_length,easyArg_0);
+  setFloatArrayProp(floatArray_0);
+  env->GetFloatArrayRegion(floatArray_0,0,easyArg_0_length,easyArg_0);
+  jobjectRefType ref_0 = env->GetObjectRefType(floatArray_0);
+  if(ref_0 == JNIGlobalRefType) {
+   env->DeleteGlobalRef(floatArray_0);
+  }
+  
+  releaseEnv(env);
+  
+  }
   jdouble Test::getDoubleProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getDoubleProp of testpackage.Test with jthis == NULL." << std::endl;
-              return (jdouble) -1.0;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getDoubleProp of testpackage.Test with jthis == NULL." << std::endl;
+      return (jdouble) -1.0;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getDoubleProp jthis=",jthis);
   jdouble retVal= (jdouble) -1.0;
   if (cls != NULL) {
@@ -1280,21 +1115,12 @@ namespace test {
   }
   void Test::setDoubleProp(jdouble double_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setDoubleProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setDoubleProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setDoubleProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -1311,21 +1137,12 @@ namespace test {
   }
   jdoubleArray Test::getDoubleArrayProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getDoubleArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              return NULL;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getDoubleArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return NULL;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getDoubleArrayProp jthis=",jthis);
   jdoubleArray retVal=NULL;
   if (cls != NULL) {
@@ -1342,21 +1159,12 @@ namespace test {
   }
   void Test::setDoubleArrayProp(jdoubleArray doubleArray_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setDoubleArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setDoubleArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setDoubleArrayProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -1371,23 +1179,35 @@ namespace test {
   releaseEnv(env);
   
   }
+  void Test::setDoubleArrayProp(jdouble * easyArg_0,jsize easyArg_0_length) {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method setDoubleArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setDoubleArrayProp jthis=",jthis);
+  jdoubleArray doubleArray_0= env->NewDoubleArray(easyArg_0_length);
+  env->SetDoubleArrayRegion(doubleArray_0,0,easyArg_0_length,easyArg_0);
+  setDoubleArrayProp(doubleArray_0);
+  env->GetDoubleArrayRegion(doubleArray_0,0,easyArg_0_length,easyArg_0);
+  jobjectRefType ref_0 = env->GetObjectRefType(doubleArray_0);
+  if(ref_0 == JNIGlobalRefType) {
+   env->DeleteGlobalRef(doubleArray_0);
+  }
+  
+  releaseEnv(env);
+  
+  }
   void Test::setShortArrayProp(jshortArray shortArray_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setShortArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setShortArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setShortArrayProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -1402,23 +1222,35 @@ namespace test {
   releaseEnv(env);
   
   }
+  void Test::setShortArrayProp(jshort * easyArg_0,jsize easyArg_0_length) {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method setShortArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setShortArrayProp jthis=",jthis);
+  jshortArray shortArray_0= env->NewShortArray(easyArg_0_length);
+  env->SetShortArrayRegion(shortArray_0,0,easyArg_0_length,easyArg_0);
+  setShortArrayProp(shortArray_0);
+  env->GetShortArrayRegion(shortArray_0,0,easyArg_0_length,easyArg_0);
+  jobjectRefType ref_0 = env->GetObjectRefType(shortArray_0);
+  if(ref_0 == JNIGlobalRefType) {
+   env->DeleteGlobalRef(shortArray_0);
+  }
+  
+  releaseEnv(env);
+  
+  }
   void Test::setCharProp(jchar char_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setCharProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setCharProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setCharProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -1435,21 +1267,12 @@ namespace test {
   }
   jstring Test::getStrProp() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method getStrProp of testpackage.Test with jthis == NULL." << std::endl;
-              return NULL;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method getStrProp of testpackage.Test with jthis == NULL." << std::endl;
+      return NULL;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getStrProp jthis=",jthis);
   jstring retVal=NULL;
   if (cls != NULL) {
@@ -1466,21 +1289,12 @@ namespace test {
   }
   void Test::setStrProp(jstring string_0) {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method setStrProp of testpackage.Test with jthis == NULL." << std::endl;
-              
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method setStrProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setStrProp jthis=",jthis);
   
   if (cls != NULL) {
@@ -1495,23 +1309,33 @@ namespace test {
   releaseEnv(env);
   
   }
+  void Test::setStrProp(const char * easyArg_0) {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method setStrProp of testpackage.Test with jthis == NULL." << std::endl;
+      
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::setStrProp jthis=",jthis);
+  jstring string_0 = env->NewStringUTF(easyArg_0);
+  setStrProp(string_0);
+  jobjectRefType ref_0 = env->GetObjectRefType(string_0);
+  if(ref_0 == JNIGlobalRefType) {
+   env->DeleteGlobalRef(string_0);
+  }
+  
+  releaseEnv(env);
+  
+  }
   jstring Test::funcReturningString() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method funcReturningString of testpackage.Test with jthis == NULL." << std::endl;
-              return NULL;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method funcReturningString of testpackage.Test with jthis == NULL." << std::endl;
+      return NULL;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::funcReturningString jthis=",jthis);
   jstring retVal=NULL;
   if (cls != NULL) {
@@ -1571,21 +1395,12 @@ namespace test {
   }
   jstring Test::toString() {
 
-          if(jthis == NULL) {
-              std::cerr << "Call of method toString of testpackage.Test with jthis == NULL." << std::endl;
-              return NULL;
-          }
-          JNIEnv *env =getEnv();
-          jclass cls = env->GetObjectClass(jthis);
-  //        jobjectRefType ref0 = env->GetObjectRefType(jthis);
-  //        std::cout << "Test ref0=" << ref0 << std::endl;
-  //        std::cout << "Test jthis=" << jthis << std::endl;
-  //        std::cout << "Test GetObjectClass=" << env->GetObjectClass(jthis) << std::endl;
-  //        std::cout << "Test getTestClass()=" << cls << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(env->GetObjectClass(jthis),cls) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isAssignable=" << (env->IsAssignableFrom(cls,env->GetObjectClass(jthis)) ==JNI_TRUE) << std::endl;
-  //        std::cout << "Test isInstanceOf=" << (env->IsInstanceOf(jthis,cls) ==JNI_TRUE) << std::endl;
-  //    
+  if(jthis == NULL) {
+      std::cerr << "Call of method toString of testpackage.Test with jthis == NULL." << std::endl;
+      return NULL;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
   if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::toString jthis=",jthis);
   jstring retVal=NULL;
   if (cls != NULL) {
@@ -1688,7 +1503,7 @@ namespace test {
         char *classPathEnv = getenv("CLASSPATH");
         char *jvmOptionsEnv = getenv("JVM_OPTIONS");
         std::string str;
-        str += "/home/shackle/Test/dist/Test.jar";
+        str += "src/test/resources/Test.jar";
         if (classPathEnv != NULL) {
             std::string classPathEnvStr(classPathEnv);
             if (debug_j4cpp) std::cout << "classPathEnv=" << classPathEnvStr << std::endl;

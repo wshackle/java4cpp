@@ -47,6 +47,7 @@ namespace crclj {
     ~DataThingType();
     jstring getName();
     void setName(jstring string_0);
+    void setName(const char * string_0string_0);
    }; // end class DataThingType
 
    
@@ -153,6 +154,7 @@ namespace crclj {
     ~DefaultMain();
     static void main(jobjectArray stringArray_0);
     static void main(int argc,const char **argv);
+    static void main(jobject * stringArray_0stringArray_0,jsize stringArray_0_length);
    }; // end class DefaultMain
 
    
@@ -206,6 +208,7 @@ namespace crclj {
     ~SimRobotEnum();
     static jobjectArray values();
     static SimRobotEnum valueOf(jstring string_0);
+    static SimRobotEnum valueOf(const char * string_0string_0);
    }; // end class SimRobotEnum
 
    
@@ -219,8 +222,10 @@ namespace crclj {
     ~PendantClientOuterStub();
     void finishConnect();
     void showMessage(jstring string_0);
+    void showMessage(const char * string_0string_0);
     void showMessage(::crclj::java::lang::Throwable  &throwable_0);
     jboolean showDebugMessage(jstring string_0);
+    jboolean showDebugMessage(const char * string_0string_0);
     jboolean validateXmlSelected();
     jboolean replaceStateSelected();
     void finishDisconnect();
@@ -254,48 +259,16 @@ namespace crclj {
            Component(const Component &);
            
     ~Component();
-    void transferFocusBackward();
-    void setEnabled(jboolean boolean_0);
-    jboolean isDoubleBuffered();
-    void enableInputMethods(jboolean boolean_0);
-    jboolean isForegroundSet();
-    jboolean isBackgroundSet();
-    jboolean isFontSet();
-    jint getBaseline(jint int_0,jint int_1);
-    void revalidate();
-    jboolean isCursorSet();
-    void setIgnoreRepaint(jboolean boolean_0);
-    jboolean getIgnoreRepaint();
-    jboolean inside(jint int_0,jint int_1);
-    jboolean isFocusTraversable();
-    void setFocusable(jboolean boolean_0);
-    void setFocusTraversalKeysEnabled(jboolean boolean_0);
-    jboolean getFocusTraversalKeysEnabled();
-    jboolean requestFocusInWindow();
-    void nextFocus();
-    void transferFocusUpCycle();
-    jboolean hasFocus();
     void validate();
     jboolean isValid();
-    void invalidate();
-    void repaint(jlong long_0,jint int_1,jint int_2,jint int_3,jint int_4);
-    void repaint(jint int_0,jint int_1,jint int_2,jint int_3);
-    void repaint();
-    void repaint(jlong long_0);
-    void firePropertyChange(jstring string_0,jbyte byte_1,jbyte byte_2);
-    void firePropertyChange(jstring string_0,jlong long_1,jlong long_2);
-    void firePropertyChange(jstring string_0,jdouble double_1,jdouble double_2);
-    void firePropertyChange(jstring string_0,jshort short_1,jshort short_2);
-    void firePropertyChange(jstring string_0,jchar char_1,jchar char_2);
-    void firePropertyChange(jstring string_0,jfloat float_1,jfloat float_2);
     void addNotify();
     void removeNotify();
     virtual ::crclj::java::lang::Object getTreeLock();
     jboolean isDisplayable();
     void setLocation(jint int_0,jint int_1);
     void reshape(jint int_0,jint int_1,jint int_2,jint int_3);
-    void show();
     void show(jboolean boolean_0);
+    void show();
     void hide();
     jboolean isFocusCycleRoot(Container  &container_0);
     Container getFocusCycleRootAncestor();
@@ -322,6 +295,44 @@ namespace crclj {
     jboolean isPreferredSizeSet();
     jboolean isMaximumSizeSet();
     void move(jint int_0,jint int_1);
+    void invalidate();
+    void repaint();
+    void repaint(jlong long_0);
+    void repaint(jint int_0,jint int_1,jint int_2,jint int_3);
+    void repaint(jlong long_0,jint int_1,jint int_2,jint int_3,jint int_4);
+    void firePropertyChange(jstring string_0,jlong long_1,jlong long_2);
+    void firePropertyChange(const char * string_0string_0,jlong long_1long_1,jlong long_2long_2);
+    void firePropertyChange(jstring string_0,jbyte byte_1,jbyte byte_2);
+    void firePropertyChange(const char * string_0string_0,jbyte byte_1byte_1,jbyte byte_2byte_2);
+    void firePropertyChange(jstring string_0,jchar char_1,jchar char_2);
+    void firePropertyChange(const char * string_0string_0,jchar char_1char_1,jchar char_2char_2);
+    void firePropertyChange(jstring string_0,jfloat float_1,jfloat float_2);
+    void firePropertyChange(const char * string_0string_0,jfloat float_1float_1,jfloat float_2float_2);
+    void firePropertyChange(jstring string_0,jshort short_1,jshort short_2);
+    void firePropertyChange(const char * string_0string_0,jshort short_1short_1,jshort short_2short_2);
+    void firePropertyChange(jstring string_0,jdouble double_1,jdouble double_2);
+    void firePropertyChange(const char * string_0string_0,jdouble double_1double_1,jdouble double_2double_2);
+    void transferFocusBackward();
+    void setEnabled(jboolean boolean_0);
+    jboolean isDoubleBuffered();
+    void enableInputMethods(jboolean boolean_0);
+    jboolean isForegroundSet();
+    jboolean isBackgroundSet();
+    jboolean isFontSet();
+    jint getBaseline(jint int_0,jint int_1);
+    void revalidate();
+    jboolean isCursorSet();
+    void setIgnoreRepaint(jboolean boolean_0);
+    jboolean getIgnoreRepaint();
+    jboolean inside(jint int_0,jint int_1);
+    jboolean isFocusTraversable();
+    void setFocusable(jboolean boolean_0);
+    void setFocusTraversalKeysEnabled(jboolean boolean_0);
+    jboolean getFocusTraversalKeysEnabled();
+    jboolean requestFocusInWindow();
+    void nextFocus();
+    void transferFocusUpCycle();
+    jboolean hasFocus();
     void layout();
     void setVisible(jboolean boolean_0);
     jstring toString();
@@ -329,9 +340,10 @@ namespace crclj {
     jboolean contains(jint int_0,jint int_1);
     Container getParent();
     void setName(jstring string_0);
-    void list(::crclj::java::io::PrintStream  &printStream_0,jint int_1);
-    void list(::crclj::java::io::PrintStream  &printStream_0);
+    void setName(const char * string_0string_0);
     void list();
+    void list(::crclj::java::io::PrintStream  &printStream_0);
+    void list(::crclj::java::io::PrintStream  &printStream_0,jint int_1);
     jboolean isOpaque();
     void setSize(jint int_0,jint int_1);
     void resize(jint int_0,jint int_1);
@@ -349,12 +361,11 @@ namespace crclj {
     Container();
     ~Container();
     void validate();
-    void invalidate();
     void addNotify();
     void removeNotify();
     void setFocusCycleRoot(jboolean boolean_0);
-    jboolean isFocusCycleRoot();
     jboolean isFocusCycleRoot(Container  &container_0);
+    jboolean isFocusCycleRoot();
     jboolean isValidateRoot();
     jint getComponentCount();
     Component getComponent(jint int_0);
@@ -374,10 +385,12 @@ namespace crclj {
     virtual void setFocusTraversalPolicyProvider(jboolean boolean_0);
     virtual jboolean isFocusTraversalPolicyProvider();
     void transferFocusDownCycle();
+    void invalidate();
     void layout();
     Component add(Component  &component_0);
     void add(Component  &component_0,::crclj::java::lang::Object  &object_1,jint int_2);
     Component add(jstring string_0,Component  &component_1);
+    Component add(const char * string_0string_0,Component  &component_1 &component_1);
     Component add(Component  &component_0,jint int_1);
     void add(Component  &component_0,::crclj::java::lang::Object  &object_1);
     void remove(Component  &component_0);
@@ -399,19 +412,6 @@ namespace crclj {
            
     JComponent();
     ~JComponent();
-    void setEnabled(jboolean boolean_0);
-    jboolean isDoubleBuffered();
-    jint getBaseline(jint int_0,jint int_1);
-    void revalidate();
-    jboolean requestFocusInWindow();
-    void updateUI();
-    jstring getUIClassID();
-    void setDoubleBuffered(jboolean boolean_0);
-    void repaint(jlong long_0,jint int_1,jint int_2,jint int_3,jint int_4);
-    void setOpaque(jboolean boolean_0);
-    void firePropertyChange(jstring string_0,jboolean boolean_1,jboolean boolean_2);
-    void firePropertyChange(jstring string_0,jchar char_1,jchar char_2);
-    void firePropertyChange(jstring string_0,jint int_1,jint int_2);
     void setInheritsPopupMenu(jboolean boolean_0);
     jboolean getInheritsPopupMenu();
     jboolean isPaintingTile();
@@ -431,6 +431,7 @@ namespace crclj {
     void resetKeyboardActions();
     jboolean requestDefaultFocus();
     void setToolTipText(jstring string_0);
+    void setToolTipText(const char * string_0string_0);
     jstring getToolTipText();
     void setAutoscrolls(jboolean boolean_0);
     jboolean getAutoscrolls();
@@ -447,12 +448,28 @@ namespace crclj {
     jboolean isValidateRoot();
     jint getX();
     jint getY();
-    jboolean requestFocus(jboolean boolean_0);
     void requestFocus();
+    jboolean requestFocus(jboolean boolean_0);
     jint getWidth();
     jint getHeight();
     jfloat getAlignmentX();
     jfloat getAlignmentY();
+    void repaint(jlong long_0,jint int_1,jint int_2,jint int_3,jint int_4);
+    void setOpaque(jboolean boolean_0);
+    void firePropertyChange(jstring string_0,jchar char_1,jchar char_2);
+    void firePropertyChange(const char * string_0string_0,jchar char_1char_1,jchar char_2char_2);
+    void firePropertyChange(jstring string_0,jint int_1,jint int_2);
+    void firePropertyChange(const char * string_0string_0,jint int_1int_1,jint int_2int_2);
+    void firePropertyChange(jstring string_0,jboolean boolean_1,jboolean boolean_2);
+    void firePropertyChange(const char * string_0string_0,jboolean boolean_1boolean_1,jboolean boolean_2boolean_2);
+    void setEnabled(jboolean boolean_0);
+    jboolean isDoubleBuffered();
+    jint getBaseline(jint int_0,jint int_1);
+    void revalidate();
+    jboolean requestFocusInWindow();
+    void updateUI();
+    jstring getUIClassID();
+    void setDoubleBuffered(jboolean boolean_0);
     void setVisible(jboolean boolean_0);
     jboolean contains(jint int_0,jint int_1);
     jboolean isOpaque();
@@ -466,8 +483,8 @@ namespace crclj {
            JPanel(jobject _jthis, bool copy);
            JPanel(const JPanel &);
            
-    JPanel(jboolean boolean_0);
     JPanel();
+    JPanel(jboolean boolean_0);
     ~JPanel();
     void updateUI();
     jstring getUIClassID();
@@ -490,7 +507,9 @@ namespace crclj {
     void setRobotType(SimRobotEnum  &simRobotEnum_0);
     jdoubleArray getJointvals();
     void setJointvals(jdoubleArray doubleArray_0);
+    void setJointvals(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length);
     void setSeglengths(jdoubleArray doubleArray_0);
+    void setSeglengths(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length);
    }; // end class OverHeadJPanel
   } // end namespace utils
 
@@ -514,9 +533,11 @@ namespace crclj {
            
     ~ForceUnitEnumType();
     static ForceUnitEnumType fromValue(jstring string_0);
+    static ForceUnitEnumType fromValue(const char * string_0string_0);
     jstring value();
     static jobjectArray values();
     static ForceUnitEnumType valueOf(jstring string_0);
+    static ForceUnitEnumType valueOf(const char * string_0string_0);
    }; // end class ForceUnitEnumType
 
    
@@ -529,8 +550,10 @@ namespace crclj {
     ~ParameterSettingType();
     jstring getParameterName();
     void setParameterName(jstring string_0);
+    void setParameterName(const char * string_0string_0);
     jstring getParameterValue();
     void setParameterValue(jstring string_0);
+    void setParameterValue(const char * string_0string_0);
    }; // end class ParameterSettingType
 
    
@@ -797,9 +820,11 @@ namespace crclj {
            
     ~CommandStateEnumType();
     static CommandStateEnumType fromValue(jstring string_0);
+    static CommandStateEnumType fromValue(const char * string_0string_0);
     jstring value();
     static jobjectArray values();
     static CommandStateEnumType valueOf(jstring string_0);
+    static CommandStateEnumType valueOf(const char * string_0string_0);
    }; // end class CommandStateEnumType
   } // end namespace base
 
@@ -845,6 +870,7 @@ namespace crclj {
     static ::crclj::rcs::posemath::PmRotationVector toPmRotationVector(::crclj::crcl::base::PoseType  &poseType_0);
     static ::crclj::rcs::posemath::PmRpy toPmRpy(::crclj::crcl::base::PoseType  &poseType_0);
     static jdouble maxDiffDoubleArray(jdoubleArray doubleArray_0,jdoubleArray doubleArray_1);
+    static jdouble maxDiffDoubleArray(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length,jdouble * doubleArray_1doubleArray_1,jsize doubleArray_1_length);
     static jdouble diffPosesRot(::crclj::crcl::base::PoseType  &poseType_0,::crclj::crcl::base::PoseType  &poseType_1);
     static ::crclj::crcl::base::PointType toPointType(::crclj::rcs::posemath::PmCartesian  &pmCartesian_0);
     static ::crclj::crcl::base::VectorType toCRCLVector(::crclj::org::apache::commons::math3::geometry::euclidean::threed::Vector3D  &vector3D_0);
@@ -863,12 +889,17 @@ namespace crclj {
     ~XpathUtils();
     jobjectArray getSchemaFiles();
     void setSchemaFiles(jobjectArray fileArray_0);
+    void setSchemaFiles(jobject * fileArray_0fileArray_0,jsize fileArray_0_length);
     jstring getDocumentation(jstring string_0);
+    jstring getDocumentation(const char * string_0string_0);
     virtual jstring nodeToString(::crclj::org::w3c::dom::Node  &node_0);
     jstring queryXml(::crclj::java::io::File  &file_0,jstring string_1);
+    jstring queryXml(::crclj::java::io::File  &file_0 &file_0,const char * string_1string_1);
     jstring queryXml(jobjectArray fileArray_0,jstring string_1);
+    jstring queryXml(jobject * fileArray_0fileArray_0,jsize fileArray_0_length,const char * string_1string_1);
     jstring nodeListToString(::crclj::org::w3c::dom::NodeList  &nodeList_0);
     jstring queryXmlString(jstring string_0,jstring string_1);
+    jstring queryXmlString(const char * string_0string_0,const char * string_1string_1);
    }; // end class XpathUtils
 
    
@@ -880,6 +911,7 @@ namespace crclj {
     ~ListChooserJPanel();
     ::crclj::java::lang::Object getSelectedChoice();
     static ::crclj::java::lang::Object Choose(::crclj::java::awt::Frame  &frame_0,jstring string_1,jobjectArray objectArray_2,::crclj::java::lang::Object  &object_3);
+    static ::crclj::java::lang::Object Choose(::crclj::java::awt::Frame  &frame_0 &frame_0,const char * string_1string_1,jobject * objectArray_2objectArray_2,jsize objectArray_2_length,::crclj::java::lang::Object  &object_3 &object_3);
    }; // end class ListChooserJPanel
   } // end namespace utils
  } // end namespace crcl
@@ -895,7 +927,6 @@ namespace crclj {
            
     Window(Frame  &frame_0);
     ~Window();
-    void dispose();
     void addNotify();
     void setOpacity(jfloat float_0);
     void removeNotify();
@@ -930,11 +961,13 @@ namespace crclj {
     jboolean isValidateRoot();
     jboolean isShowing();
     void applyResourceBundle(jstring string_0);
+    void applyResourceBundle(const char * string_0string_0);
     void setLocationRelativeTo(Component  &component_0);
     void createBufferStrategy(jint int_0);
     void setLocationByPlatform(jboolean boolean_0);
     jboolean isLocationByPlatform();
     void setBounds(jint int_0,jint int_1,jint int_2,jint int_3);
+    void dispose();
     void pack();
     void setVisible(jboolean boolean_0);
     jboolean isOpaque();
@@ -951,7 +984,6 @@ namespace crclj {
     Frame(jstring string_0);
     Frame();
     ~Frame();
-    void setUndecorated(jboolean boolean_0);
     void addNotify();
     jstring getTitle();
     jboolean isResizable();
@@ -965,7 +997,9 @@ namespace crclj {
     void setCursor(jint int_0);
     jint getCursorType();
     static jobjectArray getFrames();
+    void setUndecorated(jboolean boolean_0);
     void setTitle(jstring string_0);
+    void setTitle(const char * string_0string_0);
     jint getState();
    }; // end class Frame
   } // end namespace awt
@@ -1010,6 +1044,7 @@ namespace crclj {
     ~LauncherJFrame();
     static void main(jobjectArray stringArray_0);
     static void main(int argc,const char **argv);
+    static void main(jobject * stringArray_0stringArray_0,jsize stringArray_0_length);
    }; // end class LauncherJFrame
 
    
@@ -1023,10 +1058,14 @@ namespace crclj {
     jdouble getScale();
     void setScale(jdouble double_0);
     void setSeglengths(jdoubleArray doubleArray_0);
+    void setSeglengths(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length);
     ::crclj::crcl::base::PoseType jointsToPose(jdoubleArray doubleArray_0,::crclj::crcl::base::PoseType  &poseType_1);
+    ::crclj::crcl::base::PoseType jointsToPose(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length,::crclj::crcl::base::PoseType  &poseType_1 &poseType_1);
     ::crclj::crcl::base::PoseType jointsToPose(jdoubleArray doubleArray_0);
+    ::crclj::crcl::base::PoseType jointsToPose(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length);
     jdoubleArray getSeglengths();
     jdoubleArray poseToJoints(jdoubleArray doubleArray_0,::crclj::crcl::base::PoseType  &poseType_1);
+    jdoubleArray poseToJoints(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length,::crclj::crcl::base::PoseType  &poseType_1 &poseType_1);
    }; // end class SimulatedKinematicsPlausible
 
    
@@ -1042,6 +1081,7 @@ namespace crclj {
     void setDelayMillis(jint int_0);
     static void main(jobjectArray stringArray_0);
     static void main(int argc,const char **argv);
+    static void main(jobject * stringArray_0stringArray_0,jsize stringArray_0_length);
     jint getPort();
    }; // end class GripperJFrame
   } // end namespace utils
@@ -1078,6 +1118,7 @@ namespace crclj {
     MessageType();
     ~MessageType();
     void setMessage(jstring string_0);
+    void setMessage(const char * string_0string_0);
     jstring getMessage();
    }; // end class MessageType
 
@@ -1089,9 +1130,11 @@ namespace crclj {
            
     ~AngleUnitEnumType();
     static AngleUnitEnumType fromValue(jstring string_0);
+    static AngleUnitEnumType fromValue(const char * string_0string_0);
     jstring value();
     static jobjectArray values();
     static AngleUnitEnumType valueOf(jstring string_0);
+    static AngleUnitEnumType valueOf(const char * string_0string_0);
    }; // end class AngleUnitEnumType
 
    
@@ -1114,9 +1157,11 @@ namespace crclj {
            
     ~TorqueUnitEnumType();
     static TorqueUnitEnumType fromValue(jstring string_0);
+    static TorqueUnitEnumType fromValue(const char * string_0string_0);
     jstring value();
     static jobjectArray values();
     static TorqueUnitEnumType valueOf(jstring string_0);
+    static TorqueUnitEnumType valueOf(const char * string_0string_0);
    }; // end class TorqueUnitEnumType
 
    
@@ -1151,6 +1196,7 @@ namespace crclj {
     ~RunProgramType();
     jstring getProgramText();
     void setProgramText(jstring string_0);
+    void setProgramText(const char * string_0string_0);
    }; // end class RunProgramType
   } // end namespace base
 
@@ -1167,6 +1213,7 @@ namespace crclj {
     static void runPerfTest(jboolean boolean_0);
     static void main(jobjectArray stringArray_0);
     static void main(int argc,const char **argv);
+    static void main(jobject * stringArray_0stringArray_0,jsize stringArray_0_length);
    }; // end class PerfTest
   } // end namespace utils
 
@@ -1192,6 +1239,7 @@ namespace crclj {
     ~GripperStatusType();
     jstring getGripperName();
     void setGripperName(jstring string_0);
+    void setGripperName(const char * string_0string_0);
    }; // end class GripperStatusType
 
    
@@ -1243,7 +1291,9 @@ namespace crclj {
     SimServerOuterStub(jboolean boolean_0,jboolean boolean_1,jboolean boolean_2,jboolean boolean_3,jboolean boolean_4,jboolean boolean_5,jboolean boolean_6,jboolean boolean_7,jboolean boolean_8,jboolean boolean_9);
     ~SimServerOuterStub();
     void showMessage(jstring string_0);
+    void showMessage(const char * string_0string_0);
     void showDebugMessage(jstring string_0);
+    void showDebugMessage(const char * string_0string_0);
     jboolean isEXISelected();
     jboolean isSendStatusWithoutRequestSelected();
     void updateConnectedClients(jint int_0);
@@ -1256,7 +1306,9 @@ namespace crclj {
     void updatePanels(jboolean boolean_0);
     void updateIsInitialized(jboolean boolean_0);
     void updateCurrentCommandType(jstring string_0);
+    void updateCurrentCommandType(const char * string_0string_0);
     void updateEndEffector(jstring string_0);
+    void updateEndEffector(const char * string_0string_0);
     void updateToolChangerIsOpen(jboolean boolean_0);
     jboolean isInitializedSelected();
     void finishSetCurrentWaypoint(jint int_0);
@@ -1277,7 +1329,9 @@ namespace crclj {
     SimServerOuter();
     ~SimServerOuter();
     void showMessage(jstring string_0);
+    void showMessage(const char * string_0string_0);
     void showDebugMessage(jstring string_0);
+    void showDebugMessage(const char * string_0string_0);
     jboolean isEXISelected();
     jboolean isSendStatusWithoutRequestSelected();
     void updateConnectedClients(jint int_0);
@@ -1290,7 +1344,9 @@ namespace crclj {
     void updatePanels(jboolean boolean_0);
     void updateIsInitialized(jboolean boolean_0);
     void updateCurrentCommandType(jstring string_0);
+    void updateCurrentCommandType(const char * string_0string_0);
     void updateEndEffector(jstring string_0);
+    void updateEndEffector(const char * string_0string_0);
     void updateToolChangerIsOpen(jboolean boolean_0);
     jboolean isInitializedSelected();
     void finishSetCurrentWaypoint(jint int_0);
@@ -1310,8 +1366,11 @@ namespace crclj {
            
     SimServerInner(SimServerOuter  &simServerOuter_0);
     ~SimServerInner();
+    ::crclj::crcl::base::CRCLStatusType getStatus();
     void setCmdSchema(jobjectArray fileArray_0);
+    void setCmdSchema(jobject * fileArray_0fileArray_0,jsize fileArray_0_length);
     void setStatSchema(jobjectArray fileArray_0);
+    void setStatSchema(jobject * fileArray_0fileArray_0,jsize fileArray_0_length);
     SimRobotEnum getRobotType();
     void setRobotType(SimRobotEnum  &simRobotEnum_0);
     ::crclj::crcl::base::CommandStateEnumType getCommandState();
@@ -1324,7 +1383,6 @@ namespace crclj {
     jlong getDelayMillis();
     void setDelayMillis(jlong long_0);
     void restartServer();
-    ::crclj::crcl::base::CRCLStatusType getStatus();
     void updateConnectedClients();
     XpathUtils getXpu();
     void simulatedTeleportToPose(::crclj::crcl::base::PoseType  &poseType_0);
@@ -1385,10 +1443,14 @@ namespace crclj {
            
     MultiLineStringJPanel();
     ~MultiLineStringJPanel();
-    static jboolean showText(jstring string_0);
-    static jboolean showText(jstring string_0,::crclj::java::awt::Frame  &frame_1,jstring string_2,jboolean boolean_3);
     static jstring editText(jstring string_0);
+    static jstring editText(const char * string_0string_0);
     static jstring editText(jstring string_0,::crclj::java::awt::Frame  &frame_1,jstring string_2,jboolean boolean_3);
+    static jstring editText(const char * string_0string_0,::crclj::java::awt::Frame  &frame_1 &frame_1,const char * string_2string_2,jboolean boolean_3boolean_3);
+    static jboolean showText(jstring string_0);
+    static jboolean showText(const char * string_0string_0);
+    static jboolean showText(jstring string_0,::crclj::java::awt::Frame  &frame_1,jstring string_2,jboolean boolean_3);
+    static jboolean showText(const char * string_0string_0,::crclj::java::awt::Frame  &frame_1 &frame_1,const char * string_2string_2,jboolean boolean_3boolean_3);
    }; // end class MultiLineStringJPanel
 
    
@@ -1403,8 +1465,10 @@ namespace crclj {
     void setObj(::crclj::java::lang::Object  &object_0);
     static ::crclj::java::lang::Object editObject(::crclj::java::lang::Object  &object_0,XpathUtils  &xpathUtils_1,::crclj::java::util::function::Predicate  &predicate_2);
     static ::crclj::java::lang::Object editObject(::crclj::java::lang::Object  &object_0,::crclj::java::awt::Frame  &frame_1,jstring string_2,jboolean boolean_3,XpathUtils  &xpathUtils_4,::crclj::java::util::function::Predicate  &predicate_5);
+    static ::crclj::java::lang::Object editObject(::crclj::java::lang::Object  &object_0 &object_0,::crclj::java::awt::Frame  &frame_1 &frame_1,const char * string_2string_2,jboolean boolean_3boolean_3,XpathUtils  &xpathUtils_4 &xpathUtils_4,::crclj::java::util::function::Predicate  &predicate_5 &predicate_5);
     static void main(jobjectArray stringArray_0);
     static void main(int argc,const char **argv);
+    static void main(jobject * stringArray_0stringArray_0,jsize stringArray_0_length);
     static ::crclj::java::util::List getClasses();
    }; // end class ObjTableJPanel
   } // end namespace utils
@@ -1677,9 +1741,11 @@ namespace crclj {
            
     ~LengthUnitEnumType();
     static LengthUnitEnumType fromValue(jstring string_0);
+    static LengthUnitEnumType fromValue(const char * string_0string_0);
     jstring value();
     static jobjectArray values();
     static LengthUnitEnumType valueOf(jstring string_0);
+    static LengthUnitEnumType valueOf(const char * string_0string_0);
    }; // end class LengthUnitEnumType
 
    
@@ -1728,8 +1794,10 @@ namespace crclj {
     ~PendantClientOuter();
     void finishConnect();
     void showMessage(jstring string_0);
+    void showMessage(const char * string_0string_0);
     void showMessage(::crclj::java::lang::Throwable  &throwable_0);
     jboolean showDebugMessage(jstring string_0);
+    jboolean showDebugMessage(const char * string_0string_0);
     jboolean validateXmlSelected();
     jboolean replaceStateSelected();
     void finishDisconnect();
@@ -1763,7 +1831,9 @@ namespace crclj {
     void setRobotType(SimRobotEnum  &simRobotEnum_0);
     jdoubleArray getJointvals();
     void setJointvals(jdoubleArray doubleArray_0);
+    void setJointvals(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length);
     void setSeglengths(jdoubleArray doubleArray_0);
+    void setSeglengths(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length);
     jdoubleArray getSeglengths();
    }; // end class SideViewJPanel
 
@@ -1778,10 +1848,14 @@ namespace crclj {
     jdouble getScale();
     void setScale(jdouble double_0);
     void setSeglengths(jdoubleArray doubleArray_0);
+    void setSeglengths(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length);
     ::crclj::crcl::base::PoseType jointsToPose(jdoubleArray doubleArray_0,::crclj::crcl::base::PoseType  &poseType_1);
+    ::crclj::crcl::base::PoseType jointsToPose(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length,::crclj::crcl::base::PoseType  &poseType_1 &poseType_1);
     ::crclj::crcl::base::PoseType jointsToPose(jdoubleArray doubleArray_0);
+    ::crclj::crcl::base::PoseType jointsToPose(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length);
     jdoubleArray getSeglengths();
     jdoubleArray poseToJoints(jdoubleArray doubleArray_0,::crclj::crcl::base::PoseType  &poseType_1);
+    jdoubleArray poseToJoints(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length,::crclj::crcl::base::PoseType  &poseType_1 &poseType_1);
    }; // end class SimulatedKinematicsSimple
 
    
@@ -1793,11 +1867,16 @@ namespace crclj {
     XpathQueryJFrame();
     ~XpathQueryJFrame();
     void setQuery(jstring string_0);
-    jstring runQuery(jstring string_0,jstring string_1);
+    void setQuery(const char * string_0string_0);
     void setResult(jstring string_0);
+    void setResult(const char * string_0string_0);
     void Message(jstring string_0);
+    void Message(const char * string_0string_0);
+    jstring runQuery(jstring string_0,jstring string_1);
+    jstring runQuery(const char * string_0string_0,const char * string_1string_1);
     static void main(jobjectArray stringArray_0);
     static void main(int argc,const char **argv);
+    static void main(jobject * stringArray_0stringArray_0,jsize stringArray_0_length);
     jstring getQuery();
     jstring getResult();
    }; // end class XpathQueryJFrame
@@ -1867,9 +1946,11 @@ namespace crclj {
            
     ~StopConditionEnumType();
     static StopConditionEnumType fromValue(jstring string_0);
+    static StopConditionEnumType fromValue(const char * string_0string_0);
     jstring value();
     static jobjectArray values();
     static StopConditionEnumType valueOf(jstring string_0);
+    static StopConditionEnumType valueOf(const char * string_0string_0);
    }; // end class StopConditionEnumType
   } // end namespace base
 
@@ -1885,6 +1966,7 @@ namespace crclj {
     ~TestInstance();
     static void main(jobjectArray stringArray_0);
     static void main(int argc,const char **argv);
+    static void main(jobject * stringArray_0stringArray_0,jsize stringArray_0_length);
    }; // end class TestInstance
 
    
@@ -1895,9 +1977,11 @@ namespace crclj {
            
     SimServer();
     ~SimServer();
-    void showMessage(::crclj::java::lang::Throwable  &throwable_0);
     void showMessage(jstring string_0);
+    void showMessage(const char * string_0string_0);
+    void showMessage(::crclj::java::lang::Throwable  &throwable_0);
     void showDebugMessage(jstring string_0);
+    void showDebugMessage(const char * string_0string_0);
     jboolean isEXISelected();
     ::crclj::crcl::base::CommandStateEnumType getCommandState();
     void setCommandState(::crclj::crcl::base::CommandStateEnumType  &commandStateEnumType_0);
@@ -1915,19 +1999,22 @@ namespace crclj {
     void updatePanels(jboolean boolean_0);
     void updateIsInitialized(jboolean boolean_0);
     void updateCurrentCommandType(jstring string_0);
+    void updateCurrentCommandType(const char * string_0string_0);
     void updateEndEffector(jstring string_0);
+    void updateEndEffector(const char * string_0string_0);
     void updateToolChangerIsOpen(jboolean boolean_0);
     jboolean isInitializedSelected();
     void finishSetCurrentWaypoint(jint int_0);
     void updateLengthUnit(::crclj::crcl::base::LengthUnitEnumType  &lengthUnitEnumType_0);
-    jboolean checkPose(::crclj::crcl::base::PoseType  &poseType_0);
     void updateNumWaypoints(jint int_0);
     jboolean isDebugMoveDoneSelected();
     jboolean isDebugSendStatusSelected();
     jboolean isDebugReadCommandSelected();
     jboolean isReplaceXmlHeaderSelected();
+    jboolean checkPose(::crclj::crcl::base::PoseType  &poseType_0);
     static void main(jobjectArray stringArray_0);
     static void main(int argc,const char **argv);
+    static void main(jobject * stringArray_0stringArray_0,jsize stringArray_0_length);
    }; // end class SimServer
 
    
@@ -1940,6 +2027,7 @@ namespace crclj {
     ~CmdLineSimServer();
     static void main(jobjectArray stringArray_0);
     static void main(int argc,const char **argv);
+    static void main(jobject * stringArray_0stringArray_0,jsize stringArray_0_length);
    }; // end class CmdLineSimServer
   } // end namespace utils
  } // end namespace crcl
@@ -1978,11 +2066,11 @@ namespace crclj {
     AnnotatedPose(jlong long_0,::crclj::java::math::BigInteger  &bigInteger_1,jstring string_2,::crclj::rcs::posemath::PmCartesian  &pmCartesian_3,::crclj::rcs::posemath::PmQuaternion  &pmQuaternion_4,::crclj::crcl::base::CRCLStatusType  &cRCLStatusType_5);
     ~AnnotatedPose();
     jlong getTime();
+    ::crclj::crcl::base::CRCLStatusType getStatus();
     ::crclj::java::math::BigInteger getCmdId();
     jstring getCommandName();
     ::crclj::rcs::posemath::PmCartesian getTran();
     ::crclj::rcs::posemath::PmQuaternion getRot();
-    ::crclj::crcl::base::CRCLStatusType getStatus();
    }; // end class AnnotatedPose
 
    
@@ -2012,11 +2100,15 @@ namespace crclj {
     void setStatSchema(::crclj::javax::xml::validation::Schema  &schema_0);
     jstring getReadInProgressString();
     jstring readUntilEndTag(jstring string_0,::crclj::java::io::InputStream  &inputStream_1);
+    jstring readUntilEndTag(const char * string_0string_0,::crclj::java::io::InputStream  &inputStream_1 &inputStream_1);
     ::crclj::crcl::base::CRCLCommandInstanceType stringToCommand(jstring string_0,jboolean boolean_1);
+    ::crclj::crcl::base::CRCLCommandInstanceType stringToCommand(const char * string_0string_0,jboolean boolean_1boolean_1);
     ::crclj::crcl::base::CRCLCommandInstanceType readCommandFromStream(::crclj::java::io::InputStream  &inputStream_0,jboolean boolean_1);
     ::crclj::crcl::base::CRCLProgramType stringToProgram(jstring string_0,jboolean boolean_1);
+    ::crclj::crcl::base::CRCLProgramType stringToProgram(const char * string_0string_0,jboolean boolean_1boolean_1);
     ::crclj::crcl::base::CRCLCommandInstanceType readCommand(jboolean boolean_0);
     ::crclj::crcl::base::CRCLStatusType stringToStatus(jstring string_0,jboolean boolean_1);
+    ::crclj::crcl::base::CRCLStatusType stringToStatus(const char * string_0string_0,jboolean boolean_1boolean_1);
     ::crclj::crcl::base::CRCLStatusType readStatusFromStream(::crclj::java::io::InputStream  &inputStream_0,jboolean boolean_1);
     jboolean isEXIEnabled();
     jboolean isPrefixEXISizeEnabled();
@@ -2028,7 +2120,9 @@ namespace crclj {
     void writeEXIStatusToStream(::crclj::java::io::OutputStream  &outputStream_0,::crclj::crcl::base::CRCLStatusType  &cRCLStatusType_1);
     void writeEXICommandToStream(::crclj::java::io::OutputStream  &outputStream_0,::crclj::crcl::base::CRCLCommandInstanceType  &cRCLCommandInstanceType_1);
     ::crclj::crcl::base::CRCLStatusType exiToStatus(jbyteArray byteArray_0);
+    ::crclj::crcl::base::CRCLStatusType exiToStatus(jbyte * byteArray_0byteArray_0,jsize byteArray_0_length);
     ::crclj::crcl::base::CRCLCommandInstanceType exiToCommand(jbyteArray byteArray_0);
+    ::crclj::crcl::base::CRCLCommandInstanceType exiToCommand(jbyte * byteArray_0byteArray_0,jsize byteArray_0_length);
     ::crclj::crcl::base::CRCLStatusType readStatusFromEXIStream(::crclj::java::io::InputStream  &inputStream_0);
     ::crclj::crcl::base::CRCLStatusType readStatusFromSaxSource(::crclj::javax::xml::transform::sax::SAXSource  &sAXSource_0);
     ::crclj::crcl::base::CRCLCommandInstanceType readCommandFromEXIStream(::crclj::java::io::InputStream  &inputStream_0);
@@ -2042,6 +2136,7 @@ namespace crclj {
     jstring programToPrettyDocString(::crclj::crcl::base::CRCLProgramType  &cRCLProgramType_0,jboolean boolean_1);
     void writeCommand(::crclj::crcl::base::CRCLCommandInstanceType  &cRCLCommandInstanceType_0,jboolean boolean_1);
     void writeWithFill(jstring string_0);
+    void writeWithFill(const char * string_0string_0);
     void writeProgram(::crclj::crcl::base::CRCLProgramType  &cRCLProgramType_0,jboolean boolean_1);
     jboolean isReplaceHeader();
     void setReplaceHeader(jboolean boolean_0);
@@ -2049,18 +2144,25 @@ namespace crclj {
     jstring statusToPrettyString(::crclj::crcl::base::CRCLStatusType  &cRCLStatusType_0,jboolean boolean_1);
     static jobjectArray findSchemaFiles();
     static jobjectArray reorderStatSchemaFiles(jobjectArray fileArray_0);
+    static jobjectArray reorderStatSchemaFiles(jobject * fileArray_0fileArray_0,jsize fileArray_0_length);
     static ::crclj::java::util::List reorderStatSchemaFiles(::crclj::java::util::List  &list_0);
     static ::crclj::javax::xml::validation::Schema filesToSchema(jobjectArray fileArray_0);
+    static ::crclj::javax::xml::validation::Schema filesToSchema(jobject * fileArray_0fileArray_0,jsize fileArray_0_length);
     static jobjectArray readStatSchemaFiles(::crclj::java::io::File  &file_0);
     static void saveProgramSchemaFiles(::crclj::java::io::File  &file_0,jobjectArray fileArray_1);
+    static void saveProgramSchemaFiles(::crclj::java::io::File  &file_0 &file_0,jobject * fileArray_1fileArray_1,jsize fileArray_1_length);
     static void saveStatSchemaFiles(::crclj::java::io::File  &file_0,jobjectArray fileArray_1);
+    static void saveStatSchemaFiles(::crclj::java::io::File  &file_0 &file_0,jobject * fileArray_1fileArray_1,jsize fileArray_1_length);
     static jobjectArray reorderCommandSchemaFiles(jobjectArray fileArray_0);
+    static jobjectArray reorderCommandSchemaFiles(jobject * fileArray_0fileArray_0,jsize fileArray_0_length);
     static ::crclj::java::util::List reorderCommandSchemaFiles(::crclj::java::util::List  &list_0);
     static ::crclj::java::util::List reorderProgramSchemaFiles(::crclj::java::util::List  &list_0);
     static jobjectArray reorderProgramSchemaFiles(jobjectArray fileArray_0);
+    static jobjectArray reorderProgramSchemaFiles(jobject * fileArray_0fileArray_0,jsize fileArray_0_length);
     static jobjectArray readCmdSchemaFiles(::crclj::java::io::File  &file_0);
     static jobjectArray readProgramSchemaFiles(::crclj::java::io::File  &file_0);
     static void saveCmdSchemaFiles(::crclj::java::io::File  &file_0,jobjectArray fileArray_1);
+    static void saveCmdSchemaFiles(::crclj::java::io::File  &file_0 &file_0,jobject * fileArray_1fileArray_1,jsize fileArray_1_length);
     void writeStatus(::crclj::crcl::base::CRCLStatusType  &cRCLStatusType_0,jboolean boolean_1);
     void close();
     jint available();
@@ -2116,16 +2218,13 @@ namespace crclj {
     PendantClient(jstring string_0);
     PendantClient();
     ~PendantClient();
-    void openXmlProgramFile(::crclj::java::io::File  &file_0);
-    void saveXmlProgramFile(::crclj::java::io::File  &file_0);
-    jdouble getRpyJogIncrement();
-    void setRpyJogIncrement(jdouble double_0);
-    void showProgram(::crclj::crcl::base::CRCLProgramType  &cRCLProgramType_0);
     jboolean isConnected();
     void finishConnect();
     void showMessage(jstring string_0);
+    void showMessage(const char * string_0string_0);
     void showMessage(::crclj::java::lang::Throwable  &throwable_0);
     jboolean showDebugMessage(jstring string_0);
+    jboolean showDebugMessage(const char * string_0string_0);
     jboolean validateXmlSelected();
     jboolean replaceStateSelected();
     void finishDisconnect();
@@ -2143,10 +2242,17 @@ namespace crclj {
     jboolean isRecordPoseSelected();
     jboolean isEXISelected();
     jboolean isUseReadStatusThreadSelected();
+    void openXmlProgramFile(::crclj::java::io::File  &file_0);
+    void saveXmlProgramFile(::crclj::java::io::File  &file_0);
+    jdouble getRpyJogIncrement();
+    void setRpyJogIncrement(jdouble double_0);
+    void showProgram(::crclj::crcl::base::CRCLProgramType  &cRCLProgramType_0);
     void setStatus(::crclj::crcl::base::CRCLStatusType  &cRCLStatusType_0);
     static void main(jobjectArray stringArray_0);
     static void main(int argc,const char **argv);
+    static void main(jobject * stringArray_0stringArray_0,jsize stringArray_0_length);
     void connect(jstring string_0,jint int_1);
+    void connect(const char * string_0string_0,jint int_1int_1);
     jstring getHost();
     jint getPort();
    }; // end class PendantClient
@@ -2161,6 +2267,7 @@ namespace crclj {
     ~CmdLineClient();
     static void main(jobjectArray stringArray_0);
     static void main(int argc,const char **argv);
+    static void main(jobject * stringArray_0stringArray_0,jsize stringArray_0_length);
    }; // end class CmdLineClient
 
    
@@ -2173,6 +2280,7 @@ namespace crclj {
     ~CRCLSocketExample();
     static void main(jobjectArray stringArray_0);
     static void main(int argc,const char **argv);
+    static void main(jobject * stringArray_0stringArray_0,jsize stringArray_0_length);
    }; // end class CRCLSocketExample
 
    
@@ -2183,6 +2291,20 @@ namespace crclj {
            
     PendantClientInner(PendantClientOuter  &pendantClientOuter_0);
     ~PendantClientInner();
+    void abort();
+    void disconnect();
+    jboolean isConnected();
+    ::crclj::crcl::base::CRCLStatusType getStatus();
+    ::crclj::java::math::BigInteger getCmdId();
+    void setProgramSchema(jobjectArray fileArray_0);
+    void setProgramSchema(jobject * fileArray_0fileArray_0,jsize fileArray_0_length);
+    void setCmdSchema(jobjectArray fileArray_0);
+    void setCmdSchema(jobject * fileArray_0fileArray_0,jsize fileArray_0_length);
+    void setStatSchema(jobjectArray fileArray_0);
+    void setStatSchema(jobject * fileArray_0fileArray_0,jsize fileArray_0_length);
+    static ::crclj::java::util::Optional getJointStatus(::crclj::crcl::base::CRCLStatusType  &cRCLStatusType_0,::crclj::java::math::BigInteger  &bigInteger_1);
+    void readStatus();
+    ::crclj::java::math::BigDecimal getJointPosition(::crclj::java::math::BigInteger  &bigInteger_0);
     void closeTestProgramThread();
     jboolean requestStatus();
     jboolean checkProgramValid(::crclj::crcl::base::CRCLProgramType  &cRCLProgramType_0);
@@ -2223,21 +2345,11 @@ namespace crclj {
     void unpause();
     ::crclj::crcl::base::CRCLProgramType getProgram();
     void savePoseListToCsvFile(jstring string_0);
+    void savePoseListToCsvFile(const char * string_0string_0);
     ::crclj::java::util::List getPoseList();
     void startStatusReaderThread();
     void stopStatusReaderThread();
-    void abort();
-    void disconnect();
-    jboolean isConnected();
-    void setProgramSchema(jobjectArray fileArray_0);
-    void setCmdSchema(jobjectArray fileArray_0);
-    void setStatSchema(jobjectArray fileArray_0);
-    static ::crclj::java::util::Optional getJointStatus(::crclj::crcl::base::CRCLStatusType  &cRCLStatusType_0,::crclj::java::math::BigInteger  &bigInteger_1);
-    void readStatus();
-    ::crclj::java::math::BigDecimal getJointPosition(::crclj::java::math::BigInteger  &bigInteger_0);
     void pause();
-    ::crclj::java::math::BigInteger getCmdId();
-    ::crclj::crcl::base::CRCLStatusType getStatus();
     jboolean isDone(::crclj::java::math::BigInteger  &bigInteger_0);
     XpathUtils getXpu();
     void setStatus(::crclj::crcl::base::CRCLStatusType  &cRCLStatusType_0);
@@ -2248,6 +2360,7 @@ namespace crclj {
     ::crclj::crcl::base::PoseToleranceType getExpectedIntermediatePoseTolerance();
     void setExpectedIntermediatePoseTolerance(::crclj::crcl::base::PoseToleranceType  &poseToleranceType_0);
     void connect(jstring string_0,jint int_1);
+    void connect(const char * string_0string_0,jint int_1int_1);
    }; // end class PendantClientInner
   } // end namespace utils
  } // end namespace crcl
@@ -2364,6 +2477,7 @@ namespace crclj {
     List subList(jint int_0,jint int_1);
     jobjectArray toArray();
     jobjectArray toArray(jobjectArray objectArray_0);
+    jobjectArray toArray(jobject * objectArray_0objectArray_0,jsize objectArray_0_length);
     jboolean addAll(Collection  &collection_0);
     jboolean addAll(jint int_0,Collection  &collection_1);
     ::crclj::java::lang::Object set(jint int_0,::crclj::java::lang::Object  &object_1);
@@ -2453,7 +2567,9 @@ namespace crclj {
     jlong getFreeSpace();
     jlong getUsableSpace();
     static File createTempFile(jstring string_0,jstring string_1);
+    static File createTempFile(const char * string_0string_0,const char * string_1string_1);
     static File createTempFile(jstring string_0,jstring string_1,File  &file_2);
+    static File createTempFile(const char * string_0string_0,const char * string_1string_1,File  &file_2 &file_2);
    }; // end class File
   } // end namespace io
  } // end namespace java
@@ -2502,11 +2618,11 @@ namespace crclj {
          Vector3D(jdouble double_0,Vector3D  &vector3D_1,jdouble double_2,Vector3D  &vector3D_3,jdouble double_4,Vector3D  &vector3D_5);
          Vector3D(jdouble double_0,Vector3D  &vector3D_1,jdouble double_2,Vector3D  &vector3D_3,jdouble double_4,Vector3D  &vector3D_5,jdouble double_6,Vector3D  &vector3D_7);
          ~Vector3D();
-         static jdouble distanceSq(Vector3D  &vector3D_0,Vector3D  &vector3D_1);
-         static jdouble distance(Vector3D  &vector3D_0,Vector3D  &vector3D_1);
          jdouble getAlpha();
          jdouble getX();
          jdouble getY();
+         static jdouble distanceSq(Vector3D  &vector3D_0,Vector3D  &vector3D_1);
+         static jdouble distance(Vector3D  &vector3D_0,Vector3D  &vector3D_1);
          static jdouble angle(Vector3D  &vector3D_0,Vector3D  &vector3D_1);
          jdouble getZ();
          Vector3D negate();
@@ -2542,8 +2658,8 @@ namespace crclj {
          Rotation(jdouble double_0,jdouble double_1,jdouble double_2,jdouble double_3,jboolean boolean_4);
          Rotation(Vector3D  &vector3D_0,Vector3D  &vector3D_1);
          ~Rotation();
-         static jdouble distance(Rotation  &rotation_0,Rotation  &rotation_1);
          Vector3D getAxis();
+         static jdouble distance(Rotation  &rotation_0,Rotation  &rotation_1);
          jdouble getAngle();
          Rotation revert();
          jdouble getQ0();
@@ -2551,9 +2667,11 @@ namespace crclj {
          jdouble getQ2();
          jdouble getQ3();
          void applyTo(jdoubleArray doubleArray_0,jdoubleArray doubleArray_1);
+         void applyTo(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length,jdouble * doubleArray_1doubleArray_1,jsize doubleArray_1_length);
          Rotation applyTo(Rotation  &rotation_0);
          Vector3D applyTo(Vector3D  &vector3D_0);
          void applyInverseTo(jdoubleArray doubleArray_0,jdoubleArray doubleArray_1);
+         void applyInverseTo(jdouble * doubleArray_0doubleArray_0,jsize doubleArray_0_length,jdouble * doubleArray_1doubleArray_1,jsize doubleArray_1_length);
          Vector3D applyInverseTo(Vector3D  &vector3D_0);
          Rotation applyInverseTo(Rotation  &rotation_0);
         }; // end class Rotation
@@ -2576,16 +2694,16 @@ namespace crclj {
             Point2D(const Point2D &);
             
      ~Point2D();
-     jdouble distanceSq(Point2D  &point2D_0);
-     static jdouble distanceSq(jdouble double_0,jdouble double_1,jdouble double_2,jdouble double_3);
-     jdouble distanceSq(jdouble double_0,jdouble double_1);
-     jdouble distance(Point2D  &point2D_0);
-     jdouble distance(jdouble double_0,jdouble double_1);
-     static jdouble distance(jdouble double_0,jdouble double_1,jdouble double_2,jdouble double_3);
      void setLocation(Point2D  &point2D_0);
      void setLocation(jdouble double_0,jdouble double_1);
      jdouble getX();
      jdouble getY();
+     static jdouble distanceSq(jdouble double_0,jdouble double_1,jdouble double_2,jdouble double_3);
+     jdouble distanceSq(Point2D  &point2D_0);
+     jdouble distanceSq(jdouble double_0,jdouble double_1);
+     jdouble distance(jdouble double_0,jdouble double_1);
+     static jdouble distance(jdouble double_0,jdouble double_1,jdouble double_2,jdouble double_3);
+     jdouble distance(Point2D  &point2D_0);
      jboolean equals(::crclj::java::lang::Object  &object_0);
      jint hashCode();
      ::crclj::java::lang::Object clone();
@@ -2636,6 +2754,7 @@ namespace crclj {
     jstring toString();
     PmCartesian clone();
     static PmCartesian valueOf(jstring string_0);
+    static PmCartesian valueOf(const char * string_0string_0);
    }; // end class PmCartesian
 
    
@@ -2707,6 +2826,7 @@ namespace crclj {
      jstring getNodeName();
      jstring getNodeValue();
      void setNodeValue(jstring string_0);
+     void setNodeValue(const char * string_0string_0);
      jshort getNodeType();
      Node getParentNode();
      NodeList getChildNodes();
@@ -2721,23 +2841,31 @@ namespace crclj {
      jboolean hasChildNodes();
      Node cloneNode(jboolean boolean_0);
      void setPrefix(jstring string_0);
+     void setPrefix(const char * string_0string_0);
      jboolean hasAttributes();
      jstring getBaseURI();
      jshort compareDocumentPosition(Node  &node_0);
      jstring getTextContent();
      void setTextContent(jstring string_0);
+     void setTextContent(const char * string_0string_0);
      jboolean isSameNode(Node  &node_0);
      jstring lookupPrefix(jstring string_0);
+     jstring lookupPrefix(const char * string_0string_0);
      jboolean isDefaultNamespace(jstring string_0);
+     jboolean isDefaultNamespace(const char * string_0string_0);
      jstring lookupNamespaceURI(jstring string_0);
+     jstring lookupNamespaceURI(const char * string_0string_0);
      jboolean isEqualNode(Node  &node_0);
      ::crclj::java::lang::Object getFeature(jstring string_0,jstring string_1);
+     ::crclj::java::lang::Object getFeature(const char * string_0string_0,const char * string_1string_1);
      ::crclj::java::lang::Object getUserData(jstring string_0);
+     ::crclj::java::lang::Object getUserData(const char * string_0string_0);
      jstring getPrefix();
      jstring getNamespaceURI();
      jstring getLocalName();
      void normalize();
      jboolean isSupported(jstring string_0,jstring string_1);
+     jboolean isSupported(const char * string_0string_0,const char * string_1string_1);
     }; // end class Node
 
     
@@ -2767,31 +2895,31 @@ namespace crclj {
             
      XMLGregorianCalendar();
      ~XMLGregorianCalendar();
-     void setTime(jint int_0,jint int_1,jint int_2);
      void setTime(jint int_0,jint int_1,jint int_2,::crclj::java::math::BigDecimal  &bigDecimal_3);
+     void setTime(jint int_0,jint int_1,jint int_2);
      void setTime(jint int_0,jint int_1,jint int_2,jint int_3);
      jint getYear();
      jint getMonth();
-     void setYear(::crclj::java::math::BigInteger  &bigInteger_0);
      void setYear(jint int_0);
+     void setYear(::crclj::java::math::BigInteger  &bigInteger_0);
      void setMonth(jint int_0);
      jint getDay();
      jboolean isValid();
      jint getSecond();
      void setFractionalSecond(::crclj::java::math::BigDecimal  &bigDecimal_0);
+     void setMinute(jint int_0);
+     void setSecond(jint int_0);
+     jstring toXMLFormat();
+     void setMillisecond(jint int_0);
+     ::crclj::java::math::BigInteger getEon();
      ::crclj::java::math::BigInteger getEonAndYear();
      jint getTimezone();
-     ::crclj::java::math::BigInteger getEon();
      jint getHour();
      jint getMinute();
      jint getMillisecond();
      ::crclj::java::math::BigDecimal getFractionalSecond();
-     jstring toXMLFormat();
      void setDay(jint int_0);
      void setHour(jint int_0);
-     void setMinute(jint int_0);
-     void setSecond(jint int_0);
-     void setMillisecond(jint int_0);
      void setTimezone(jint int_0);
      jboolean equals(::crclj::java::lang::Object  &object_0);
      jstring toString();
@@ -2818,7 +2946,9 @@ namespace crclj {
     OutputStream();
     ~OutputStream();
     void write(jbyteArray byteArray_0,jint int_1,jint int_2);
+    void write(jbyte * byteArray_0byteArray_0,jsize byteArray_0_length,jint int_1int_1,jint int_2int_2);
     void write(jbyteArray byteArray_0);
+    void write(jbyte * byteArray_0byteArray_0,jsize byteArray_0_length);
     void write(jint int_0);
     void flush();
     void close();
@@ -2833,7 +2963,9 @@ namespace crclj {
     FilterOutputStream(OutputStream  &outputStream_0);
     ~FilterOutputStream();
     void write(jbyteArray byteArray_0,jint int_1,jint int_2);
+    void write(jbyte * byteArray_0byteArray_0,jsize byteArray_0_length,jint int_1int_1,jint int_2int_2);
     void write(jbyteArray byteArray_0);
+    void write(jbyte * byteArray_0byteArray_0,jsize byteArray_0_length);
     void write(jint int_0);
     void flush();
     void close();
@@ -2858,28 +2990,35 @@ namespace crclj {
     void println(jlong long_0);
     void println(::crclj::java::lang::Object  &object_0);
     void println(jstring string_0);
+    void println(const char * string_0string_0);
     void println(jcharArray charArray_0);
+    void println(jchar * charArray_0charArray_0,jsize charArray_0_length);
     void println();
     void println(jboolean boolean_0);
     void println(jchar char_0);
     void println(jint int_0);
     PrintStream append(jchar char_0);
     PrintStream format(jstring string_0,jobjectArray objectArray_1);
+    PrintStream format(const char * string_0string_0,jobject * objectArray_1objectArray_1,jsize objectArray_1_length);
     void write(jint int_0);
     void write(jbyteArray byteArray_0,jint int_1,jint int_2);
+    void write(jbyte * byteArray_0byteArray_0,jsize byteArray_0_length,jint int_1int_1,jint int_2int_2);
     void print(jboolean boolean_0);
     void print(jlong long_0);
     void print(jdouble double_0);
     void print(jfloat float_0);
     void print(::crclj::java::lang::Object  &object_0);
     void print(jstring string_0);
+    void print(const char * string_0string_0);
     void print(jcharArray charArray_0);
+    void print(jchar * charArray_0charArray_0,jsize charArray_0_length);
     void print(jchar char_0);
     void print(jint int_0);
     void flush();
     void close();
     jboolean checkError();
     PrintStream printf(jstring string_0,jobjectArray objectArray_1);
+    PrintStream printf(const char * string_0string_0,jobject * objectArray_1objectArray_1,jsize objectArray_1_length);
    }; // end class PrintStream
   } // end namespace io
 
@@ -2911,18 +3050,12 @@ namespace crclj {
            BigInteger(jobject _jthis, bool copy);
            BigInteger(const BigInteger &);
            
-    BigInteger(jbyteArray byteArray_0);
-    BigInteger(jint int_0,jbyteArray byteArray_1);
     BigInteger(jstring string_0,jint int_1);
+    BigInteger(jint int_0,jbyteArray byteArray_1);
+    BigInteger(jbyteArray byteArray_0);
     BigInteger(jstring string_0);
     ~BigInteger();
     BigInteger mod(BigInteger  &bigInteger_0);
-    BigInteger nextProbablePrime();
-    BigInteger modPow(BigInteger  &bigInteger_0,BigInteger  &bigInteger_1);
-    BigInteger modInverse(BigInteger  &bigInteger_0);
-    BigInteger clearBit(jint int_0);
-    jint getLowestSetBit();
-    jboolean isProbablePrime(jint int_0);
     jobjectArray divideAndRemainder(BigInteger  &bigInteger_0);
     jlong longValueExact();
     jint intValueExact();
@@ -2931,6 +3064,12 @@ namespace crclj {
     jint bitLength();
     jboolean testBit(jint int_0);
     BigInteger notMethod();
+    BigInteger nextProbablePrime();
+    BigInteger modPow(BigInteger  &bigInteger_0,BigInteger  &bigInteger_1);
+    BigInteger modInverse(BigInteger  &bigInteger_0);
+    BigInteger clearBit(jint int_0);
+    jint getLowestSetBit();
+    jboolean isProbablePrime(jint int_0);
     BigInteger subtract(BigInteger  &bigInteger_0);
     BigInteger multiply(BigInteger  &bigInteger_0);
     BigInteger negate();
@@ -3021,12 +3160,16 @@ namespace crclj {
     jboolean isReachable(jint int_0);
     jstring getCanonicalHostName();
     static InetAddress getByAddress(jbyteArray byteArray_0);
+    static InetAddress getByAddress(jbyte * byteArray_0byteArray_0,jsize byteArray_0_length);
     static InetAddress getByAddress(jstring string_0,jbyteArray byteArray_1);
+    static InetAddress getByAddress(const char * string_0string_0,jbyte * byteArray_1byteArray_1,jsize byteArray_1_length);
     static jobjectArray getAllByName(jstring string_0);
+    static jobjectArray getAllByName(const char * string_0string_0);
+    static InetAddress getByName(jstring string_0);
+    static InetAddress getByName(const char * string_0string_0);
     static InetAddress getLoopbackAddress();
     jboolean isMulticastAddress();
     jboolean isAnyLocalAddress();
-    static InetAddress getByName(jstring string_0);
     static InetAddress getLocalHost();
     jboolean equals(::crclj::java::lang::Object  &object_0);
     jstring toString();
@@ -3082,7 +3225,9 @@ namespace crclj {
     InputStream();
     ~InputStream();
     jint read(jbyteArray byteArray_0,jint int_1,jint int_2);
+    jint read(jbyte * byteArray_0byteArray_0,jsize byteArray_0_length,jint int_1int_1,jint int_2int_2);
     jint read(jbyteArray byteArray_0);
+    jint read(jbyte * byteArray_0byteArray_0,jsize byteArray_0_length);
     jint read();
     void close();
     void mark(jint int_0);
@@ -3109,6 +3254,7 @@ namespace crclj {
       ~SAXSource();
       jstring getSystemId();
       void setSystemId(jstring string_0);
+      void setSystemId(const char * string_0string_0);
      }; // end class SAXSource
     } // end namespace sax
    } // end namespace transform
@@ -3127,8 +3273,8 @@ namespace crclj {
     ~Optional();
     static Optional ofNullable(::crclj::java::lang::Object  &object_0);
     ::crclj::java::lang::Object orElse(::crclj::java::lang::Object  &object_0);
-    jboolean isPresent();
     Optional flatMap(function::Function  &function_0);
+    jboolean isPresent();
     ::crclj::java::lang::Object get();
     jboolean equals(::crclj::java::lang::Object  &object_0);
     jstring toString();
@@ -3148,21 +3294,22 @@ namespace crclj {
             
      Stream();
      ~Stream();
-     Optional findAny();
-     Stream distinct();
      jboolean anyMatch(::crclj::java::util::function::Predicate  &predicate_0);
+     static Stream iterate(::crclj::java::lang::Object  &object_0,::crclj::java::util::function::UnaryOperator  &unaryOperator_1);
+     Optional findAny();
+     Stream flatMap(::crclj::java::util::function::Function  &function_0);
+     Stream sorted();
+     Stream distinct();
      jboolean allMatch(::crclj::java::util::function::Predicate  &predicate_0);
      jboolean noneMatch(::crclj::java::util::function::Predicate  &predicate_0);
      Optional findFirst();
-     static Stream iterate(::crclj::java::lang::Object  &object_0,::crclj::java::util::function::UnaryOperator  &unaryOperator_1);
-     Stream flatMap(::crclj::java::util::function::Function  &function_0);
-     Stream sorted();
      Stream limit(jlong long_0);
      jlong count();
      static Stream concat(Stream  &stream_0,Stream  &stream_1);
      jobjectArray toArray();
      Stream skip(jlong long_0);
      static Stream of(jobjectArray objectArray_0);
+     static Stream of(jobject * objectArray_0objectArray_0,jsize objectArray_0_length);
      static Stream of(::crclj::java::lang::Object  &object_0);
      static Stream empty();
      Stream filter(::crclj::java::util::function::Predicate  &predicate_0);
@@ -3188,6 +3335,7 @@ namespace crclj {
     jboolean contains(::crclj::java::lang::Object  &object_0);
     jint size();
     jobjectArray toArray(jobjectArray objectArray_0);
+    jobjectArray toArray(jobject * objectArray_0objectArray_0,jsize objectArray_0_length);
     jobjectArray toArray();
     jboolean addAll(Collection  &collection_0);
     stream::Stream stream();

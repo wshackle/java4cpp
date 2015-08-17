@@ -9,6 +9,12 @@
 
 namespace %NAMESPACE% {
     
-
+    namespace java {
+            namespace lang {
+                class Object;
+            } // end namespace lang;
+    }// end namespace java 
+    
+   
 
     

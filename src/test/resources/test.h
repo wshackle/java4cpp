@@ -12,6 +12,7 @@ namespace test {
     extern void DebugPrintJObject(const char *file, int lineno, const char *prefix, jobject jobj);
     extern void SetDebugJ4Cpp(bool debug);
     extern bool GetDebugJ4Cpp();
+    extern void PrintObject(const char *prefix, const ::test::java::lang::Object &objref);
     
     namespace java {
         namespace lang {
@@ -28,9 +29,7 @@ namespace test {
         }
     }
     
-    extern void PrintObject(const char *prefix, const ::test::java::lang::Object &objref);
     
-    // end header_template_start.h
     
     
 
@@ -79,18 +78,20 @@ namespace test {
           
    Test();
    ~Test();
-   static Test getTestStatic();
    jint getI();
+   static Test getTestStatic();
    ::test::java::util::List getListOfStrings();
    void setListOfStrings(::test::java::util::List  &list_0);
    A getClassObjectA();
    void setClassObjectA(A  &a_0);
    jbyteArray getByteArrayProp();
    void setByteArrayProp(jbyteArray byteArray_0);
+   void setByteArrayProp(jbyte * easyArg_0,jsize easyArg_0_length);
    jbyte getByteProp();
    void setByteProp(jbyte byte_0);
    jcharArray getCharArrayProp();
    void setCharArrayProp(jcharArray charArray_0);
+   void setCharArrayProp(jchar * easyArg_0,jsize easyArg_0_length);
    jchar getCharProp();
    jshort getShortProp();
    void setShortProp(jshort short_0);
@@ -99,25 +100,32 @@ namespace test {
    void setIntProp(jint int_0);
    jintArray getIntArrayProp();
    void setIntArrayProp(jintArray intArray_0);
+   void setIntArrayProp(jint * easyArg_0,jsize easyArg_0_length);
    jlong getLongProp();
    void setLongProp(jlong long_0);
    jlongArray getLongArrayProp();
    void setLongArrayProp(jlongArray longArray_0);
+   void setLongArrayProp(jlong * easyArg_0,jsize easyArg_0_length);
    jfloat getFloatProp();
    void setFloatProp(jfloat float_0);
    jfloatArray getFloatArrayProp();
    void setFloatArrayProp(jfloatArray floatArray_0);
+   void setFloatArrayProp(jfloat * easyArg_0,jsize easyArg_0_length);
    jdouble getDoubleProp();
    void setDoubleProp(jdouble double_0);
    jdoubleArray getDoubleArrayProp();
    void setDoubleArrayProp(jdoubleArray doubleArray_0);
+   void setDoubleArrayProp(jdouble * easyArg_0,jsize easyArg_0_length);
    void setShortArrayProp(jshortArray shortArray_0);
+   void setShortArrayProp(jshort * easyArg_0,jsize easyArg_0_length);
    void setCharProp(jchar char_0);
    jstring getStrProp();
    void setStrProp(jstring string_0);
+   void setStrProp(const char * easyArg_0);
    jstring funcReturningString();
    static void main(jobjectArray stringArray_0);
    static void main(int argc,const char **argv);
+   static void main(jobject * easyArg_0,jsize easyArg_0_length);
    jstring toString();
   }; // end class Test
  } // end namespace testpackage
@@ -149,6 +157,7 @@ namespace test {
     List subList(jint int_0,jint int_1);
     jobjectArray toArray();
     jobjectArray toArray(jobjectArray objectArray_0);
+    jobjectArray toArray(jobject * easyArg_0,jsize easyArg_0_length);
     ::test::java::lang::Object set(jint int_0,::test::java::lang::Object  &object_1);
    }; // end class List
   } // end namespace util

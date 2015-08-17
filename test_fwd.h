@@ -4,7 +4,13 @@
 
 namespace test {
     
-
+    namespace java {
+            namespace lang {
+                class Object;
+            } // end namespace lang;
+    }// end namespace java 
+    
+   
 
     
  class ClassInDefaultPackage;
