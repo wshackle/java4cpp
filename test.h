@@ -43,8 +43,8 @@ namespace test {
          
   ClassInDefaultPackage(jint int_0);
   ~ClassInDefaultPackage();
-  static void staticTest(jint int_0);
   jint getI();
+  static void staticTest(jint int_0);
  }; // end class ClassInDefaultPackage
 
  namespace testpackage{
@@ -66,8 +66,14 @@ namespace test {
           MyClient(jobject _jthis, bool copy);
           MyClient(const MyClient &);
           
-   MyClient();
+   MyClient(jstring string_0,jint int_1);
+   MyClient(const char * easyArg_0,jint easyArg_1);
    ~MyClient();
+   jboolean equals(::test::java::lang::Object  &object_0);
+   jstring toString();
+   jint hashCode();
+   jstring getHost();
+   jint getPort();
   }; // end class MyClient
 
   
@@ -78,8 +84,8 @@ namespace test {
           
    Test();
    ~Test();
-   jint getI();
    static Test getTestStatic();
+   jint getI();
    ::test::java::util::List getListOfStrings();
    void setListOfStrings(::test::java::util::List  &list_0);
    A getClassObjectA();

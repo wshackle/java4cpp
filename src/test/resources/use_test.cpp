@@ -8,6 +8,9 @@ using namespace std;
 
 int main(int argc, const char **argv) {
     
+    MyClient mc("localhost",8080);
+    PrintObject("mc=",mc);
+    
     //SetDebugJ4Cpp(true);
     Test t;
     A a;

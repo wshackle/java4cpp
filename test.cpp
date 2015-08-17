@@ -109,23 +109,6 @@ namespace test {
  	// Place-holder for later extensibility.
  }
 
- void ClassInDefaultPackage::staticTest(jint int_0) {
-
- JNIEnv *env =getEnv();
- static jclass cls = getClassInDefaultPackageClass();
- 
- if (cls != NULL) {
-     static jmethodID mid = env->GetStaticMethodID(cls, "staticTest", "(I)V");
-     if (NULL == mid) {
-         std::cerr << "Class ClassInDefaultPackage has no method named staticTest with signature (I)V." << std::endl;
-         
-     } else {
-          env->CallStaticVoidMethod( cls, mid ,int_0 );
-     }
- }
- releaseEnv(env);
- 
- }
  jint ClassInDefaultPackage::getI() {
 
  if(jthis == NULL) {
@@ -147,6 +130,23 @@ namespace test {
  }
  releaseEnv(env);
  return retVal;
+ }
+ void ClassInDefaultPackage::staticTest(jint int_0) {
+
+ JNIEnv *env =getEnv();
+ static jclass cls = getClassInDefaultPackageClass();
+ 
+ if (cls != NULL) {
+     static jmethodID mid = env->GetStaticMethodID(cls, "staticTest", "(I)V");
+     if (NULL == mid) {
+         std::cerr << "Class ClassInDefaultPackage has no method named staticTest with signature (I)V." << std::endl;
+         
+     } else {
+          env->CallStaticVoidMethod( cls, mid ,int_0 );
+     }
+ }
+ releaseEnv(env);
+ 
  }
  static jclass getNewClassInDefaultPackageClass() {
      jclass clss = getEnv()->FindClass("ClassInDefaultPackage");
@@ -281,15 +281,15 @@ namespace test {
           jthis = getEnv()->NewGlobalRef(_jthis);
       }
   }
-  MyClient::MyClient() {
+  MyClient::MyClient(jstring string_0,jint int_1) {
    JNIEnv *env =getEnv();
    static jclass cls = getMyClientClass();
    if (cls != NULL) {
-       static jmethodID mid = env->GetMethodID(cls, "<init>", "()V");
+       static jmethodID mid = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;I)V");
        if (NULL == mid) {
-           std::cerr << "Class MyClient has no method constructor signature ()V" << std::endl;
+           std::cerr << "Class MyClient has no method constructor signature (Ljava/lang/String;I)V" << std::endl;
        } else {
-           jthis = env->NewObject(cls, mid );
+           jthis = env->NewObject(cls, mid ,string_0,int_1);
            jobjectRefType ref = env->GetObjectRefType(jthis);
            if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," new MyClient jthis=",jthis);
            if(ref != JNIGlobalRefType) {
@@ -300,12 +300,148 @@ namespace test {
    releaseEnv(env);
   }
 
+  MyClient::MyClient(const char * easyArg_0,jint easyArg_1){
+  JNIEnv *env =getEnv();
+  static jclass cls = getMyClientClass();
+  jstring string_0 = env->NewStringUTF(easyArg_0);
+  jint int_1= easyArg_1;
+  
+  if (cls != NULL) {
+      static jmethodID mid = env->GetMethodID(cls, "<init>", "(Ljava/lang/String;I)V");
+      if (NULL == mid) {
+          std::cerr << "Class MyClient has no method constructor signature (Ljava/lang/String;I)V" << std::endl;
+      } else {
+          jthis = env->NewObject(cls, mid ,string_0,int_1);
+          jobjectRefType ref = env->GetObjectRefType(jthis);
+          if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," new MyClient jthis=",jthis);
+          if(ref != JNIGlobalRefType) {
+              jthis = env->NewGlobalRef(jthis);
+          }
+      }
+  }
+  jobjectRefType ref_0 = env->GetObjectRefType(string_0);
+  if(ref_0 == JNIGlobalRefType) {
+   env->DeleteGlobalRef(string_0);
+  }
+  
+  releaseEnv(env);
+  }
 
   // Destructor for testpackage.MyClient
   MyClient::~MyClient() {
   	// Place-holder for later extensibility.
   }
 
+  jboolean MyClient::equals(::test::java::lang::Object  &object_0) {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method equals of testpackage.MyClient with jthis == NULL." << std::endl;
+      return false;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," MyClient::equals jthis=",jthis);
+  jboolean retVal=false;
+  if (cls != NULL) {
+      static jmethodID mid = env->GetMethodID(cls, "equals", "(Ljava/lang/Object;)Z");
+      if (NULL == mid) {
+          std::cerr << "Class testpackage.MyClient has no method named equals with signature (Ljava/lang/Object;)Z." << std::endl;
+          return false;
+      } else {
+          retVal= (jboolean)  env->CallBooleanMethod(jthis, mid ,object_0.jthis );
+      }
+  }
+  releaseEnv(env);
+  return retVal;
+  }
+  jstring MyClient::toString() {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method toString of testpackage.MyClient with jthis == NULL." << std::endl;
+      return NULL;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," MyClient::toString jthis=",jthis);
+  jstring retVal=NULL;
+  if (cls != NULL) {
+      static jmethodID mid = env->GetMethodID(cls, "toString", "()Ljava/lang/String;");
+      if (NULL == mid) {
+          std::cerr << "Class testpackage.MyClient has no method named toString with signature ()Ljava/lang/String;." << std::endl;
+          return NULL;
+      } else {
+          retVal= (jstring)  env->CallObjectMethod(jthis, mid  );
+      }
+  }
+  releaseEnv(env);
+  return retVal;
+  }
+  jint MyClient::hashCode() {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method hashCode of testpackage.MyClient with jthis == NULL." << std::endl;
+      return (jint) -1;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," MyClient::hashCode jthis=",jthis);
+  jint retVal= (jint) -1;
+  if (cls != NULL) {
+      static jmethodID mid = env->GetMethodID(cls, "hashCode", "()I");
+      if (NULL == mid) {
+          std::cerr << "Class testpackage.MyClient has no method named hashCode with signature ()I." << std::endl;
+          return (jint) -1;
+      } else {
+          retVal= (jint)  env->CallIntMethod(jthis, mid  );
+      }
+  }
+  releaseEnv(env);
+  return retVal;
+  }
+  jstring MyClient::getHost() {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method getHost of testpackage.MyClient with jthis == NULL." << std::endl;
+      return NULL;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," MyClient::getHost jthis=",jthis);
+  jstring retVal=NULL;
+  if (cls != NULL) {
+      static jmethodID mid = env->GetMethodID(cls, "getHost", "()Ljava/lang/String;");
+      if (NULL == mid) {
+          std::cerr << "Class testpackage.MyClient has no method named getHost with signature ()Ljava/lang/String;." << std::endl;
+          return NULL;
+      } else {
+          retVal= (jstring)  env->CallObjectMethod(jthis, mid  );
+      }
+  }
+  releaseEnv(env);
+  return retVal;
+  }
+  jint MyClient::getPort() {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method getPort of testpackage.MyClient with jthis == NULL." << std::endl;
+      return (jint) -1;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," MyClient::getPort jthis=",jthis);
+  jint retVal= (jint) -1;
+  if (cls != NULL) {
+      static jmethodID mid = env->GetMethodID(cls, "getPort", "()I");
+      if (NULL == mid) {
+          std::cerr << "Class testpackage.MyClient has no method named getPort with signature ()I." << std::endl;
+          return (jint) -1;
+      } else {
+          retVal= (jint)  env->CallIntMethod(jthis, mid  );
+      }
+  }
+  releaseEnv(env);
+  return retVal;
+  }
   static jclass getNewMyClientClass() {
       jclass clss = getEnv()->FindClass("testpackage/MyClient");
       if (NULL == clss) {
@@ -360,28 +496,6 @@ namespace test {
   	// Place-holder for later extensibility.
   }
 
-  jint Test::getI() {
-
-  if(jthis == NULL) {
-      std::cerr << "Call of method getI of testpackage.Test with jthis == NULL." << std::endl;
-      return (jint) -1;
-  }
-  JNIEnv *env =getEnv();
-  jclass cls = env->GetObjectClass(jthis);
-  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getI jthis=",jthis);
-  jint retVal= (jint) -1;
-  if (cls != NULL) {
-      static jmethodID mid = env->GetMethodID(cls, "getI", "()I");
-      if (NULL == mid) {
-          std::cerr << "Class testpackage.Test has no method named getI with signature ()I." << std::endl;
-          return (jint) -1;
-      } else {
-          retVal= (jint)  env->CallIntMethod(jthis, mid  );
-      }
-  }
-  releaseEnv(env);
-  return retVal;
-  }
   Test Test::getTestStatic() {
 
   JNIEnv *env =getEnv();
@@ -403,6 +517,28 @@ namespace test {
    std::cout << "retVal=" << retVal << std::endl;
    Test retObject(retVal,false);
    return retObject;
+  }
+  jint Test::getI() {
+
+  if(jthis == NULL) {
+      std::cerr << "Call of method getI of testpackage.Test with jthis == NULL." << std::endl;
+      return (jint) -1;
+  }
+  JNIEnv *env =getEnv();
+  jclass cls = env->GetObjectClass(jthis);
+  if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," Test::getI jthis=",jthis);
+  jint retVal= (jint) -1;
+  if (cls != NULL) {
+      static jmethodID mid = env->GetMethodID(cls, "getI", "()I");
+      if (NULL == mid) {
+          std::cerr << "Class testpackage.Test has no method named getI with signature ()I." << std::endl;
+          return (jint) -1;
+      } else {
+          retVal= (jint)  env->CallIntMethod(jthis, mid  );
+      }
+  }
+  releaseEnv(env);
+  return retVal;
   }
   ::test::java::util::List Test::getListOfStrings() {
 
