@@ -15,6 +15,11 @@
 *.a
 *.lib
 
+#Dumped core
+core
+hs_err_pid*.log
+core.[0-9]*
+
 # Executables
 *.exe
 *.out
