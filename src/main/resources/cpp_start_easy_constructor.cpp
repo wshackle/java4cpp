@@ -9,5 +9,6 @@
 //%%% "%METHOD_ONFAIL% will be replaced with the code to execute on failure eg return -1        
 //%%% "%METHOD_CALL_TYPE% will be replaced with the type of Call<Type>Method needed.  
 //%%% "%METHOD_RETURN%" will be replaced with "return" or "" for void functions.   
+// Convenience Constructor converts common C++ types to JNI types
 JNIEnv *env =getEnv();
 static jclass cls = get%CLASS_NAME%Class();

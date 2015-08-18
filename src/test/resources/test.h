@@ -13,6 +13,8 @@ namespace test {
     extern void SetDebugJ4Cpp(bool debug);
     extern bool GetDebugJ4Cpp();
     extern void PrintObject(const char *prefix, const ::test::java::lang::Object &objref);
+    extern jclass getStringClass();
+    extern jstring getEmptyString();
     
     namespace java {
         namespace lang {
@@ -41,10 +43,13 @@ namespace test {
          ClassInDefaultPackage(jobject _jthis, bool copy);
          ClassInDefaultPackage(const ClassInDefaultPackage &);
          
+  protected:
+  ClassInDefaultPackage();
+  public:
   ClassInDefaultPackage(jint int_0);
   ~ClassInDefaultPackage();
-  jint getI();
   static void staticTest(jint int_0);
+  jint getI();
  }; // end class ClassInDefaultPackage
 
  namespace testpackage{
@@ -66,6 +71,9 @@ namespace test {
           MyClient(jobject _jthis, bool copy);
           MyClient(const MyClient &);
           
+   protected:
+   MyClient();
+   public:
    MyClient(jstring string_0,jint int_1);
    MyClient(const char * easyArg_0,jint easyArg_1);
    ~MyClient();
@@ -131,7 +139,6 @@ namespace test {
    jstring funcReturningString();
    static void main(jobjectArray stringArray_0);
    static void main(int argc,const char **argv);
-   static void main(jobject * easyArg_0,jsize easyArg_0_length);
    jstring toString();
   }; // end class Test
  } // end namespace testpackage
@@ -163,7 +170,6 @@ namespace test {
     List subList(jint int_0,jint int_1);
     jobjectArray toArray();
     jobjectArray toArray(jobjectArray objectArray_0);
-    jobjectArray toArray(jobject * easyArg_0,jsize easyArg_0_length);
     ::test::java::lang::Object set(jint int_0,::test::java::lang::Object  &object_1);
    }; // end class List
   } // end namespace util

@@ -11,4 +11,3 @@
 //%%% "%METHOD_RETURN%" will be replaced with "return" or "" for void functions.   
 
 releaseEnv(env);
-%METHOD_RETURN_GET%

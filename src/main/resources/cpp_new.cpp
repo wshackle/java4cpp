@@ -13,8 +13,20 @@ if (cls != NULL) {
         std::cerr << "Class %CLASS_NAME% has no method constructor signature %JNI_SIGNATURE%" << std::endl;
     } else {
         jthis = env->NewObject(cls, mid %CONSTRUCTOR_ARGS%);
+        jthrowable t = env->ExceptionOccurred();
+        if(t != NULL) {
+            DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",t);
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            throw this;
+        }
+        if(jthis == NULL) {
+            std::cerr << "Call to create new %CLASS_NAME% with signature %JNI_SIGNATURE% returned null." << std::endl;
+            releaseEnv(env);
+            return;
+        }
         jobjectRefType ref = env->GetObjectRefType(jthis);
-        if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," new %CLASS_NAME% jthis=",jthis);
+        if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__," new %CLASS_NAME% jthis=",jthis);
         if(ref != JNIGlobalRefType) {
             jthis = env->NewGlobalRef(jthis);
         }

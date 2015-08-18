@@ -18,6 +18,8 @@ namespace %NAMESPACE% {
     extern void SetDebugJ4Cpp(bool debug);
     extern bool GetDebugJ4Cpp();
     extern void PrintObject(const char *prefix, const ::%NAMESPACE%::java::lang::Object &objref);
+    extern jclass getStringClass();
+    extern jstring getEmptyString();
     
     namespace java {
         namespace lang {

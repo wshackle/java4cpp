@@ -19,6 +19,13 @@ if (cls != NULL) {
         %METHOD_ONFAIL%
     } else {
         %METHOD_RETURN_STORE% env->CallStatic%METHOD_CALL_TYPE%Method( cls, mid %METHOD_ARGS% );
+        jthrowable t = env->ExceptionOccurred();
+        if(t != NULL) {
+            DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",t);
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            throw env;
+        }
     }
 }
 releaseEnv(env);

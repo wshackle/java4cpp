@@ -10,12 +10,12 @@
 //%%% "%METHOD_CALL_TYPE% will be replaced with the type of Call<Type>Method needed.  
 //%%% "%METHOD_RETURN%" will be replaced with "return" or "" for void functions.   
 if(jthis == NULL) {
-    std::cerr << "Call of method %METHOD_NAME% of %FULL_CLASS_NAME% with jthis == NULL." << std::endl;
+    std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method %METHOD_NAME% of %FULL_CLASS_NAME% with jthis == NULL." << std::endl;
     %METHOD_ONFAIL%
 }
 JNIEnv *env =getEnv();
 jclass cls = env->GetObjectClass(jthis);
-if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",jthis);
+if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",jthis);
 %RETURN_VAR_DECLARE%
 if (cls != NULL) {
     static jmethodID mid = env->GetMethodID(cls, "%METHOD_NAME%", "%JNI_SIGNATURE%");
@@ -24,6 +24,13 @@ if (cls != NULL) {
         %METHOD_ONFAIL%
     } else {
         %METHOD_RETURN_STORE% env->Call%METHOD_CALL_TYPE%Method(jthis, mid %METHOD_ARGS% );
+        jthrowable t = env->ExceptionOccurred();
+        if(t != NULL) {
+            DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",t);
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            throw this;
+        }
     }
 }
 releaseEnv(env);
