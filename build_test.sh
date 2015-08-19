@@ -2,11 +2,14 @@
 set -x;
 
 reset; 
-mvn package;
+
+if test ! -f target/java4cpp-1.0-SNAPSHOT-jar-with-dependencies.jar ; then
+    mvn package;
+fi
 
 rm test*.h test*.cpp 2>/dev/null || true
 
-java -jar target/java4cpp-1.0-SNAPSHOT-jar-with-dependencies.jar -j src/test/resources/Test.jar;
+java -jar target/java4cpp-1.0-SNAPSHOT-jar-with-dependencies.jar -n test -j src/test/resources/Test.jar;
 
 export JAVA_HOME=/usr/local/jdk1.8.0_40/ ;
 ls -ld "${JAVA_HOME}"; 

@@ -37,6 +37,7 @@ namespace test {
 
             Object::~Object() {
                 if (NULL != jthis) {
+                    if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__,"Destructor called for ",jthis);
                     getEnv()->DeleteGlobalRef(jthis);
                     jthis = NULL;
                 }
@@ -91,12 +92,19 @@ namespace test {
          std::cerr << "Class ClassInDefaultPackage has no method constructor signature ()V" << std::endl;
      } else {
          jthis = env->NewObject(cls, mid );
-         jobjectRefType ref = env->GetObjectRefType(jthis);
+         jthrowable t = env->ExceptionOccurred();
+         if(t != NULL) {
+             DebugPrintJObject(__FILE__,__LINE__," ClassInDefaultPackage::%METHOD_NAME% jthis=",t);
+             env->ExceptionDescribe();
+             env->ExceptionClear();
+             throw this;
+         }
          if(jthis == NULL) {
              std::cerr << "Call to create new ClassInDefaultPackage with signature ()V returned null." << std::endl;
              releaseEnv(env);
              return;
          }
+         jobjectRefType ref = env->GetObjectRefType(jthis);
          if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__," new ClassInDefaultPackage jthis=",jthis);
          if(ref != JNIGlobalRefType) {
              jthis = env->NewGlobalRef(jthis);
@@ -115,12 +123,19 @@ namespace test {
           std::cerr << "Class ClassInDefaultPackage has no method constructor signature (I)V" << std::endl;
       } else {
           jthis = env->NewObject(cls, mid ,int_0);
-          jobjectRefType ref = env->GetObjectRefType(jthis);
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," ClassInDefaultPackage::%METHOD_NAME% jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
           if(jthis == NULL) {
               std::cerr << "Call to create new ClassInDefaultPackage with signature (I)V returned null." << std::endl;
               releaseEnv(env);
               return;
           }
+          jobjectRefType ref = env->GetObjectRefType(jthis);
           if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__," new ClassInDefaultPackage jthis=",jthis);
           if(ref != JNIGlobalRefType) {
               jthis = env->NewGlobalRef(jthis);
@@ -136,27 +151,10 @@ namespace test {
  	// Place-holder for later extensibility.
  }
 
- void ClassInDefaultPackage::staticTest(jint int_0) {
-
- JNIEnv *env =getEnv();
- static jclass cls = getClassInDefaultPackageClass();
- 
- if (cls != NULL) {
-     static jmethodID mid = env->GetStaticMethodID(cls, "staticTest", "(I)V");
-     if (NULL == mid) {
-         std::cerr << "Class ClassInDefaultPackage has no method named staticTest with signature (I)V." << std::endl;
-         
-     } else {
-          env->CallStaticVoidMethod( cls, mid ,int_0 );
-     }
- }
- releaseEnv(env);
- 
- }
  jint ClassInDefaultPackage::getI() {
 
  if(jthis == NULL) {
-     std::cerr << "Call of method getI of ClassInDefaultPackage with jthis == NULL." << std::endl;
+     std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getI of ClassInDefaultPackage with jthis == NULL." << std::endl;
      return (jint) -1;
  }
  JNIEnv *env =getEnv();
@@ -170,10 +168,41 @@ namespace test {
          return (jint) -1;
      } else {
          retVal= (jint)  env->CallIntMethod(jthis, mid  );
+         jthrowable t = env->ExceptionOccurred();
+         if(t != NULL) {
+             DebugPrintJObject(__FILE__,__LINE__," ClassInDefaultPackage::getI jthis=",t);
+             env->ExceptionDescribe();
+             env->ExceptionClear();
+             throw this;
+         }
      }
  }
  releaseEnv(env);
  return retVal;
+ }
+ void ClassInDefaultPackage::staticTest(jint int_0) {
+
+ JNIEnv *env =getEnv();
+ static jclass cls = getClassInDefaultPackageClass();
+ 
+ if (cls != NULL) {
+     static jmethodID mid = env->GetStaticMethodID(cls, "staticTest", "(I)V");
+     if (NULL == mid) {
+         std::cerr << "Class ClassInDefaultPackage has no method named staticTest with signature (I)V." << std::endl;
+         return;
+     } else {
+          env->CallStaticVoidMethod( cls, mid ,int_0 );
+         jthrowable t = env->ExceptionOccurred();
+         if(t != NULL) {
+             DebugPrintJObject(__FILE__,__LINE__," ClassInDefaultPackage::staticTest jthis=",t);
+             env->ExceptionDescribe();
+             env->ExceptionClear();
+             throw env;
+         }
+     }
+ }
+ releaseEnv(env);
+ 
  }
  static jclass getNewClassInDefaultPackageClass() {
      jclass clss = getEnv()->FindClass("ClassInDefaultPackage");
@@ -214,12 +243,19 @@ namespace test {
            std::cerr << "Class A has no method constructor signature ()V" << std::endl;
        } else {
            jthis = env->NewObject(cls, mid );
-           jobjectRefType ref = env->GetObjectRefType(jthis);
+           jthrowable t = env->ExceptionOccurred();
+           if(t != NULL) {
+               DebugPrintJObject(__FILE__,__LINE__," A::staticTest jthis=",t);
+               env->ExceptionDescribe();
+               env->ExceptionClear();
+               throw this;
+           }
            if(jthis == NULL) {
                std::cerr << "Call to create new A with signature ()V returned null." << std::endl;
                releaseEnv(env);
                return;
            }
+           jobjectRefType ref = env->GetObjectRefType(jthis);
            if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__," new A jthis=",jthis);
            if(ref != JNIGlobalRefType) {
                jthis = env->NewGlobalRef(jthis);
@@ -247,6 +283,13 @@ namespace test {
           Test nullObject((jobject)NULL,false); return nullObject;
       } else {
           retVal= (jobject)  env->CallStaticObjectMethod( cls, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," A::getTestStatic jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw env;
+          }
       }
   }
   releaseEnv(env);
@@ -258,7 +301,7 @@ namespace test {
   Test A::getTestNonStatic() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getTestNonStatic of testpackage.A with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getTestNonStatic of testpackage.A with jthis == NULL." << std::endl;
       Test nullObject((jobject)NULL,false); return nullObject;
   }
   JNIEnv *env =getEnv();
@@ -272,6 +315,13 @@ namespace test {
           Test nullObject((jobject)NULL,false); return nullObject;
       } else {
           retVal= (jobject)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," A::getTestNonStatic jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -318,12 +368,19 @@ namespace test {
           std::cerr << "Class MyClient has no method constructor signature ()V" << std::endl;
       } else {
           jthis = env->NewObject(cls, mid );
-          jobjectRefType ref = env->GetObjectRefType(jthis);
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," MyClient::getTestNonStatic jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
           if(jthis == NULL) {
               std::cerr << "Call to create new MyClient with signature ()V returned null." << std::endl;
               releaseEnv(env);
               return;
           }
+          jobjectRefType ref = env->GetObjectRefType(jthis);
           if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__," new MyClient jthis=",jthis);
           if(ref != JNIGlobalRefType) {
               jthis = env->NewGlobalRef(jthis);
@@ -342,12 +399,19 @@ namespace test {
            std::cerr << "Class MyClient has no method constructor signature (Ljava/lang/String;I)V" << std::endl;
        } else {
            jthis = env->NewObject(cls, mid ,string_0,int_1);
-           jobjectRefType ref = env->GetObjectRefType(jthis);
+           jthrowable t = env->ExceptionOccurred();
+           if(t != NULL) {
+               DebugPrintJObject(__FILE__,__LINE__," MyClient::getTestNonStatic jthis=",t);
+               env->ExceptionDescribe();
+               env->ExceptionClear();
+               throw this;
+           }
            if(jthis == NULL) {
                std::cerr << "Call to create new MyClient with signature (Ljava/lang/String;I)V returned null." << std::endl;
                releaseEnv(env);
                return;
            }
+           jobjectRefType ref = env->GetObjectRefType(jthis);
            if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__," new MyClient jthis=",jthis);
            if(ref != JNIGlobalRefType) {
                jthis = env->NewGlobalRef(jthis);
@@ -370,6 +434,13 @@ namespace test {
           std::cerr << "Class MyClient has no method constructor signature (Ljava/lang/String;I)V" << std::endl;
       } else {
           jthis = env->NewObject(cls, mid ,string_0,int_1);
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," MyClient::getTestNonStatic jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
           if(jthis == NULL) {
               std::cerr << "Call to create new MyClient with signature (Ljava/lang/String;I)V returned null." << std::endl;
               releaseEnv(env);
@@ -398,7 +469,7 @@ namespace test {
   jboolean MyClient::equals(::test::java::lang::Object  &object_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method equals of testpackage.MyClient with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method equals of testpackage.MyClient with jthis == NULL." << std::endl;
       return false;
   }
   JNIEnv *env =getEnv();
@@ -412,6 +483,13 @@ namespace test {
           return false;
       } else {
           retVal= (jboolean)  env->CallBooleanMethod(jthis, mid ,object_0.jthis );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," MyClient::equals jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -420,7 +498,7 @@ namespace test {
   jstring MyClient::toString() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method toString of testpackage.MyClient with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method toString of testpackage.MyClient with jthis == NULL." << std::endl;
       return NULL;
   }
   JNIEnv *env =getEnv();
@@ -434,6 +512,13 @@ namespace test {
           return NULL;
       } else {
           retVal= (jstring)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," MyClient::toString jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -442,7 +527,7 @@ namespace test {
   jint MyClient::hashCode() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method hashCode of testpackage.MyClient with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method hashCode of testpackage.MyClient with jthis == NULL." << std::endl;
       return (jint) -1;
   }
   JNIEnv *env =getEnv();
@@ -456,6 +541,13 @@ namespace test {
           return (jint) -1;
       } else {
           retVal= (jint)  env->CallIntMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," MyClient::hashCode jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -464,7 +556,7 @@ namespace test {
   jstring MyClient::getHost() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getHost of testpackage.MyClient with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getHost of testpackage.MyClient with jthis == NULL." << std::endl;
       return NULL;
   }
   JNIEnv *env =getEnv();
@@ -478,6 +570,13 @@ namespace test {
           return NULL;
       } else {
           retVal= (jstring)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," MyClient::getHost jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -486,7 +585,7 @@ namespace test {
   jint MyClient::getPort() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getPort of testpackage.MyClient with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getPort of testpackage.MyClient with jthis == NULL." << std::endl;
       return (jint) -1;
   }
   JNIEnv *env =getEnv();
@@ -500,6 +599,13 @@ namespace test {
           return (jint) -1;
       } else {
           retVal= (jint)  env->CallIntMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," MyClient::getPort jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -543,12 +649,19 @@ namespace test {
            std::cerr << "Class Test has no method constructor signature ()V" << std::endl;
        } else {
            jthis = env->NewObject(cls, mid );
-           jobjectRefType ref = env->GetObjectRefType(jthis);
+           jthrowable t = env->ExceptionOccurred();
+           if(t != NULL) {
+               DebugPrintJObject(__FILE__,__LINE__," Test::getPort jthis=",t);
+               env->ExceptionDescribe();
+               env->ExceptionClear();
+               throw this;
+           }
            if(jthis == NULL) {
                std::cerr << "Call to create new Test with signature ()V returned null." << std::endl;
                releaseEnv(env);
                return;
            }
+           jobjectRefType ref = env->GetObjectRefType(jthis);
            if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__," new Test jthis=",jthis);
            if(ref != JNIGlobalRefType) {
                jthis = env->NewGlobalRef(jthis);
@@ -576,6 +689,13 @@ namespace test {
           Test nullObject((jobject)NULL,false); return nullObject;
       } else {
           retVal= (jobject)  env->CallStaticObjectMethod( cls, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getTestStatic jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw env;
+          }
       }
   }
   releaseEnv(env);
@@ -587,7 +707,7 @@ namespace test {
   jint Test::getI() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getI of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getI of testpackage.Test with jthis == NULL." << std::endl;
       return (jint) -1;
   }
   JNIEnv *env =getEnv();
@@ -601,6 +721,13 @@ namespace test {
           return (jint) -1;
       } else {
           retVal= (jint)  env->CallIntMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getI jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -609,7 +736,7 @@ namespace test {
   ::test::java::util::List Test::getListOfStrings() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getListOfStrings of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getListOfStrings of testpackage.Test with jthis == NULL." << std::endl;
       ::test::java::util::List nullObject((jobject)NULL,false); return nullObject;
   }
   JNIEnv *env =getEnv();
@@ -623,6 +750,13 @@ namespace test {
           ::test::java::util::List nullObject((jobject)NULL,false); return nullObject;
       } else {
           retVal= (jobject)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getListOfStrings jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -634,8 +768,8 @@ namespace test {
   void Test::setListOfStrings(::test::java::util::List  &list_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setListOfStrings of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setListOfStrings of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -645,9 +779,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setListOfStrings", "(Ljava/util/List;)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setListOfStrings with signature (Ljava/util/List;)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,list_0.jthis );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setListOfStrings jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -656,7 +797,7 @@ namespace test {
   A Test::getClassObjectA() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getClassObjectA of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getClassObjectA of testpackage.Test with jthis == NULL." << std::endl;
       A nullObject((jobject)NULL,false); return nullObject;
   }
   JNIEnv *env =getEnv();
@@ -670,6 +811,13 @@ namespace test {
           A nullObject((jobject)NULL,false); return nullObject;
       } else {
           retVal= (jobject)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getClassObjectA jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -681,8 +829,8 @@ namespace test {
   void Test::setClassObjectA(A  &a_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setClassObjectA of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setClassObjectA of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -692,9 +840,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setClassObjectA", "(Ltestpackage/A;)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setClassObjectA with signature (Ltestpackage/A;)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,a_0.jthis );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setClassObjectA jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -703,7 +858,7 @@ namespace test {
   jbyteArray Test::getByteArrayProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getByteArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getByteArrayProp of testpackage.Test with jthis == NULL." << std::endl;
       return NULL;
   }
   JNIEnv *env =getEnv();
@@ -717,6 +872,13 @@ namespace test {
           return NULL;
       } else {
           retVal= (jbyteArray)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getByteArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -725,8 +887,8 @@ namespace test {
   void Test::setByteArrayProp(jbyteArray byteArray_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setByteArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setByteArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -736,9 +898,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setByteArrayProp", "([B)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setByteArrayProp with signature ([B)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,byteArray_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setByteArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -749,7 +918,7 @@ namespace test {
    // convenience method, converts to/from JNI types to common C++ types.
    if(jthis == NULL) {
        std::cerr << "Call of method setByteArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-       
+       return;
    }
    JNIEnv *env =getEnv();
    jclass cls = env->GetObjectClass(jthis);
@@ -771,7 +940,7 @@ namespace test {
   jbyte Test::getByteProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getByteProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getByteProp of testpackage.Test with jthis == NULL." << std::endl;
       return (jbyte) -1;
   }
   JNIEnv *env =getEnv();
@@ -785,6 +954,13 @@ namespace test {
           return (jbyte) -1;
       } else {
           retVal= (jbyte)  env->CallByteMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getByteProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -793,8 +969,8 @@ namespace test {
   void Test::setByteProp(jbyte byte_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setByteProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setByteProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -804,9 +980,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setByteProp", "(B)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setByteProp with signature (B)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,byte_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setByteProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -815,7 +998,7 @@ namespace test {
   jcharArray Test::getCharArrayProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getCharArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getCharArrayProp of testpackage.Test with jthis == NULL." << std::endl;
       return NULL;
   }
   JNIEnv *env =getEnv();
@@ -829,6 +1012,13 @@ namespace test {
           return NULL;
       } else {
           retVal= (jcharArray)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getCharArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -837,8 +1027,8 @@ namespace test {
   void Test::setCharArrayProp(jcharArray charArray_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setCharArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setCharArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -848,9 +1038,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setCharArrayProp", "([C)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setCharArrayProp with signature ([C)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,charArray_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setCharArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -861,7 +1058,7 @@ namespace test {
    // convenience method, converts to/from JNI types to common C++ types.
    if(jthis == NULL) {
        std::cerr << "Call of method setCharArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-       
+       return;
    }
    JNIEnv *env =getEnv();
    jclass cls = env->GetObjectClass(jthis);
@@ -883,7 +1080,7 @@ namespace test {
   jchar Test::getCharProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getCharProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getCharProp of testpackage.Test with jthis == NULL." << std::endl;
       return (jchar) -1;
   }
   JNIEnv *env =getEnv();
@@ -897,6 +1094,13 @@ namespace test {
           return (jchar) -1;
       } else {
           retVal= (jchar)  env->CallCharMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getCharProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -905,7 +1109,7 @@ namespace test {
   jshort Test::getShortProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getShortProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getShortProp of testpackage.Test with jthis == NULL." << std::endl;
       return (jshort) -1;
   }
   JNIEnv *env =getEnv();
@@ -919,6 +1123,13 @@ namespace test {
           return (jshort) -1;
       } else {
           retVal= (jshort)  env->CallShortMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getShortProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -927,8 +1138,8 @@ namespace test {
   void Test::setShortProp(jshort short_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setShortProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setShortProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -938,9 +1149,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setShortProp", "(S)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setShortProp with signature (S)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,short_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setShortProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -949,7 +1167,7 @@ namespace test {
   jshortArray Test::getShortArrayProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getShortArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getShortArrayProp of testpackage.Test with jthis == NULL." << std::endl;
       return NULL;
   }
   JNIEnv *env =getEnv();
@@ -963,6 +1181,13 @@ namespace test {
           return NULL;
       } else {
           retVal= (jshortArray)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getShortArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -971,7 +1196,7 @@ namespace test {
   jint Test::getIntProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getIntProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getIntProp of testpackage.Test with jthis == NULL." << std::endl;
       return (jint) -1;
   }
   JNIEnv *env =getEnv();
@@ -985,6 +1210,13 @@ namespace test {
           return (jint) -1;
       } else {
           retVal= (jint)  env->CallIntMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getIntProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -993,8 +1225,8 @@ namespace test {
   void Test::setIntProp(jint int_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setIntProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setIntProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -1004,9 +1236,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setIntProp", "(I)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setIntProp with signature (I)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,int_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setIntProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1015,7 +1254,7 @@ namespace test {
   jintArray Test::getIntArrayProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getIntArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getIntArrayProp of testpackage.Test with jthis == NULL." << std::endl;
       return NULL;
   }
   JNIEnv *env =getEnv();
@@ -1029,6 +1268,13 @@ namespace test {
           return NULL;
       } else {
           retVal= (jintArray)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getIntArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1037,8 +1283,8 @@ namespace test {
   void Test::setIntArrayProp(jintArray intArray_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setIntArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setIntArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -1048,9 +1294,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setIntArrayProp", "([I)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setIntArrayProp with signature ([I)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,intArray_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setIntArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1061,7 +1314,7 @@ namespace test {
    // convenience method, converts to/from JNI types to common C++ types.
    if(jthis == NULL) {
        std::cerr << "Call of method setIntArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-       
+       return;
    }
    JNIEnv *env =getEnv();
    jclass cls = env->GetObjectClass(jthis);
@@ -1083,7 +1336,7 @@ namespace test {
   jlong Test::getLongProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getLongProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getLongProp of testpackage.Test with jthis == NULL." << std::endl;
       return (jlong) -1;
   }
   JNIEnv *env =getEnv();
@@ -1097,6 +1350,13 @@ namespace test {
           return (jlong) -1;
       } else {
           retVal= (jlong)  env->CallLongMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getLongProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1105,8 +1365,8 @@ namespace test {
   void Test::setLongProp(jlong long_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setLongProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setLongProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -1116,9 +1376,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setLongProp", "(J)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setLongProp with signature (J)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,long_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setLongProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1127,7 +1394,7 @@ namespace test {
   jlongArray Test::getLongArrayProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getLongArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getLongArrayProp of testpackage.Test with jthis == NULL." << std::endl;
       return NULL;
   }
   JNIEnv *env =getEnv();
@@ -1141,6 +1408,13 @@ namespace test {
           return NULL;
       } else {
           retVal= (jlongArray)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getLongArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1149,8 +1423,8 @@ namespace test {
   void Test::setLongArrayProp(jlongArray longArray_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setLongArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setLongArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -1160,9 +1434,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setLongArrayProp", "([J)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setLongArrayProp with signature ([J)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,longArray_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setLongArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1173,7 +1454,7 @@ namespace test {
    // convenience method, converts to/from JNI types to common C++ types.
    if(jthis == NULL) {
        std::cerr << "Call of method setLongArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-       
+       return;
    }
    JNIEnv *env =getEnv();
    jclass cls = env->GetObjectClass(jthis);
@@ -1195,7 +1476,7 @@ namespace test {
   jfloat Test::getFloatProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getFloatProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getFloatProp of testpackage.Test with jthis == NULL." << std::endl;
       return (jfloat) -1.0;
   }
   JNIEnv *env =getEnv();
@@ -1209,6 +1490,13 @@ namespace test {
           return (jfloat) -1.0;
       } else {
           retVal= (jfloat)  env->CallFloatMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getFloatProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1217,8 +1505,8 @@ namespace test {
   void Test::setFloatProp(jfloat float_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setFloatProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setFloatProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -1228,9 +1516,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setFloatProp", "(F)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setFloatProp with signature (F)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,float_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setFloatProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1239,7 +1534,7 @@ namespace test {
   jfloatArray Test::getFloatArrayProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getFloatArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getFloatArrayProp of testpackage.Test with jthis == NULL." << std::endl;
       return NULL;
   }
   JNIEnv *env =getEnv();
@@ -1253,6 +1548,13 @@ namespace test {
           return NULL;
       } else {
           retVal= (jfloatArray)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getFloatArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1261,8 +1563,8 @@ namespace test {
   void Test::setFloatArrayProp(jfloatArray floatArray_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setFloatArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setFloatArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -1272,9 +1574,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setFloatArrayProp", "([F)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setFloatArrayProp with signature ([F)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,floatArray_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setFloatArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1285,7 +1594,7 @@ namespace test {
    // convenience method, converts to/from JNI types to common C++ types.
    if(jthis == NULL) {
        std::cerr << "Call of method setFloatArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-       
+       return;
    }
    JNIEnv *env =getEnv();
    jclass cls = env->GetObjectClass(jthis);
@@ -1307,7 +1616,7 @@ namespace test {
   jdouble Test::getDoubleProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getDoubleProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getDoubleProp of testpackage.Test with jthis == NULL." << std::endl;
       return (jdouble) -1.0;
   }
   JNIEnv *env =getEnv();
@@ -1321,6 +1630,13 @@ namespace test {
           return (jdouble) -1.0;
       } else {
           retVal= (jdouble)  env->CallDoubleMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getDoubleProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1329,8 +1645,8 @@ namespace test {
   void Test::setDoubleProp(jdouble double_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setDoubleProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setDoubleProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -1340,9 +1656,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setDoubleProp", "(D)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setDoubleProp with signature (D)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,double_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setDoubleProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1351,7 +1674,7 @@ namespace test {
   jdoubleArray Test::getDoubleArrayProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getDoubleArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getDoubleArrayProp of testpackage.Test with jthis == NULL." << std::endl;
       return NULL;
   }
   JNIEnv *env =getEnv();
@@ -1365,6 +1688,13 @@ namespace test {
           return NULL;
       } else {
           retVal= (jdoubleArray)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getDoubleArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1373,8 +1703,8 @@ namespace test {
   void Test::setDoubleArrayProp(jdoubleArray doubleArray_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setDoubleArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setDoubleArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -1384,9 +1714,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setDoubleArrayProp", "([D)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setDoubleArrayProp with signature ([D)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,doubleArray_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setDoubleArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1397,7 +1734,7 @@ namespace test {
    // convenience method, converts to/from JNI types to common C++ types.
    if(jthis == NULL) {
        std::cerr << "Call of method setDoubleArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-       
+       return;
    }
    JNIEnv *env =getEnv();
    jclass cls = env->GetObjectClass(jthis);
@@ -1419,8 +1756,8 @@ namespace test {
   void Test::setShortArrayProp(jshortArray shortArray_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setShortArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setShortArrayProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -1430,9 +1767,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setShortArrayProp", "([S)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setShortArrayProp with signature ([S)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,shortArray_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setShortArrayProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1443,7 +1787,7 @@ namespace test {
    // convenience method, converts to/from JNI types to common C++ types.
    if(jthis == NULL) {
        std::cerr << "Call of method setShortArrayProp of testpackage.Test with jthis == NULL." << std::endl;
-       
+       return;
    }
    JNIEnv *env =getEnv();
    jclass cls = env->GetObjectClass(jthis);
@@ -1465,8 +1809,8 @@ namespace test {
   void Test::setCharProp(jchar char_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setCharProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setCharProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -1476,9 +1820,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setCharProp", "(C)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setCharProp with signature (C)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,char_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setCharProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1487,7 +1838,7 @@ namespace test {
   jstring Test::getStrProp() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method getStrProp of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method getStrProp of testpackage.Test with jthis == NULL." << std::endl;
       return NULL;
   }
   JNIEnv *env =getEnv();
@@ -1501,6 +1852,13 @@ namespace test {
           return NULL;
       } else {
           retVal= (jstring)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::getStrProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1509,8 +1867,8 @@ namespace test {
   void Test::setStrProp(jstring string_0) {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method setStrProp of testpackage.Test with jthis == NULL." << std::endl;
-      
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method setStrProp of testpackage.Test with jthis == NULL." << std::endl;
+      return;
   }
   JNIEnv *env =getEnv();
   jclass cls = env->GetObjectClass(jthis);
@@ -1520,9 +1878,16 @@ namespace test {
       static jmethodID mid = env->GetMethodID(cls, "setStrProp", "(Ljava/lang/String;)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named setStrProp with signature (Ljava/lang/String;)V." << std::endl;
-          
+          return;
       } else {
            env->CallVoidMethod(jthis, mid ,string_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::setStrProp jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1533,7 +1898,7 @@ namespace test {
    // convenience method, converts to/from JNI types to common C++ types.
    if(jthis == NULL) {
        std::cerr << "Call of method setStrProp of testpackage.Test with jthis == NULL." << std::endl;
-       
+       return;
    }
    JNIEnv *env =getEnv();
    jclass cls = env->GetObjectClass(jthis);
@@ -1553,7 +1918,7 @@ namespace test {
   jstring Test::funcReturningString() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method funcReturningString of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method funcReturningString of testpackage.Test with jthis == NULL." << std::endl;
       return NULL;
   }
   JNIEnv *env =getEnv();
@@ -1567,6 +1932,13 @@ namespace test {
           return NULL;
       } else {
           retVal= (jstring)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::funcReturningString jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1581,9 +1953,16 @@ namespace test {
       static jmethodID mid = env->GetStaticMethodID(cls, "main", "([Ljava/lang/String;)V");
       if (NULL == mid) {
           std::cerr << "Class testpackage.Test has no method named main with signature ([Ljava/lang/String;)V." << std::endl;
-          
+          return;
       } else {
            env->CallStaticVoidMethod( cls, mid ,stringArray_0 );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::main jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw env;
+          }
       }
   }
   releaseEnv(env);
@@ -1618,7 +1997,7 @@ namespace test {
   jstring Test::toString() {
 
   if(jthis == NULL) {
-      std::cerr << "Call of method toString of testpackage.Test with jthis == NULL." << std::endl;
+      std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method toString of testpackage.Test with jthis == NULL." << std::endl;
       return NULL;
   }
   JNIEnv *env =getEnv();
@@ -1632,6 +2011,13 @@ namespace test {
           return NULL;
       } else {
           retVal= (jstring)  env->CallObjectMethod(jthis, mid  );
+          jthrowable t = env->ExceptionOccurred();
+          if(t != NULL) {
+              DebugPrintJObject(__FILE__,__LINE__," Test::toString jthis=",t);
+              env->ExceptionDescribe();
+              env->ExceptionClear();
+              throw this;
+          }
       }
   }
   releaseEnv(env);
@@ -1679,12 +2065,19 @@ namespace test {
            std::cerr << "Class List has no method constructor signature ()V" << std::endl;
        } else {
            jthis = env->NewObject(cls, mid );
-           jobjectRefType ref = env->GetObjectRefType(jthis);
+           jthrowable t = env->ExceptionOccurred();
+           if(t != NULL) {
+               DebugPrintJObject(__FILE__,__LINE__," List::toString jthis=",t);
+               env->ExceptionDescribe();
+               env->ExceptionClear();
+               throw this;
+           }
            if(jthis == NULL) {
                std::cerr << "Call to create new List with signature ()V returned null." << std::endl;
                releaseEnv(env);
                return;
            }
+           jobjectRefType ref = env->GetObjectRefType(jthis);
            if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__," new List jthis=",jthis);
            if(ref != JNIGlobalRefType) {
                jthis = env->NewGlobalRef(jthis);
@@ -1848,7 +2241,6 @@ namespace test {
         const char *cstr = env->GetStringUTFChars(jobjstr, &iscopy);
         std::cout << file << ":" << lineno << " jobj=" << jobj << " " << prefix << cstr << std::endl;
         env->ReleaseStringUTFChars(jobjstr,cstr);
-        std::cout << file << ":" << lineno << std::endl;
     }
     
     void PrintObject(const char *prefix, const ::test::java::lang::Object &objref) {

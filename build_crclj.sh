@@ -2,11 +2,13 @@
 set -x;
 
 reset; 
-mvn package;
+if test ! -f target/java4cpp-1.0-SNAPSHOT-jar-with-dependencies.jar ; then
+    mvn package;
+fi
 
-rm crclj*.cpp crclj*.h 2>/dev/null || true
+rm crclj*.cpp crclj*.h core core.[0-9]* hs_*.log *.o crclj_test >2/dev/null 
 
-java -jar target/java4cpp-1.0-SNAPSHOT-jar-with-dependencies.jar -p crcl -n crclj -j ../crac/CRCLJava/target/CRCLJava-1.0-SNAPSHOT-jar-with-dependencies.jar;
+java -jar target/java4cpp-1.0-SNAPSHOT-jar-with-dependencies.jar  -l 10000 -n crclj -j ../crac/CRCLJava/target/CRCLJava-1.0-SNAPSHOT-jar-with-dependencies.jar;
 
 export JAVA_HOME=/usr/local/jdk1.8.0_40/ ;
 ls -ld "${JAVA_HOME}"; 

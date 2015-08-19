@@ -121,7 +121,7 @@ public class J4CppMain {
         }
     }
 
-    public static String namespace = "initial_namespace";
+    public static String namespace = "java4cpp";
 
     private static String getModifiedClassName(Class cls) {
         Class enclosingClass = cls.getEnclosingClass();
@@ -363,11 +363,58 @@ public class J4CppMain {
         badNamesSet.addAll(Arrays.asList("and", "and_eq", "bitand",
                 "bitor", "compl", "not", "not_eq", "or",
                 "not_eq", "or", "or_eq", "xor", "xor_eq",
-                "delete", "namespace"));
+                "delete", "namespace", "union"));
         return badNamesSet;
     }
 
-    private static String fixMethodName(String mname) {
+    private static String fixMethodName(Method m) {
+        String mname = m.getName();
+        
+        Method ma[] = m.getDeclaringClass().getMethods();
+        if(mname.equals("distance") || mname.equals("distance1")) {
+            if(m.getDeclaringClass().getName().contains("MathArrays")) {
+                System.out.println("debug me");
+            }
+        }
+        int index = 0;
+        boolean index_incremented = false;
+        for (int i = 0; i < ma.length; i++) {
+            Method method = ma[i];
+            if (method.equals(m)) {
+                break;
+            }
+            if(method.getParameterCount() != m.getParameterCount()) {
+                continue;
+            }
+            if(m.getParameterCount() >= 1) {
+                if(String.class.isAssignableFrom(m.getParameterTypes()[0])
+                        != String.class.isAssignableFrom(method.getParameterTypes()[0])) {
+                    continue;
+                }
+            }
+            if (method.getName().equals(m.getName())) {
+                index++;
+                index_incremented = true;
+            }
+        }
+        int start_index = 0;
+        while (index_incremented) {
+            index_incremented = false;
+            for (int i = 0; i < ma.length; i++) {
+                Method method = ma[i];
+                for (int j = start_index; j <= index; j++) {
+                    if (method.getName().equals(m.getName() + j)
+                            && m.getParameterCount() == method.getParameterCount()) {
+                        index++;
+                        index_incremented = true;
+                    }
+                }
+            }
+            start_index = index;
+        }
+        if (index > 0) {
+            mname = mname + index;
+        }
         if (badNames.contains(mname)) {
             return mname + "Method";
         }
@@ -377,7 +424,7 @@ public class J4CppMain {
     private static String getCppDeclaration(Method m, Class<?> relClass) {
         return getCppModifiers(m)
                 + getCppType(m.getReturnType(), relClass) + " "
-                + fixMethodName(m.getName())
+                + fixMethodName(m)
                 + getCppParamDeclarations(m.getParameterTypes(), relClass)
                 + ";";
     }
@@ -390,7 +437,7 @@ public class J4CppMain {
                 + getCppType(m.getReturnType(), relClass) + " "
                 + clssOnlyName
                 + "::"
-                + fixMethodName(m.getName())
+                + fixMethodName(m)
                 + getCppParamDeclarations(m.getParameterTypes(), relClass)
                 + " {\n";
     }
@@ -403,7 +450,7 @@ public class J4CppMain {
                 + getCppType(m.getReturnType(), relClass) + " "
                 + clssOnlyName
                 + "::"
-                + fixMethodName(m.getName())
+                + fixMethodName(m)
                 + getEasyCallCppParamDeclarations(m.getParameterTypes(), relClass)
                 + " {\n";
     }
@@ -705,8 +752,14 @@ public class J4CppMain {
     }
 
     private static boolean checkMethod(Method m, List<Class> classes) {
-        if(m.getName().contains("setCRCLCommand")) {
-            System.out.println("debug me");
+//        if (m.getName().contains("MsgToTimeStamp")) {
+//            System.out.println("debug me");
+//        }
+        if (m.getDeclaringClass().getName().equals(m.getName())) {
+            return false;
+        }
+        if (m.getDeclaringClass().getName().endsWith("." + m.getName())) {
+            return false;
         }
         if (m.isSynthetic()) {
             return false;
@@ -772,12 +825,12 @@ public class J4CppMain {
 //        }
         return !Modifier.isStatic(m.getModifiers())
                 && Arrays.stream(m.getParameterTypes())
-                .anyMatch(t -> t.isArray() || isString(t)) 
+                .anyMatch(t -> t.isArray() || isString(t))
                 && Arrays.stream(m.getParameterTypes())
                 .noneMatch(t -> t.isArray() && !t.getComponentType().isPrimitive());
     }
 
-    private static boolean isConstructorToMakeEasy(Constructor c,Class relClss) {
+    private static boolean isConstructorToMakeEasy(Constructor c, Class relClss) {
         return Arrays.stream(c.getParameterTypes())
                 .anyMatch(t -> t.isArray() || isString(t))
                 && Arrays.stream(c.getParameterTypes())
@@ -801,12 +854,12 @@ public class J4CppMain {
     private static String getEasyCallCppDeclaration(Method m, Class<?> relClass) {
         return getCppModifiers(m)
                 + getCppType(m.getReturnType(), relClass) + " "
-                + fixMethodName(m.getName())
+                + fixMethodName(m)
                 + getEasyCallCppParamDeclarations(m.getParameterTypes(), relClass)
                 + ";";
     }
 
-    public static boolean hasNoArgConstructor(Constructor []constructors) {
+    public static boolean hasNoArgConstructor(Constructor[] constructors) {
         for (Constructor c : constructors) {
             if ((Modifier.isProtected(c.getModifiers()) || Modifier.isPublic(c.getModifiers()))
                     && c.getParameterCount() == 0) {
@@ -883,11 +936,17 @@ public class J4CppMain {
                     if (jar.startsWith("~/")) {
                         jar = System.getProperty("user.home") + jar.substring(1);
                     }
+                    if (jar.startsWith("./")) {
+                        jar = System.getProperty("user.dir") + jar.substring(1);
+                    }
+                    if (jar.startsWith("../")) {
+                        jar = new File(System.getProperty("user.dir")).getParentFile().getCanonicalPath() + jar.substring(2);
+                    }
                     int lastSep = jar.lastIndexOf(File.separator);
                     int start = Math.max(0, lastSep + 1);
                     int period = jar.indexOf('.', start + 1);
                     int end = Math.max(start + 1, period);
-                    namespace = jar.substring(start, end).toLowerCase().replace("-", "");
+                    //namespace = jar.substring(start, end).toLowerCase().replace("-", "");
                 }
                 namespace = line.getOptionValue("namespace", namespace);
                 System.out.println("namespace = " + namespace);
@@ -972,7 +1031,7 @@ public class J4CppMain {
                     }
                     if (!classes.contains(clss)
                             && isAddableClass(clss, excludedClasses)) {
-                        System.out.println("clss = " + clss);
+//                        System.out.println("clss = " + clss);
                         classes.add(clss);
 //                        Class superClass = clss.getSuperclass();
 //                        while (null != superClass
@@ -1220,101 +1279,130 @@ public class J4CppMain {
                     .replace(".", "_");
             map.put(HEADER_DEFINE, headerDefine);
             map.put(NAMESPACE, namespace);
-            try (PrintWriter pw = new PrintWriter(new FileWriter(header))) {
-                processTemplate(pw, map, HEADER_TEMPLATE_STARTH, tabs);
-                Class lastClass = null;
-                for (int class_index = 0; class_index < classes.size(); class_index++) {
-                    Class clss = classes.get(class_index);
-                    String clssName = clss.getCanonicalName();
-                    tabs = openClassNamespace(clss, pw, tabs, lastClass);
-                    String clssOnlyName = getCppClassName(clss);
-                    map.put(CLASS_NAME, clssOnlyName);
-                    map.put("%BASE_CLASS_FULL_NAME%", classToCppBase(clss));
-                    tabs += TAB_STRING;
-                    processTemplate(pw, map, HEADER_CLASS_STARTH, tabs);
-                    tabs += TAB_STRING;
-
-//                    if (clssName.contains("Component")) {
-//                        System.out.println("debug me");
-//                    }
-                    Constructor constructors[] = clss.getDeclaredConstructors();
-                    if (!hasNoArgConstructor(constructors)) {
-                        if (constructors.length > 0) {
-                            pw.println(tabs + "protected:");
-                        }
-                        pw.println(tabs + clssOnlyName + "();");
-                        if (constructors.length > 0) {
-                            pw.println(tabs + "public:");
-                        }
-                    }
-                    for (Constructor c : constructors) {
-                        if (c.getParameterCount() == 0
-                                && Modifier.isProtected(c.getModifiers())) {
-                            pw.println(tabs + "protected:");
-                            pw.println(tabs + clssOnlyName + "();");
-                            pw.println(tabs + "public:");
-                        }
-                        if (c.getParameterCount() == 1
-                                && clss.isAssignableFrom(c.getParameterTypes()[0])) {
-                            continue;
-                        }
-                        if (!Modifier.isPublic(c.getModifiers())) {
-                            continue;
-                        }
-                        if (c.getParameterTypes().length == 1) {
-                            if (c.getParameterTypes()[0].getName().equals(clss.getName())) {
-//                                    System.out.println("skipping constructor.");
-                                continue;
-                            }
-                        }
-
-                        if (!checkParameters(c.getParameterTypes(), classes)) {
-                            continue;
-                        }
-                        pw.println(tabs + clssOnlyName + getCppParamDeclarations(c.getParameterTypes(), clss) + ";");
-                        if (isConstructorToMakeEasy(c,clss)) {
-                            pw.println(tabs + clssOnlyName + getEasyCallCppParamDeclarations(c.getParameterTypes(), clss) + ";");
-                        }
-                    }
-
-                    pw.println(tabs + "~" + clssOnlyName + "();");
-                    Method methods[] = clss.getDeclaredMethods();
-                    for (int j = 0; j < methods.length; j++) {
-                        Method method = methods[j];
-                        if (!checkMethod(method, classes)) {
-                            continue;
-                        }
-                        if ((method.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC) {
-                            pw.println(tabs + getCppDeclaration(method, clss));
-                        }
-                        if (isArrayStringMethod(method)) {
-                            pw.println(tabs + getCppModifiers(method)
-                                    + getCppType(method.getReturnType(), clss) + " "
-                                    + fixMethodName(method.getName())
-                                    + "(int argc,const char **argv);");
-                        }
-                        if (isMethodToMakeEasy(method)) {
-                            pw.println(tabs + getEasyCallCppDeclaration(method, clss));
-                        }
-                    }
-                    tabs = tabs.substring(0, tabs.length() - 1);
-                    pw.println(tabs + "}; // end class " + clssOnlyName);
-                    tabs = tabs.substring(0, tabs.length() - 1);
-                    Class nextClass = (class_index < (classes.size() - 1))
-                            ? classes.get(class_index + 1) : null;
-                    tabs = closeClassNamespace(clss, pw, tabs, nextClass);
-                    pw.println();
-                    lastClass = clss;
-                }
-                processTemplate(pw, map, HEADER_TEMPLATE_ENDH, tabs);
-            } catch (Exception ex) {
-                Logger.getLogger(J4CppMain.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
             int num_class_segments = (classes.size() + 5) / 5;
             String fmt = "%d";
             if (num_class_segments > 10) {
                 fmt = "%02d";
+            }
+            if (num_class_segments > 100) {
+                fmt = "%03d";
+            }
+            String header_file_base = header;
+            if (header_file_base.endsWith(".h")) {
+                header_file_base = header_file_base.substring(0, header_file_base.length() - 2);
+            } else if (header_file_base.endsWith(".hh")) {
+                header_file_base = header_file_base.substring(0, header_file_base.length() - 3);
+            } else if (header_file_base.endsWith(".hpp")) {
+                header_file_base = header_file_base.substring(0, header_file_base.length() - 4);
+            }
+            try (PrintWriter pw = new PrintWriter(new FileWriter(header))) {
+                processTemplate(pw, map, HEADER_TEMPLATE_STARTH, tabs);
+                for (int segment_index = 0; segment_index < num_class_segments; segment_index++) {
+                    String header_segment_file = header_file_base + String.format(fmt, segment_index) + ".h";
+                    pw.println("#include \"" + header_segment_file + "\"");
+                }
+                processTemplate(pw, map, HEADER_TEMPLATE_ENDH, tabs);
+            }
+            for (int segment_index = 0; segment_index < num_class_segments; segment_index++) {
+                String header_segment_file = header_file_base + String.format(fmt, segment_index) + ".h";
+                try (PrintWriter pw = new PrintWriter(new FileWriter(header_segment_file))) {
+                    //processTemplate(pw, map, HEADER_TEMPLATE_STARTH, tabs);
+                    pw.println("// Never include this file (" + header_segment_file + ") directly. include " + header + " instead.");
+                    pw.println();
+                    Class lastClass = null;
+                    List<Class> classesSegList = classes.subList(segment_index * 5,
+                            Math.min(segment_index * 5 + 5, classes.size()));
+                    for (int class_index = 0; class_index < classesSegList.size(); class_index++) {
+                        Class clss = classesSegList.get(class_index);
+                        String clssName = clss.getCanonicalName();
+                        tabs = openClassNamespace(clss, pw, tabs, lastClass);
+                        String clssOnlyName = getCppClassName(clss);
+                        map.put(CLASS_NAME, clssOnlyName);
+                        map.put("%BASE_CLASS_FULL_NAME%", classToCppBase(clss));
+                        tabs += TAB_STRING;
+                        processTemplate(pw, map, HEADER_CLASS_STARTH, tabs);
+                        tabs += TAB_STRING;
+
+//                    if (clssName.contains("Component")) {
+//                        System.out.println("debug me");
+//                    }
+                        Constructor constructors[] = clss.getDeclaredConstructors();
+                        if (!hasNoArgConstructor(constructors)) {
+                            if (constructors.length > 0) {
+                                pw.println(tabs + "protected:");
+                            }
+                            pw.println(tabs + clssOnlyName + "();");
+                            if (constructors.length > 0) {
+                                pw.println(tabs + "public:");
+                            }
+                        }
+                        for (Constructor c : constructors) {
+                            if (c.getParameterCount() == 0
+                                    && Modifier.isProtected(c.getModifiers())) {
+                                pw.println(tabs + "protected:");
+                                pw.println(tabs + clssOnlyName + "();");
+                                pw.println(tabs + "public:");
+                            }
+                            if (checkConstructor(c, clss, classes)) {
+                                continue;
+                            }
+
+                            if (c.getParameterCount() == 1
+                                    && clss.isAssignableFrom(c.getParameterTypes()[0])) {
+                                continue;
+                            }
+                            if (!Modifier.isPublic(c.getModifiers())) {
+                                continue;
+                            }
+                            if (c.getParameterTypes().length == 1) {
+                                if (c.getParameterTypes()[0].getName().equals(clss.getName())) {
+//                                    System.out.println("skipping constructor.");
+                                    continue;
+                                }
+                            }
+
+                            if (!checkParameters(c.getParameterTypes(), classes)) {
+                                continue;
+                            }
+                            pw.println(tabs + clssOnlyName + getCppParamDeclarations(c.getParameterTypes(), clss) + ";");
+                            if (isConstructorToMakeEasy(c, clss)) {
+                                pw.println(tabs + clssOnlyName + getEasyCallCppParamDeclarations(c.getParameterTypes(), clss) + ";");
+                            }
+                        }
+
+                        pw.println(tabs + "~" + clssOnlyName + "();");
+                        Method methods[] = clss.getDeclaredMethods();
+                        for (int j = 0; j < methods.length; j++) {
+                            Method method = methods[j];
+                            if (!checkMethod(method, classes)) {
+                                continue;
+                            }
+                            if ((method.getModifiers() & Modifier.PUBLIC) == Modifier.PUBLIC) {
+                                pw.println(tabs + getCppDeclaration(method, clss));
+                            }
+                            if (isArrayStringMethod(method)) {
+                                pw.println(tabs + getCppModifiers(method)
+                                        + getCppType(method.getReturnType(), clss) + " "
+                                        + fixMethodName(method)
+                                        + "(int argc,const char **argv);");
+                            }
+                            if (isMethodToMakeEasy(method)) {
+                                pw.println(tabs + getEasyCallCppDeclaration(method, clss));
+                            }
+                        }
+                        tabs = tabs.substring(0, tabs.length() - 1);
+                        pw.println(tabs + "}; // end class " + clssOnlyName);
+                        tabs = tabs.substring(0, tabs.length() - 1);
+                        Class nextClass = (class_index < (classesSegList.size() - 1))
+                                ? classesSegList.get(class_index + 1) : null;
+                        tabs = closeClassNamespace(clss, pw, tabs, nextClass);
+                        pw.println();
+                        lastClass = clss;
+                    }
+                    //processTemplate(pw, map, HEADER_TEMPLATE_ENDH, tabs);
+                } catch (Exception ex) {
+                    Logger.getLogger(J4CppMain.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             for (int segment_index = 0; segment_index < num_class_segments; segment_index++) {
                 String output_segment_file = output;
@@ -1352,7 +1440,7 @@ public class J4CppMain {
 //                            System.out.println("debug me");
 //                        }
                         if (!hasNoArgConstructor(constructors)) {
-                            pw.println(tabs + clssOnlyName + "::" + clssOnlyName + "() : " +classToCppBase(clss)+"((jobject)NULL,false) {");
+                            pw.println(tabs + clssOnlyName + "::" + clssOnlyName + "() : " + classToCppBase(clss) + "((jobject)NULL,false) {");
                             map.put(JNI_SIGNATURE, "()V");
                             map.put(CONSTRUCTOR_ARGS, "");
                             processTemplate(pw, map, CPP_NEWCPP, tabs);
@@ -1360,21 +1448,11 @@ public class J4CppMain {
                             pw.println();
                         }
                         for (Constructor c : constructors) {
-                            if (!Modifier.isPublic(c.getModifiers())) {
-                                if (c.getParameterCount() != 0 || !Modifier.isProtected(c.getModifiers())) {
-                                    continue;
-                                }
-                            }
-                            if (c.getParameterCount() == 1
-                                    && clss.isAssignableFrom(c.getParameterTypes()[0])) {
-                                continue;
-                            }
-
-                            if (!checkParameters(c.getParameterTypes(), classes)) {
+                            if (checkConstructor(c, clss, classes)) {
                                 continue;
                             }
                             Class[] paramClasses = c.getParameterTypes();
-                            pw.println(tabs + clssOnlyName + "::" + clssOnlyName + getCppParamDeclarations(paramClasses, clss) + " : "+classToCppBase(clss)+"((jobject)NULL,false) {");
+                            pw.println(tabs + clssOnlyName + "::" + clssOnlyName + getCppParamDeclarations(paramClasses, clss) + " : " + classToCppBase(clss) + "((jobject)NULL,false) {");
                             tabs = tabs + TAB_STRING;
                             map.put(JNI_SIGNATURE, "(" + getJNIParamSignature(paramClasses) + ")V");
                             map.put(CONSTRUCTOR_ARGS, (paramClasses.length > 0 ? "," : "") + getCppParamNames(paramClasses));
@@ -1382,8 +1460,8 @@ public class J4CppMain {
                             tabs = tabs.substring(0, tabs.length() - 1);
                             pw.println(tabs + "}");
                             pw.println();
-                            if (isConstructorToMakeEasy(c,clss)) {
-                                pw.println(tabs + clssOnlyName + "::" + clssOnlyName + getEasyCallCppParamDeclarations(c.getParameterTypes(), clss)  + " : "+classToCppBase(clss)+"((jobject)NULL,false) {");
+                            if (isConstructorToMakeEasy(c, clss)) {
+                                pw.println(tabs + clssOnlyName + "::" + clssOnlyName + getEasyCallCppParamDeclarations(c.getParameterTypes(), clss) + " : " + classToCppBase(clss) + "((jobject)NULL,false) {");
                                 processTemplate(pw, map, "cpp_start_easy_constructor.cpp", tabs);
                                 for (int paramIndex = 0; paramIndex < paramClasses.length; paramIndex++) {
                                     Class paramClasse = paramClasses[paramIndex];
@@ -1440,7 +1518,7 @@ public class J4CppMain {
                             int modifiers = method.getModifiers();
                             if (Modifier.isPublic(modifiers) && !Modifier.isAbstract(modifiers)) {
                                 pw.println(getCppMethodDefinitionStart(tabs, clssOnlyName, method, clss));
-                                map.put(METHOD_NAME, fixMethodName(method.getName()));
+                                map.put(METHOD_NAME, fixMethodName(method));
                                 Class[] paramClasses = method.getParameterTypes();
                                 String methodArgs = getCppParamNames(paramClasses);
                                 map.put(METHOD_ARGS, (paramClasses.length > 0 ? "," : "") + methodArgs);
@@ -1487,7 +1565,7 @@ public class J4CppMain {
                                     String methodArgsIn = getCppParamNamesIn(paramClasses);
                                     String retStoreOut = isVoid(returnClass) ? "" : "retVal= (" + getMethodReturnOutVarType(returnClass, clss) + ") ";
 
-                                    pw.println(tabs + retStoreOut + fixMethodName(method.getName()) + "(" + methodArgsIn + ");");
+                                    pw.println(tabs + retStoreOut + fixMethodName(method) + "(" + methodArgsIn + ");");
                                     for (int paramIndex = 0; paramIndex < paramClasses.length; paramIndex++) {
                                         Class paramClasse = paramClasses[paramIndex];
                                         String parmName = getParamNameIn(paramClasse, paramIndex);
@@ -1543,6 +1621,38 @@ public class J4CppMain {
             Logger.getLogger(J4CppMain.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    private static boolean checkConstructor(Constructor c, Class clss, List<Class> classes) {
+        if (!Modifier.isPublic(c.getModifiers())) {
+            if (c.getParameterCount() != 0 || !Modifier.isProtected(c.getModifiers())) {
+                return true;
+            }
+        }
+        Constructor ca[] = clss.getDeclaredConstructors();
+        for (int i = 0; i < ca.length; i++) {
+            Constructor constructor = ca[i];
+            if (constructor.equals(c)) {
+                break;
+            }
+            if (constructor.getParameterCount() == c.getParameterCount()) {
+                if(c.getParameterCount() >= 1
+                        && 
+                        String.class.isAssignableFrom(c.getParameterTypes()[0])
+                         != String.class.isAssignableFrom(constructor.getParameterTypes()[0])) {
+                    continue;
+                }
+                return true;
+            }
+        }
+        if (c.getParameterCount() == 1
+                && clss.isAssignableFrom(c.getParameterTypes()[0])) {
+            return true;
+        }
+        if (!checkParameters(c.getParameterTypes(), classes)) {
+            return true;
+        }
+        return false;
     }
     private static final int DEFAULT_LIMIT = 200;
     private static final String TAB_STRING = " "; // used to be "\t"
