@@ -12,7 +12,7 @@
         JNIEnv *env; /* pointer to native method interface */
         JavaVM * jvmBuf[1];
         jsize nVMs;
-        debug_j4cpp = debug_j4cpp || (getenv("DEBUG_J4CPP") != NULL);
+        debug_j4cpp = debug_j4cpp || (getenv("DEBUG_J4CPP") != NULL && getenv("DEBUG_J4CPP")[0] != 0);
         char *classPathEnv = getenv("CLASSPATH");
         char *jvmOptionsEnv = getenv("JVM_OPTIONS");
         std::string str;

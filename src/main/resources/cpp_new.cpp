@@ -15,7 +15,7 @@ if (cls != NULL) {
         jthis = env->NewObject(cls, mid %CONSTRUCTOR_ARGS%);
         jthrowable t = env->ExceptionOccurred();
         if(t != NULL) {
-            DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",t);
+            DebugPrintJObject(__FILE__,__LINE__," Exception occurred in  %CLASS_NAME% constructor : ",t);
             env->ExceptionDescribe();
             env->ExceptionClear();
             throw this;

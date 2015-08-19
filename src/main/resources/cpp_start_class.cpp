@@ -13,7 +13,7 @@ static inline jclass get%CLASS_NAME%Class();
         // Place holder for future extensibility
 }
 
-%CLASS_NAME%::%CLASS_NAME%(const %CLASS_NAME% &objref) {
+%CLASS_NAME%::%CLASS_NAME%(const %CLASS_NAME% &objref): %BASE_CLASS_FULL_NAME%((jobject)NULL,false) {
     jobject _jthis = objref.jthis;
     if (_jthis != NULL) {
         jthis = getEnv()->NewGlobalRef(_jthis);
