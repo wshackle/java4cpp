@@ -90,6 +90,24 @@
         return StringClass;
     }
 
+    static jclass getNewClassClass() {
+        jclass clss = getEnv()->FindClass("java/lang/Class");
+        if (NULL == clss) {
+            std::cerr << " Can't find class java/lang/Class" << std::endl;
+        }
+        return clss;
+    }
+
+    static jclass ClassClass = NULL;
+
+    jclass getClassClass() {
+        if (ClassClass != NULL) {
+            return ClassClass;
+        }
+        ClassClass = getNewStringClass();
+        return ClassClass;
+    }
+    
     static jstring getNewEmptyString() {
         return getEnv()->NewStringUTF("");
     }
@@ -105,6 +123,10 @@
     }
 
     void PrintJObject(const char *prefix, jobject jobj) {
+        if(NULL == jobj) {
+            std::cout << prefix << "NULL" << std::endl;
+            return;
+        }
         JNIEnv *env = getEnv();
         jclass clss = env->GetObjectClass(jobj);
         jmethodID midToString = env->GetMethodID(clss, "toString", "()Ljava/lang/String;");
@@ -113,6 +135,19 @@
         const char *cstr = env->GetStringUTFChars(jobjstr, &iscopy);
         std::cout << prefix << cstr << std::endl;
         env->ReleaseStringUTFChars(jobjstr,cstr);
+    }
+    
+    void PrintJThrowable(const char *prefix, jthrowable jobj) {
+        JNIEnv *env = getEnv();
+        jclass clss = env->GetObjectClass(jobj);
+        jmethodID midToString = env->GetMethodID(clss, "toString", "()Ljava/lang/String;");
+        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        jboolean iscopy = JNI_FALSE;
+        const char *cstr = env->GetStringUTFChars(jobjstr, &iscopy);
+        std::cerr << prefix << cstr << std::endl;
+        env->ReleaseStringUTFChars(jobjstr,cstr);
+        env->ExceptionDescribe();
+        env->ExceptionClear();
     }
     
     void DebugPrintJObject(const char *file, int lineno, const char *prefix, jobject jobj) {

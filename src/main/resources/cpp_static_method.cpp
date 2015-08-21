@@ -22,9 +22,9 @@ if (cls != NULL) {
         jthrowable t = env->ExceptionOccurred();
         if(t != NULL) {
             DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",t);
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            throw env;
+            if(GetDebugJ4Cpp()) env->ExceptionDescribe();
+//            env->ExceptionClear();
+            throw t;
         }
     }
 }

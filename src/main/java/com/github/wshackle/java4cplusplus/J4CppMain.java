@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
@@ -25,7 +26,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -189,32 +189,28 @@ public class J4CppMain {
         }
     }
 
-    private static String getCppModifiers(Method m) {
-        int mods = m.getModifiers();
+    private static String getCppModifiers(int modifiers) {
         String out = "";
-        if (0 != (mods & Modifier.STATIC)) {
+        if (Modifier.isStatic(modifiers)) {
             out += "static ";
-        } else if (0 != (mods & Modifier.FINAL)) {
-            out += " ";
-        }
+        } 
         return out;
     }
 
-    private static String addRefIndicator(Class c) {
+    private static String addConstRefIndicator(Class c,String orig) {
         if (!c.isPrimitive()
                 && !isString(c)
                 && !c.isArray()) {
-            return " &";
+            return "const "+orig+" &";
         }
-        return "";
+        return orig;
     }
 
     private static String classToParamNameDecl(Class<?> c, int index) {
         if (c.isArray()) {
             return classToParamName(c.getComponentType()) + "Array_" + index;
         }
-        return addRefIndicator(c)
-                + c.getSimpleName().substring(0, 1).toLowerCase() + c.getSimpleName().substring(1) + "_" + index;
+        return c.getSimpleName().substring(0, 1).toLowerCase() + c.getSimpleName().substring(1) + "_" + index;
     }
 
     private static String addCppJThis(Class c) {
@@ -259,6 +255,7 @@ public class J4CppMain {
         } else {
             return "L" + clss.getCanonicalName().replace(".", "/") + ";";
         }
+       
     }
 
     private static String getJNIParamSignature(Class<?>[] clsses) {
@@ -312,7 +309,7 @@ public class J4CppMain {
         sb.append("(");
         for (int i = 0; i < clsses.length; i++) {
             Class<?> clsse = clsses[i];
-            String name = getCppType(clsse, relClass) + " " + classToParamNameDecl(clsse, i);
+            String name = addConstRefIndicator(clsse,getCppType(clsse, relClass)) + " " + classToParamNameDecl(clsse, i);
             sb.append(name);
             if (i < clsses.length - 1) {
                 sb.append(",");
@@ -363,7 +360,7 @@ public class J4CppMain {
         badNamesSet.addAll(Arrays.asList("and", "and_eq", "bitand",
                 "bitor", "compl", "not", "not_eq", "or",
                 "not_eq", "or", "or_eq", "xor", "xor_eq",
-                "delete", "namespace", "union"));
+                "delete", "namespace", "union","cast"));
         return badNamesSet;
     }
 
@@ -422,13 +419,54 @@ public class J4CppMain {
     }
 
     private static String getCppDeclaration(Method m, Class<?> relClass) {
-        return getCppModifiers(m)
+        return getCppModifiers(m.getModifiers())
                 + getCppType(m.getReturnType(), relClass) + " "
                 + fixMethodName(m)
                 + getCppParamDeclarations(m.getParameterTypes(), relClass)
                 + ";";
     }
 
+    private static String getCppFieldGetterDeclaration(Field f, Class<?> relClass) {
+        return getCppModifiers(f.getModifiers())
+                + getCppType(f.getType(), relClass) + " "
+                + "get"+f.getName().substring(0,1).toUpperCase()+ f.getName().substring(1)
+                + "();";
+    }
+    
+    private static String getCppFieldSetterDeclaration(Field f, Class<?> relClass) {
+        return getCppModifiers(f.getModifiers())
+                + "void set"+f.getName().substring(0,1).toUpperCase()+ f.getName().substring(1)
+                + "("+addConstRefIndicator(f.getType(),getCppType(f.getType(), relClass)) 
+                + " " +classToParamNameDecl(f.getType(), 0)
+                + ");";
+    }
+    
+    private static String getCppFieldGetterDefinitionStart(String tabs,
+            String clssOnlyName,
+            Field f,
+            Class<?> relClass) {
+        return tabs //+ getCppModifiers(m)
+                + getCppType(f.getType(), relClass) + " "
+                + clssOnlyName
+                + "::"
+                + "get"+f.getName().substring(0,1).toUpperCase()+f.getName().substring(1)
+                + "() {\n";
+    }
+    
+    private static String getCppFieldSetterDefinitionStart(String tabs,
+            String clssOnlyName,
+            Field f,
+            Class<?> relClass) {
+        return tabs //+ getCppModifiers(m)
+                + "void "
+                + clssOnlyName
+                + "::"
+                + "set"+f.getName().substring(0,1).toUpperCase()+f.getName().substring(1)
+                + "(" +addConstRefIndicator(f.getType(),getCppType(f.getType(), relClass)) 
+                + " " +classToParamNameDecl(f.getType(), 0)
+                +") {\n";
+    }
+    
     private static String getCppMethodDefinitionStart(String tabs,
             String clssOnlyName,
             Method m,
@@ -481,7 +519,7 @@ public class J4CppMain {
         } else if (returnClass.isArray()) {
             return "return NULL;";
         } else {
-            return getCppRelativeName(returnClass, relClass) + " nullObject((jobject)NULL,false); return nullObject;";
+            return "static " +getCppRelativeName(returnClass, relClass) + " nullObject((jobject)NULL,false); return nullObject;";
         }
     }
 
@@ -852,7 +890,7 @@ public class J4CppMain {
     }
 
     private static String getEasyCallCppDeclaration(Method m, Class<?> relClass) {
-        return getCppModifiers(m)
+        return getCppModifiers(m.getModifiers())
                 + getCppType(m.getReturnType(), relClass) + " "
                 + fixMethodName(m)
                 + getEasyCallCppParamDeclarations(m.getParameterTypes(), relClass)
@@ -869,6 +907,59 @@ public class J4CppMain {
         return false;
     }
 
+    private static boolean addGetterMethod(Field f, Class clss,List<Class> classes) {
+        if(!Modifier.isPublic(f.getModifiers())) {
+            return false;
+        }
+        if(!f.getType().isPrimitive() 
+                && !String.class.equals(f.getType())
+                && !classes.contains(f.getType())) {
+            return false;
+        }
+        Method ma[] = clss.getMethods();
+        for (int i = 0; i < ma.length; i++) {
+            Method method = ma[i];
+            if(method.getName().equalsIgnoreCase(f.getName())) {
+                return false;
+            }
+            if(method.getName().equalsIgnoreCase("get"+f.getName())) {
+                return false;
+            }
+            if(method.getName().equalsIgnoreCase("set"+f.getName())) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    private static boolean addSetterMethod(Field f, Class clss, List<Class> classes) {
+        if(!Modifier.isPublic(f.getModifiers())) {
+            return false;
+        }
+        if(!f.getType().isPrimitive() 
+                && !String.class.equals(f.getType())
+                && !classes.contains(f.getType())) {
+            return false;
+        }
+        if(Modifier.isFinal(f.getModifiers())) {
+            return false;
+        }
+        Method ma[] = clss.getMethods();
+        for (int i = 0; i < ma.length; i++) {
+            Method method = ma[i];
+            if(method.getName().equalsIgnoreCase(f.getName())) {
+                return false;
+            }
+            if(method.getName().equalsIgnoreCase("get"+f.getName())) {
+                return false;
+            }
+            if(method.getName().equalsIgnoreCase("set"+f.getName())) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     public static void main(String[] args) {
 
         try {
@@ -1319,6 +1410,7 @@ public class J4CppMain {
                         String clssOnlyName = getCppClassName(clss);
                         map.put(CLASS_NAME, clssOnlyName);
                         map.put("%BASE_CLASS_FULL_NAME%", classToCppBase(clss));
+                        map.put(OBJECT_CLASS_FULL_NAME, getCppRelativeName(Object.class, clss));
                         tabs += TAB_STRING;
                         processTemplate(pw, map, HEADER_CLASS_STARTH, tabs);
                         tabs += TAB_STRING;
@@ -1381,6 +1473,16 @@ public class J4CppMain {
                         }
 
                         pw.println(tabs + "~" + clssOnlyName + "();");
+                        Field fa[] = clss.getDeclaredFields();
+                        for (int findex = 0; findex < fa.length; findex++) {
+                            Field field = fa[findex];
+                            if(addGetterMethod(field,clss,classes)) {
+                                pw.println(tabs +getCppFieldGetterDeclaration(field,clss));
+                            }
+                            if(addSetterMethod(field,clss,classes)) {
+                                pw.println(tabs +getCppFieldSetterDeclaration(field,clss));
+                            }
+                        }
                         Method methods[] = clss.getDeclaredMethods();
                         for (int j = 0; j < methods.length; j++) {
                             Method method = methods[j];
@@ -1391,7 +1493,7 @@ public class J4CppMain {
                                 pw.println(tabs + getCppDeclaration(method, clss));
                             }
                             if (isArrayStringMethod(method)) {
-                                pw.println(tabs + getCppModifiers(method)
+                                pw.println(tabs + getCppModifiers(method.getModifiers())
                                         + getCppType(method.getReturnType(), clss) + " "
                                         + fixMethodName(method)
                                         + "(int argc,const char **argv);");
@@ -1523,6 +1625,34 @@ public class J4CppMain {
                         pw.println(tabs + "\t// Place-holder for later extensibility.");
                         pw.println(tabs + "}");
                         pw.println();
+                        Field fa[] = clss.getDeclaredFields();
+                        for (int findex = 0; findex < fa.length; findex++) {
+                            Field field = fa[findex];
+                            if(addGetterMethod(field,clss,classes)) {
+                                pw.println(getCppFieldGetterDefinitionStart(tabs, clssOnlyName, field, clss));
+                                map.put("%FIELD_NAME%", field.getName());
+                                map.put(JNI_SIGNATURE, classToJNISignature(field.getType()));
+                                Class returnClass = field.getType();
+                                map.put(METHOD_ONFAIL, getOnFailString(returnClass, clss));
+                                map.put("%METHOD_RETURN%", isVoid(returnClass) ? "" : "return");
+                                map.put("%METHOD_CALL_TYPE%", getMethodCallString(returnClass));
+                                map.put("%METHOD_RETURN_TYPE%", getCppType(returnClass, clss));
+                                map.put("%RETURN_VAR_DECLARE%", getMethodReturnVarDeclare(returnClass));
+                                String retStore = isVoid(returnClass) ? "" : "retVal= (" + getMethodReturnVarType(returnClass) + ") ";
+                                map.put("%METHOD_RETURN_STORE%", retStore);
+                                map.put("%METHOD_RETURN_GET%", getMethodReturnGet(tabs, returnClass, clss));
+                                
+                                if(Modifier.isStatic(field.getModifiers())) {
+                                    processTemplate(pw, map, "cpp_static_getfield.cpp", tabs);
+                                }
+                                
+                                pw.println(tabs +"}");
+                            }
+                            if(addSetterMethod(field,clss,classes)) {
+                                pw.println(getCppFieldSetterDefinitionStart(tabs, clssOnlyName, field, clss));
+                                pw.println(tabs +"}");
+                            }
+                        }
                         Method methods[] = clss.getDeclaredMethods();
                         for (int j = 0; j < methods.length; j++) {
                             Method method = methods[j];
@@ -1530,7 +1660,7 @@ public class J4CppMain {
                                 continue;
                             }
                             int modifiers = method.getModifiers();
-                            if (Modifier.isPublic(modifiers) && !Modifier.isAbstract(modifiers)) {
+                            if (Modifier.isPublic(modifiers)) {
                                 pw.println(getCppMethodDefinitionStart(tabs, clssOnlyName, method, clss));
                                 map.put(METHOD_NAME, fixMethodName(method));
                                 Class[] paramClasses = method.getParameterTypes();
@@ -1672,11 +1802,13 @@ public class J4CppMain {
     private static final String OBJECT_CLASS_FULL_NAME = "%OBJECT_CLASS_FULL_NAME%";
 
     private static String getMethodReturnGet(String tabs, Class returnClass, Class relClass) {
+        
         if (!returnClass.isArray() && !returnClass.isPrimitive()
                 && !isString(returnClass)) {
             tabs += TAB_STRING;
             return tabs + "\n"
                     + tabs + "jobjectRefType ref = env->GetObjectRefType(retVal);\n"
+                    + tabs + "if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__,\"retVal=\",retVal);"
                     //+ tabs + "std::cout << \"ref=\" << ref << std::endl;\n"
                     //                    + tabs + "std::cout << \"retVal=\" << retVal << std::endl;\n"
                     //                    + tabs + "if(ref != JNIGlobalRefType) {\n" 

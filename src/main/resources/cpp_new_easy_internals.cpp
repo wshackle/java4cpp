@@ -14,10 +14,11 @@ if (cls != NULL) {
         jthis = env->NewObject(cls, mid %CONSTRUCTOR_ARGS%);
         jthrowable t = env->ExceptionOccurred();
         if(t != NULL) {
-            DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",t);
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            throw this;
+            if(GetDebugJ4Cpp()) {
+                DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",t);
+                env->ExceptionDescribe();
+            }
+            throw t;
         }
         if(jthis == NULL) {
             std::cerr << "Call to create new %CLASS_NAME% with signature %JNI_SIGNATURE% returned null." << std::endl;

@@ -20,6 +20,7 @@ core
 hs_err_pid*.log
 core.[0-9]*
 /test
+/src/test/resources/test
 crclj_test
 
 # Executables
@@ -34,8 +35,10 @@ obj/*
 build/*
 dist/*
 private/*
-/src/test/resources/*[0-9][0-9].cpp
-/src/test/resources/*[0-9][0-9].h
+/src/test/resources/test*[0-9].cpp
+/src/test/resources/test*[0-9].h
+/src/test/resources/crclj*[0-9].cpp
+/src/test/resources/crclj*[0-9].h
 
 
 # CMake files to ignore

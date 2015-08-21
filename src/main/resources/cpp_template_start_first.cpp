@@ -40,6 +40,26 @@ namespace %NAMESPACE% {
                 }
             };
 
+            Object & Object::operator =(const Object &otherobject) {
+                jobject oldjthis = jthis;
+                jobject _newjthis = otherobject.jthis;
+                jobject newjthis= NULL;
+                jthis= NULL;
+                JNIEnv *env = getEnv();
+                if (_newjthis != NULL) {
+                    if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__,"Object::operator= called for _newjthis=",_newjthis);
+                    newjthis = env->NewGlobalRef(_newjthis);
+                }
+                if (NULL != oldjthis) {
+                    if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__,"Object::operator= called for oldjthis=",oldjthis);
+                    env->DeleteGlobalRef(oldjthis);
+                    oldjthis = NULL;
+                }
+                jthis=newjthis;
+                releaseEnv(env);
+                return *this;
+            }
+            
             Object::~Object() {
                 if (NULL != jthis) {
                     if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__,"Destructor called for ",jthis);

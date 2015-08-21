@@ -15,7 +15,20 @@ static inline jclass get%CLASS_NAME%Class();
 
 %CLASS_NAME%::%CLASS_NAME%(const %CLASS_NAME% &objref): %BASE_CLASS_FULL_NAME%((jobject)NULL,false) {
     jobject _jthis = objref.jthis;
+    if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__,"Copy Constructor for class %CLASS_NAME% _jthis=",_jthis);
     if (_jthis != NULL) {
         jthis = getEnv()->NewGlobalRef(_jthis);
+        if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__,"Copy Constructor for class %CLASS_NAME% jthis=",jthis);
     }
+}
+
+%CLASS_NAME% %CLASS_NAME%::cast(const %OBJECT_CLASS_FULL_NAME% &objref) {
+    JNIEnv *env =getEnv();
+    static jclass cls = get%CLASS_NAME%Class(); 
+    jclass objcls = env->GetObjectClass(objref.jthis);
+    if(!env->IsAssignableFrom(objcls,cls)) {
+        throw objcls;
+    }
+    %CLASS_NAME% retVal(objref.jthis,true);
+    return retVal;
 }

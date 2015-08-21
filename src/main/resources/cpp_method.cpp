@@ -20,16 +20,19 @@ if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_
 if (cls != NULL) {
     static jmethodID mid = env->GetMethodID(cls, "%METHOD_NAME%", "%JNI_SIGNATURE%");
     if (NULL == mid) {
-        std::cerr << "Class %FULL_CLASS_NAME% has no method named %METHOD_NAME% with signature %JNI_SIGNATURE%." << std::endl;
+        DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",jthis);
+        std::cerr << __FILE__ << ":" << __LINE__ <<  " Class %FULL_CLASS_NAME% has no method named %METHOD_NAME% with signature %JNI_SIGNATURE%." << std::endl;
         %METHOD_ONFAIL%
     } else {
         %METHOD_RETURN_STORE% env->Call%METHOD_CALL_TYPE%Method(jthis, mid %METHOD_ARGS% );
         jthrowable t = env->ExceptionOccurred();
         if(t != NULL) {
-            DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",t);
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            throw this;
+            if(GetDebugJ4Cpp()) {
+                DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthrowable t=",t);
+                env->ExceptionDescribe();
+            }
+//            env->ExceptionClear();
+            throw t;
         }
     }
 }
