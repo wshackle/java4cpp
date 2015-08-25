@@ -17,4 +17,5 @@ static inline jclass get%CLASS_NAME%Class() {
         return %CLASS_NAME%Class;
     }
     %CLASS_NAME%Class = getNew%CLASS_NAME%Class();
+    return %CLASS_NAME%Class;
 }

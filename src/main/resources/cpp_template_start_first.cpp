@@ -7,6 +7,8 @@
 #include <jni.h>
 #include <cstdlib>
 #include <iostream>
+#include <string>
+
 #include "%HEADER%"
 
 namespace %NAMESPACE% {

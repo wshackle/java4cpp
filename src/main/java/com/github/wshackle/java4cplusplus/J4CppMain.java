@@ -121,7 +121,7 @@ public class J4CppMain {
         }
     }
 
-    public static String namespace = "java4cpp";
+    public static String namespace = "JavaForCpp";
 
     private static String getModifiedClassName(Class cls) {
         Class enclosingClass = cls.getEnclosingClass();
@@ -193,15 +193,15 @@ public class J4CppMain {
         String out = "";
         if (Modifier.isStatic(modifiers)) {
             out += "static ";
-        } 
+        }
         return out;
     }
 
-    private static String addConstRefIndicator(Class c,String orig) {
+    private static String addConstRefIndicator(Class c, String orig) {
         if (!c.isPrimitive()
                 && !isString(c)
                 && !c.isArray()) {
-            return "const "+orig+" &";
+            return "const " + orig + " &";
         }
         return orig;
     }
@@ -255,7 +255,7 @@ public class J4CppMain {
         } else {
             return "L" + clss.getCanonicalName().replace(".", "/") + ";";
         }
-       
+
     }
 
     private static String getJNIParamSignature(Class<?>[] clsses) {
@@ -309,7 +309,7 @@ public class J4CppMain {
         sb.append("(");
         for (int i = 0; i < clsses.length; i++) {
             Class<?> clsse = clsses[i];
-            String name = addConstRefIndicator(clsse,getCppType(clsse, relClass)) + " " + classToParamNameDecl(clsse, i);
+            String name = addConstRefIndicator(clsse, getCppType(clsse, relClass)) + " " + classToParamNameDecl(clsse, i);
             sb.append(name);
             if (i < clsses.length - 1) {
                 sb.append(",");
@@ -360,7 +360,7 @@ public class J4CppMain {
         badNamesSet.addAll(Arrays.asList("and", "and_eq", "bitand",
                 "bitor", "compl", "not", "not_eq", "or",
                 "not_eq", "or", "or_eq", "xor", "xor_eq",
-                "delete", "namespace", "union","cast"));
+                "delete", "namespace", "union", "cast"));
         return badNamesSet;
     }
 
@@ -429,18 +429,18 @@ public class J4CppMain {
     private static String getCppFieldGetterDeclaration(Field f, Class<?> relClass) {
         return getCppModifiers(f.getModifiers())
                 + getCppType(f.getType(), relClass) + " "
-                + "get"+f.getName().substring(0,1).toUpperCase()+ f.getName().substring(1)
+                + "get" + f.getName().substring(0, 1).toUpperCase() + f.getName().substring(1)
                 + "();";
     }
-    
+
     private static String getCppFieldSetterDeclaration(Field f, Class<?> relClass) {
         return getCppModifiers(f.getModifiers())
-                + "void set"+f.getName().substring(0,1).toUpperCase()+ f.getName().substring(1)
-                + "("+addConstRefIndicator(f.getType(),getCppType(f.getType(), relClass)) 
-                + " " +classToParamNameDecl(f.getType(), 0)
+                + "void set" + f.getName().substring(0, 1).toUpperCase() + f.getName().substring(1)
+                + "(" + addConstRefIndicator(f.getType(), getCppType(f.getType(), relClass))
+                + " " + classToParamNameDecl(f.getType(), 0)
                 + ");";
     }
-    
+
     private static String getCppFieldGetterDefinitionStart(String tabs,
             String clssOnlyName,
             Field f,
@@ -449,10 +449,10 @@ public class J4CppMain {
                 + getCppType(f.getType(), relClass) + " "
                 + clssOnlyName
                 + "::"
-                + "get"+f.getName().substring(0,1).toUpperCase()+f.getName().substring(1)
+                + "get" + f.getName().substring(0, 1).toUpperCase() + f.getName().substring(1)
                 + "() {\n";
     }
-    
+
     private static String getCppFieldSetterDefinitionStart(String tabs,
             String clssOnlyName,
             Field f,
@@ -461,12 +461,12 @@ public class J4CppMain {
                 + "void "
                 + clssOnlyName
                 + "::"
-                + "set"+f.getName().substring(0,1).toUpperCase()+f.getName().substring(1)
-                + "(" +addConstRefIndicator(f.getType(),getCppType(f.getType(), relClass)) 
-                + " " +classToParamNameDecl(f.getType(), 0)
-                +") {\n";
+                + "set" + f.getName().substring(0, 1).toUpperCase() + f.getName().substring(1)
+                + "(" + addConstRefIndicator(f.getType(), getCppType(f.getType(), relClass))
+                + " " + classToParamNameDecl(f.getType(), 0)
+                + ") {\n";
     }
-    
+
     private static String getCppMethodDefinitionStart(String tabs,
             String clssOnlyName,
             Method m,
@@ -519,7 +519,7 @@ public class J4CppMain {
         } else if (returnClass.isArray()) {
             return "return NULL;";
         } else {
-            return "static " +getCppRelativeName(returnClass, relClass) + " nullObject((jobject)NULL,false); return nullObject;";
+            return "static " + getCppRelativeName(returnClass, relClass) + " nullObject((jobject)NULL,false); return nullObject;";
         }
     }
 
@@ -733,6 +733,8 @@ public class J4CppMain {
 
 //    public static Optional<String> getArg(final String param, final String args[]) {
 //        Arrays.stream(args)
+//    $(VC_IncludePath)
+//$(WindowsSDK_IncludePath)
 //                .
 //    }
     private static String replaceVars(Map<String, String> map, final String orig_str) {
@@ -743,7 +745,13 @@ public class J4CppMain {
             for (Map.Entry<String, String> e : map.entrySet()) {
                 key = e.getKey();
                 val = e.getValue();
-                str = str.replaceAll(key, val);
+                if (null == val) {
+                    val = "";
+                }
+                if(str.contains("JAR") && key.contains("JAR")) {
+                    System.out.println("debug me");
+                }
+                str = str.replace(key, val);
             }
         } catch (Throwable t) {
             System.err.println("orig_str=" + orig_str);
@@ -907,11 +915,11 @@ public class J4CppMain {
         return false;
     }
 
-    private static boolean addGetterMethod(Field f, Class clss,List<Class> classes) {
-        if(!Modifier.isPublic(f.getModifiers())) {
+    private static boolean addGetterMethod(Field f, Class clss, List<Class> classes) {
+        if (!Modifier.isPublic(f.getModifiers())) {
             return false;
         }
-        if(!f.getType().isPrimitive() 
+        if (!f.getType().isPrimitive()
                 && !String.class.equals(f.getType())
                 && !classes.contains(f.getType())) {
             return false;
@@ -919,45 +927,61 @@ public class J4CppMain {
         Method ma[] = clss.getMethods();
         for (int i = 0; i < ma.length; i++) {
             Method method = ma[i];
-            if(method.getName().equalsIgnoreCase(f.getName())) {
+            if (method.getName().equalsIgnoreCase(f.getName())) {
                 return false;
             }
-            if(method.getName().equalsIgnoreCase("get"+f.getName())) {
+            if (method.getName().equalsIgnoreCase("get" + f.getName())) {
                 return false;
             }
-            if(method.getName().equalsIgnoreCase("set"+f.getName())) {
+            if (method.getName().equalsIgnoreCase("set" + f.getName())) {
                 return false;
             }
         }
         return true;
     }
-    
+
     private static boolean addSetterMethod(Field f, Class clss, List<Class> classes) {
-        if(!Modifier.isPublic(f.getModifiers())) {
+        if (!Modifier.isPublic(f.getModifiers())) {
             return false;
         }
-        if(!f.getType().isPrimitive() 
+        if (!f.getType().isPrimitive()
                 && !String.class.equals(f.getType())
                 && !classes.contains(f.getType())) {
             return false;
         }
-        if(Modifier.isFinal(f.getModifiers())) {
+        if (Modifier.isFinal(f.getModifiers())) {
             return false;
         }
         Method ma[] = clss.getMethods();
         for (int i = 0; i < ma.length; i++) {
             Method method = ma[i];
-            if(method.getName().equalsIgnoreCase(f.getName())) {
+            if (method.getName().equalsIgnoreCase(f.getName())) {
                 return false;
             }
-            if(method.getName().equalsIgnoreCase("get"+f.getName())) {
+            if (method.getName().equalsIgnoreCase("get" + f.getName())) {
                 return false;
             }
-            if(method.getName().equalsIgnoreCase("set"+f.getName())) {
+            if (method.getName().equalsIgnoreCase("set" + f.getName())) {
                 return false;
             }
         }
         return true;
+    }
+
+    public static String getHomeDir() throws IOException {
+        String userHomeProp = System.getProperty("user.home");
+        System.out.println("userDirProp = " + userHomeProp);
+        String homeDir = new File(userHomeProp).getCanonicalPath();
+        System.out.println("homeDir = " + homeDir);
+        return homeDir;
+    }
+    
+    public static String getCurrentDir() throws IOException {
+        String userDirProp = System.getProperty("user.dir");
+        System.out.println("userDirProp = " + userDirProp);
+        String currentDir = new File(userDirProp).getCanonicalPath();
+        System.out.println("currentDir = " + currentDir);
+        return currentDir.replace("\\", "\\\\");
     }
     
     public static void main(String[] args) {
@@ -1025,20 +1049,34 @@ public class J4CppMain {
                 System.out.println("jar = " + jar);
                 if (null != jar) {
                     if (jar.startsWith("~/")) {
-                        jar = System.getProperty("user.home") + jar.substring(1);
+                        jar = new File(new File(getHomeDir()),jar.substring(2)).getCanonicalPath();
                     }
                     if (jar.startsWith("./")) {
-                        jar = System.getProperty("user.dir") + jar.substring(1);
+                        jar = new File(new File(getCurrentDir()),jar.substring(2)).getCanonicalPath();
                     }
                     if (jar.startsWith("../")) {
-                        jar = new File(System.getProperty("user.dir")).getParentFile().getCanonicalPath() + jar.substring(2);
+                        jar = new File(new File(getCurrentDir()).getParentFile(),jar.substring(3)).getCanonicalPath();
                     }
-                    int lastSep = jar.lastIndexOf(File.separator);
-                    int start = Math.max(0, lastSep + 1);
-                    int period = jar.indexOf('.', start + 1);
-                    int end = Math.max(start + 1, period);
-                    //namespace = jar.substring(start, end).toLowerCase().replace("-", "");
                 }
+                if (line.hasOption("class")) {
+                    classname = line.getOptionValue("class");
+                }
+                if (!line.hasOption("namespace")) {
+                    if (classname != null && classname.length() > 0) {
+                        namespace = classname.toLowerCase().replace(".", "_");
+                    } else if (jar != null && jar.length() > 0) {
+                        int lastSep = jar.lastIndexOf(File.separator);
+                        int start = Math.max(0, lastSep + 1);
+                        int period = jar.indexOf('.', start + 1);
+                        int end = Math.max(start + 1, period);
+                        namespace = jar.substring(start, end).toLowerCase();
+                        namespace = namespace.replace(" ", "_");
+                        if (namespace.indexOf("-") > 0) {
+                            namespace = namespace.substring(0, namespace.indexOf("-"));
+                        }
+                    }
+                }
+                
                 namespace = line.getOptionValue("namespace", namespace);
                 System.out.println("namespace = " + namespace);
                 if (null != namespace) {
@@ -1063,9 +1101,7 @@ public class J4CppMain {
                 } else {
                     header = "out.h";
                 }
-                if (line.hasOption("class")) {
-                    classname = line.getOptionValue("class");
-                }
+
                 if (line.hasOption("package")) {
                     packageprefix = line.getOptionValue("package");
                 }
@@ -1082,10 +1118,6 @@ public class J4CppMain {
             }
 
             List<Class> classes = new ArrayList<>();
-            Path jarPath = FileSystems.getDefault().getPath(jar);
-            ZipInputStream zip = new ZipInputStream(Files.newInputStream(jarPath, StandardOpenOption.READ));
-            URL[] urls = {new URL("jar:file:" + jar + "!/")};
-            URLClassLoader cl = URLClassLoader.newInstance(urls);
             Set<Class> excludedClasses = new HashSet<>();
             excludedClasses.add(Object.class);
             excludedClasses.add(String.class);
@@ -1094,36 +1126,41 @@ public class J4CppMain {
             excludedClasses.add(Class.class);
             excludedClasses.add(Enum.class);
             Set<String> packagesSet = new TreeSet<>();
-            for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
-                if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
-                    // This ZipEntry represents a class. Now, what class does it represent?
-                    String entryName = entry.getName();
-                    if (entryName.indexOf('$') >= 0) {
-                        continue;
-                    }
-                    String classFileName = entry.getName()
-                            .replace('/', '.');
-                    String className = classFileName
-                            .substring(0, classFileName.length() - ".class".length());
-                    if (classname != null
-                            && classname.length() > 0
-                            && !classname.equals(className)) {
-                        continue;
-                    }
-                    Class clss = cl.loadClass(className);
-                    if (packageprefix != null
-                            && packageprefix.length() > 0
-                            && !clss.getPackage().getName().startsWith(packageprefix)) {
-                        continue;
-                    }
-                    Package p = clss.getPackage();
-                    if (null != p) {
-                        packagesSet.add(clss.getPackage().getName());
-                    }
-                    if (!classes.contains(clss)
-                            && isAddableClass(clss, excludedClasses)) {
+            if (null != jar && jar.length() > 0) {
+                Path jarPath = FileSystems.getDefault().getPath(jar);
+                ZipInputStream zip = new ZipInputStream(Files.newInputStream(jarPath, StandardOpenOption.READ));
+                URL[] urls = {new URL("jar:file:" + jar + "!/")};
+                URLClassLoader cl = URLClassLoader.newInstance(urls);
+                for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                    if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
+                        // This ZipEntry represents a class. Now, what class does it represent?
+                        String entryName = entry.getName();
+                        if (entryName.indexOf('$') >= 0) {
+                            continue;
+                        }
+                        String classFileName = entry.getName()
+                                .replace('/', '.');
+                        String className = classFileName
+                                .substring(0, classFileName.length() - ".class".length());
+                        if (classname != null
+                                && classname.length() > 0
+                                && !classname.equals(className)) {
+                            continue;
+                        }
+                        Class clss = cl.loadClass(className);
+                        if (packageprefix != null
+                                && packageprefix.length() > 0
+                                && !clss.getPackage().getName().startsWith(packageprefix)) {
+                            continue;
+                        }
+                        Package p = clss.getPackage();
+                        if (null != p) {
+                            packagesSet.add(clss.getPackage().getName());
+                        }
+                        if (!classes.contains(clss)
+                                && isAddableClass(clss, excludedClasses)) {
 //                        System.out.println("clss = " + clss);
-                        classes.add(clss);
+                            classes.add(clss);
 //                        Class superClass = clss.getSuperclass();
 //                        while (null != superClass
 //                                && !classes.contains(superClass)
@@ -1131,11 +1168,18 @@ public class J4CppMain {
 //                            classes.add(superClass);
 //                            superClass = superClass.getSuperclass();
 //                        }
+                        }
                     }
                 }
             }
             if (null != classname && classname.length() > 0 && classes.size() == 0) {
-                Class c = ClassLoader.getSystemClassLoader().loadClass(classname);
+                URL url = new URL("file://" + System.getProperty("user.dir") + "/");
+                System.out.println("url = " + url);
+                URLClassLoader cl = URLClassLoader.newInstance(new URL[]{url});
+                Class c = cl.loadClass(classname);
+                if (null == c) {
+                    c = ClassLoader.getSystemClassLoader().loadClass(classname);
+                }
                 if (null != c) {
                     classes.add(c);
                 }
@@ -1333,7 +1377,7 @@ public class J4CppMain {
 //            });
             String forward_header = header.substring(0, header.lastIndexOf('.')) + "_fwd.h";
             Map<String, String> map = new HashMap<>();
-            map.put(JAR, jar);
+            map.put(JAR, jar != null ? jar : getCurrentDir());
             map.put("%FORWARD_HEADER%", forward_header);
             map.put("%HEADER%", header);
             map.put("%PATH_SEPERATOR%", File.pathSeparator);
@@ -1419,8 +1463,8 @@ public class J4CppMain {
 //                        System.out.println("debug me");
 //                    }
                         Constructor constructors[] = clss.getDeclaredConstructors();
-                        if(clssOnlyName.contains("DataTypeThing")) {
-                            
+                        if (clssOnlyName.contains("DataTypeThing")) {
+
                         }
                         if (!hasNoArgConstructor(constructors)) {
                             if (Modifier.isAbstract(clss.getModifiers())
@@ -1476,11 +1520,11 @@ public class J4CppMain {
                         Field fa[] = clss.getDeclaredFields();
                         for (int findex = 0; findex < fa.length; findex++) {
                             Field field = fa[findex];
-                            if(addGetterMethod(field,clss,classes)) {
-                                pw.println(tabs +getCppFieldGetterDeclaration(field,clss));
+                            if (addGetterMethod(field, clss, classes)) {
+                                pw.println(tabs + getCppFieldGetterDeclaration(field, clss));
                             }
-                            if(addSetterMethod(field,clss,classes)) {
-                                pw.println(tabs +getCppFieldSetterDeclaration(field,clss));
+                            if (addSetterMethod(field, clss, classes)) {
+                                pw.println(tabs + getCppFieldSetterDeclaration(field, clss));
                             }
                         }
                         Method methods[] = clss.getDeclaredMethods();
@@ -1628,7 +1672,7 @@ public class J4CppMain {
                         Field fa[] = clss.getDeclaredFields();
                         for (int findex = 0; findex < fa.length; findex++) {
                             Field field = fa[findex];
-                            if(addGetterMethod(field,clss,classes)) {
+                            if (addGetterMethod(field, clss, classes)) {
                                 pw.println(getCppFieldGetterDefinitionStart(tabs, clssOnlyName, field, clss));
                                 map.put("%FIELD_NAME%", field.getName());
                                 map.put(JNI_SIGNATURE, classToJNISignature(field.getType()));
@@ -1641,16 +1685,16 @@ public class J4CppMain {
                                 String retStore = isVoid(returnClass) ? "" : "retVal= (" + getMethodReturnVarType(returnClass) + ") ";
                                 map.put("%METHOD_RETURN_STORE%", retStore);
                                 map.put("%METHOD_RETURN_GET%", getMethodReturnGet(tabs, returnClass, clss));
-                                
-                                if(Modifier.isStatic(field.getModifiers())) {
+
+                                if (Modifier.isStatic(field.getModifiers())) {
                                     processTemplate(pw, map, "cpp_static_getfield.cpp", tabs);
                                 }
-                                
-                                pw.println(tabs +"}");
+
+                                pw.println(tabs + "}");
                             }
-                            if(addSetterMethod(field,clss,classes)) {
+                            if (addSetterMethod(field, clss, classes)) {
                                 pw.println(getCppFieldSetterDefinitionStart(tabs, clssOnlyName, field, clss));
-                                pw.println(tabs +"}");
+                                pw.println(tabs + "}");
                             }
                         }
                         Method methods[] = clss.getDeclaredMethods();
@@ -1802,7 +1846,7 @@ public class J4CppMain {
     private static final String OBJECT_CLASS_FULL_NAME = "%OBJECT_CLASS_FULL_NAME%";
 
     private static String getMethodReturnGet(String tabs, Class returnClass, Class relClass) {
-        
+
         if (!returnClass.isArray() && !returnClass.isPrimitive()
                 && !isString(returnClass)) {
             tabs += TAB_STRING;
@@ -1961,7 +2005,7 @@ public class J4CppMain {
     private static final String CPP_METHODCPP = "cpp_method.cpp";
 
     private static void printHelpAndExit(Options options) {
-        new HelpFormatter().printHelp("Java4CPlusPlus", options);
+        new HelpFormatter().printHelp("java4cpp", options);
         System.exit(1);
     }
 }

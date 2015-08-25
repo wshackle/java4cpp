@@ -12,9 +12,33 @@
         JNIEnv *env; /* pointer to native method interface */
         JavaVM * jvmBuf[1];
         jsize nVMs;
-        debug_j4cpp = debug_j4cpp || (getenv("DEBUG_J4CPP") != NULL && getenv("DEBUG_J4CPP")[0] != 0);
-        char *classPathEnv = getenv("CLASSPATH");
-        char *jvmOptionsEnv = getenv("JVM_OPTIONS");
+        char *debugJ4CppEnv = NULL;
+        char *classPathEnv = NULL;
+        char *jvmOptionsEnv = NULL;
+#if defined(_WIN32) || defined(_WIN64)
+        errno_t errno_val;
+        size_t requiredSize;
+        errno_val =  getenv_s( &requiredSize, NULL, 0, "DEBUG_J4CPP");
+        if(requiredSize > 0) {
+            debugJ4CppEnv = (char *) malloc(requiredSize);
+            errno_val =  getenv_s( &requiredSize, debugJ4CppEnv, requiredSize, "DEBUG_J4CPP");
+        }
+        errno_val =  getenv_s( &requiredSize, NULL, 0, "CLASSPATH");
+        if(requiredSize > 0) {
+            classPathEnv = (char *) malloc(requiredSize);
+            errno_val =  getenv_s( &requiredSize, classPathEnv, requiredSize, "CLASSPATH");
+        }
+        errno_val =  getenv_s( &requiredSize, NULL, 0, "JVM_OPTIONS");
+        if(requiredSize > 0) {
+            jvmOptionsEnv = (char *) malloc(requiredSize);
+            errno_val =  getenv_s( &requiredSize, jvmOptionsEnv, requiredSize, "JVM_OPTIONS");
+        }
+#else 
+        debugJ4CppEnv = getenv("DEBUG_J4CPP");
+        classPathEnv = getenv("CLASSPATH");
+        jvmOptionsEnv = getenv("JVM_OPTIONS");
+#endif
+        debug_j4cpp = debug_j4cpp || (debugJ4CppEnv != NULL && debugJ4CppEnv[0] != 0);
         std::string str;
         str += "%JAR%";
         if (classPathEnv != NULL) {
@@ -24,7 +48,11 @@
             str += classPathEnvStr;
         }
         if (debug_j4cpp) std::cout << "str=" << str << std::endl;
+#if defined(_WIN32) || defined(_WIN64)
+        _putenv_s("CLASSPATH", str.c_str());
+#else
         setenv("CLASSPATH", str.c_str(), 1);
+#endif
         std::string optsString;
         optsString += "-Djava.class.path=";
         optsString += str;
@@ -53,6 +81,20 @@
                 ((void **) (&env)),
                 ((void *) (&vm_args)));
         delete options;
+#if defined(_WIN32) || defined(_WIN64)
+        if(debugJ4CppEnv != NULL) {
+            free(debugJ4CppEnv);
+            debugJ4CppEnv = NULL;
+        }
+        if(classPathEnv != NULL) {
+            free(classPathEnv);
+            classPathEnv = NULL;
+        }
+        if(jvmOptionsEnv != NULL) {
+            free(jvmOptionsEnv);
+            jvmOptionsEnv = NULL;
+        }
+#endif
         return env;
     }
 
