@@ -272,11 +272,11 @@ namespace simple {
 #endif
         debug_j4cpp = debug_j4cpp || (debugJ4CppEnv != NULL && debugJ4CppEnv[0] != 0);
         std::string str;
-        str += "C:\\Users\\shackle\\Documents\\NetBeansProjects\\GitHubProjects\\java4cpp\\examples\\simple";
+        str += "/home/shackle/java4cpp/examples/simple";
         if (classPathEnv != NULL) {
             std::string classPathEnvStr(classPathEnv);
             if (debug_j4cpp) std::cout << "classPathEnv=" << classPathEnvStr << std::endl;
-            str += ";";
+            str += ":";
             str += classPathEnvStr;
         }
         if (debug_j4cpp) std::cout << "str=" << str << std::endl;

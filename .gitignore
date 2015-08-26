@@ -93,3 +93,9 @@ Doxyfile
 *~
 *.swp
 
+# Example generated files.
+/examples/simple/simple.h
+/examples/simple/simple0.cpp
+/examples/simple/simple0.h
+/examples/simple/simple_fwd.h
+/examples/simple/simple
