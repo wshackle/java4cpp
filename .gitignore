@@ -23,6 +23,12 @@ core.[0-9]*
 /src/test/resources/test
 crclj_test
 
+# Visual Studio generated files
+*.tlog
+*.ilk
+*.pdb
+*.idb
+
 # Executables
 *.exe
 *.out
