@@ -18,6 +18,12 @@ The generated files include:
 
 The file use_simple_java.cpp contains the C++ example source code using the generated files with a main method.
 
+General Build
+------------
+
+Using any C++ IDE or build environment add the JDK include directory and its operating system specific subdirectory to the list of directories searched for header files, the JDK's lib directory to the directories where libraries are searched. Add the jvm library to the link options. Ensure that the class file is on the CLASSPATH and the dynamic jvm library on the list of directories searched for dynamic libraries.
+
+
 Windows Build
 -------------
 
@@ -67,6 +73,26 @@ The Simple sudirectory contains the Visual Studio solutions and projects generat
         * Output window should print s.getValue() = 4. 
         * The C++ application has successfully run passing an argument to a Java class method and recieving a return value from a Java class.
 
+Linux Build
+-----------
 
+On a system where the JDK was installed in:
+
+    /usr/local/jdk1.8.0_60/
+     
+The program can be compiled with:
+
+    export JAVA_HOME=/usr/local/jdk1.8.0_60/;
+    g++ -I ${JAVA_HOME}/include -I ${JAVA_HOME}/include/linux -L ${JAVA_HOME}/jre/lib/amd64/server/  -Wl,--rpath ${JAVA_HOME}/jre/lib/amd64/server/  use_simple_java.cpp simple0.cpp -ljvm -o simple
+
+Then run with:
+
+    ./simple
+
+This produces the output:
+
+    s.getValue() = 4
+
+The C++ application has successfully run passing an argument to a Java class method and recieving a return value from a Java class.
 
 
