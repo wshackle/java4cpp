@@ -6,9 +6,10 @@
 //%%%% "%JAR%" will be replaced with name of Jar this was created from.
 
 
-
+    static JavaVM *jvm = NULL; /* denotes a Java VM */
+    
     static JNIEnv *getNewEnv() {
-        JavaVM *jvm; /* denotes a Java VM */
+        
         JNIEnv *env; /* pointer to native method interface */
         JavaVM * jvmBuf[1];
         jsize nVMs;
@@ -65,7 +66,8 @@
         if (debug_j4cpp) std::cout << "optsString=" << optsString << std::endl;
         jint v = JNI_GetCreatedJavaVMs(jvmBuf, 1, &nVMs);
         if (nVMs > 0) {
-            jvmBuf[0]->GetEnv((void **) &env, JNI_VERSION_1_6);
+            jvm = jvmBuf[0];
+            jvm->GetEnv((void **) &env, JNI_VERSION_1_6);
             return env;
         }
         JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
@@ -101,8 +103,14 @@
     static JNIEnv *env = NULL;
 
     JNIEnv *getEnv() {
-        if (env != NULL) {
-            return env;
+        if (env != NULL && jvm != NULL) {
+            JNIEnv *env2=env;
+            jint attach_ret = jvm->AttachCurrentThread((void **)&env2,NULL);
+            if(attach_ret != JNI_OK) {
+                std::cerr << "JNI AttachCurrentThread failed returning " << attach_ret << std::endl;
+                return NULL;
+            }
+            return env2;
         }
         env = getNewEnv();
         return env;
@@ -146,8 +154,26 @@
         if (ClassClass != NULL) {
             return ClassClass;
         }
-        ClassClass = getNewStringClass();
+        ClassClass = getNewClassClass();
         return ClassClass;
+    }
+    
+    static jclass getNewArraysClass() {
+        jclass clss = getEnv()->FindClass("java/util/Arrays");
+        if (NULL == clss) {
+            std::cerr << " Can't find class java/util/Arrays" << std::endl;
+        }
+        return clss;
+    }
+
+    static jclass ArraysClass = NULL;
+
+    jclass getArraysClass() {
+        if (ArraysClass != NULL) {
+            return ArraysClass;
+        }
+        ArraysClass = getNewArraysClass();
+        return ArraysClass;
     }
     
     static jstring getNewEmptyString() {
@@ -172,7 +198,199 @@
         JNIEnv *env = getEnv();
         jclass clss = env->GetObjectClass(jobj);
         jmethodID midToString = env->GetMethodID(clss, "toString", "()Ljava/lang/String;");
+        if(NULL == midToString) {
+            std::cout << prefix << "can not find toString method" << std::endl;
+            return;
+        }
         jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        if(NULL == jobjstr) {
+            std::cout << prefix << "toString() returned NULL" << std::endl;
+            return;
+        }
+        jboolean iscopy = JNI_FALSE;
+        const char *cstr = env->GetStringUTFChars(jobjstr, &iscopy);
+        std::cout << prefix << cstr << std::endl;
+        env->ReleaseStringUTFChars(jobjstr,cstr);
+    }
+    
+    void PrintJBooleanArray(const char *prefix, jbooleanArray jobj) {
+        if(NULL == jobj) {
+            std::cout << prefix << "NULL" << std::endl;
+            return;
+        }
+        JNIEnv *env = getEnv();
+        jclass clss = getArraysClass();
+        jmethodID midToString = env->GetStaticMethodID(clss, "toString", "([Z)Ljava/lang/String;");
+        if(NULL == midToString) {
+            std::cout << prefix << "can not find toString method" << std::endl;
+            return;
+        }
+        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        if(NULL == jobjstr) {
+            std::cout << prefix << "toString() returned NULL" << std::endl;
+            return;
+        }
+        jboolean iscopy = JNI_FALSE;
+        const char *cstr = env->GetStringUTFChars(jobjstr, &iscopy);
+        std::cout << prefix << cstr << std::endl;
+        env->ReleaseStringUTFChars(jobjstr,cstr);
+    }
+    
+    void PrintJByteArray(const char *prefix, jbyteArray jobj) {
+        if(NULL == jobj) {
+            std::cout << prefix << "NULL" << std::endl;
+            return;
+        }
+        JNIEnv *env = getEnv();
+        jclass clss = getArraysClass();
+        jmethodID midToString = env->GetStaticMethodID(clss, "toString", "([B)Ljava/lang/String;");
+        if(NULL == midToString) {
+            std::cout << prefix << "can not find toString method" << std::endl;
+            return;
+        }
+        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        if(NULL == jobjstr) {
+            std::cout << prefix << "toString() returned NULL" << std::endl;
+            return;
+        }
+        jboolean iscopy = JNI_FALSE;
+        const char *cstr = env->GetStringUTFChars(jobjstr, &iscopy);
+        std::cout << prefix << cstr << std::endl;
+        env->ReleaseStringUTFChars(jobjstr,cstr);
+    }
+    
+    void PrintJCharArray(const char *prefix, jcharArray jobj) {
+        if(NULL == jobj) {
+            std::cout << prefix << "NULL" << std::endl;
+            return;
+        }
+        JNIEnv *env = getEnv();
+        jclass clss = getArraysClass();
+        jmethodID midToString = env->GetStaticMethodID(clss, "toString", "([C)Ljava/lang/String;");
+        if(NULL == midToString) {
+            std::cout << prefix << "can not find toString method" << std::endl;
+            return;
+        }
+        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        if(NULL == jobjstr) {
+            std::cout << prefix << "toString() returned NULL" << std::endl;
+            return;
+        }
+        jboolean iscopy = JNI_FALSE;
+        const char *cstr = env->GetStringUTFChars(jobjstr, &iscopy);
+        std::cout << prefix << cstr << std::endl;
+        env->ReleaseStringUTFChars(jobjstr,cstr);
+    }
+    
+    void PrintJShortArray(const char *prefix, jshortArray jobj) {
+        if(NULL == jobj) {
+            std::cout << prefix << "NULL" << std::endl;
+            return;
+        }
+        JNIEnv *env = getEnv();
+        jclass clss = getArraysClass();
+        jmethodID midToString = env->GetStaticMethodID(clss, "toString", "([S)Ljava/lang/String;");
+        if(NULL == midToString) {
+            std::cout << prefix << "can not find toString method" << std::endl;
+            return;
+        }
+        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        if(NULL == jobjstr) {
+            std::cout << prefix << "toString() returned NULL" << std::endl;
+            return;
+        }
+        jboolean iscopy = JNI_FALSE;
+        const char *cstr = env->GetStringUTFChars(jobjstr, &iscopy);
+        std::cout << prefix << cstr << std::endl;
+        env->ReleaseStringUTFChars(jobjstr,cstr);
+    }
+    
+    void PrintJIntArray(const char *prefix, jintArray jobj) {
+        if(NULL == jobj) {
+            std::cout << prefix << "NULL" << std::endl;
+            return;
+        }
+        JNIEnv *env = getEnv();
+        jclass clss = getArraysClass();
+        jmethodID midToString = env->GetStaticMethodID(clss, "toString", "([I)Ljava/lang/String;");
+        if(NULL == midToString) {
+            std::cout << prefix << "can not find toString method" << std::endl;
+            return;
+        }
+        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        if(NULL == jobjstr) {
+            std::cout << prefix << "toString() returned NULL" << std::endl;
+            return;
+        }
+        jboolean iscopy = JNI_FALSE;
+        const char *cstr = env->GetStringUTFChars(jobjstr, &iscopy);
+        std::cout << prefix << cstr << std::endl;
+        env->ReleaseStringUTFChars(jobjstr,cstr);
+    }
+    
+    void PrintJLongArray(const char *prefix, jlongArray jobj) {
+        if(NULL == jobj) {
+            std::cout << prefix << "NULL" << std::endl;
+            return;
+        }
+        JNIEnv *env = getEnv();
+        jclass clss = getArraysClass();
+        jmethodID midToString = env->GetStaticMethodID(clss, "toString", "([J)Ljava/lang/String;");
+        if(NULL == midToString) {
+            std::cout << prefix << "can not find toString method" << std::endl;
+            return;
+        }
+        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        if(NULL == jobjstr) {
+            std::cout << prefix << "toString() returned NULL" << std::endl;
+            return;
+        }
+        jboolean iscopy = JNI_FALSE;
+        const char *cstr = env->GetStringUTFChars(jobjstr, &iscopy);
+        std::cout << prefix << cstr << std::endl;
+        env->ReleaseStringUTFChars(jobjstr,cstr);
+    }
+    
+    void PrintJFloatArray(const char *prefix, jfloatArray jobj) {
+        if(NULL == jobj) {
+            std::cout << prefix << "NULL" << std::endl;
+            return;
+        }
+        JNIEnv *env = getEnv();
+        jclass clss = getArraysClass();
+        jmethodID midToString = env->GetStaticMethodID(clss, "toString", "([F)Ljava/lang/String;");
+        if(NULL == midToString) {
+            std::cout << prefix << "can not find toString method" << std::endl;
+            return;
+        }
+        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        if(NULL == jobjstr) {
+            std::cout << prefix << "toString() returned NULL" << std::endl;
+            return;
+        }
+        jboolean iscopy = JNI_FALSE;
+        const char *cstr = env->GetStringUTFChars(jobjstr, &iscopy);
+        std::cout << prefix << cstr << std::endl;
+        env->ReleaseStringUTFChars(jobjstr,cstr);
+    }
+    
+    void PrintJDoubleArray(const char *prefix, jdoubleArray jobj) {
+        if(NULL == jobj) {
+            std::cout << prefix << "NULL" << std::endl;
+            return;
+        }
+        JNIEnv *env = getEnv();
+        jclass clss = getArraysClass();
+        jmethodID midToString = env->GetStaticMethodID(clss, "toString", "([D)Ljava/lang/String;");
+        if(NULL == midToString) {
+            std::cout << prefix << "can not find toString method" << std::endl;
+            return;
+        }
+        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        if(NULL == jobjstr) {
+            std::cout << prefix << "toString() returned NULL" << std::endl;
+            return;
+        }
         jboolean iscopy = JNI_FALSE;
         const char *cstr = env->GetStringUTFChars(jobjstr, &iscopy);
         std::cout << prefix << cstr << std::endl;
@@ -217,11 +435,119 @@
         PrintJObject(prefix,objref.jthis);
     }
     
-    extern void SetDebugJ4Cpp(bool debug) {
+    const char *GetStringUTFChars(jstring js, jboolean *iscopy) {
+        jboolean iscopy2;
+        const char *ret = getEnv()->GetStringUTFChars(js,&iscopy2);
+        if(NULL != iscopy) {
+            *iscopy = iscopy2;
+        }
+        return ret;
+    }
+    
+    void ReleaseStringUTFChars(jstring js, const char *utf) {
+        getEnv()->ReleaseStringUTFChars(js,utf);
+    }
+    
+    jboolean *GetBooleanArrayElements(jbooleanArray  jarray,jboolean *iscopy) {
+        jboolean iscopy2;
+        jboolean *ret = getEnv()->GetBooleanArrayElements(jarray,&iscopy2);
+        if(NULL != iscopy) {
+            *iscopy = iscopy2;
+        }
+    }
+    
+    jbyte *GetByteArrayElements(jbyteArray  jarray,jboolean *iscopy) {
+        jboolean iscopy2;
+        jbyte *ret = getEnv()->GetByteArrayElements(jarray,&iscopy2);
+        if(NULL != iscopy) {
+            *iscopy = iscopy2;
+        }
+        return ret;
+    }
+    
+    jchar *GetCharArrayElements(jcharArray  jarray,jboolean *iscopy) {
+        jboolean iscopy2;
+        jchar *ret = getEnv()->GetCharArrayElements(jarray,&iscopy2);
+        if(NULL != iscopy) {
+            *iscopy = iscopy2;
+        }
+        return ret;
+    }
+    jshort *GetShortArrayElements(jshortArray  jarray,jboolean *iscopy) {
+        jboolean iscopy2;
+        jshort *ret = getEnv()->GetShortArrayElements(jarray,&iscopy2);
+        if(NULL != iscopy) {
+            *iscopy = iscopy2;
+        }
+        return ret;
+    }
+    jint *GetIntArrayElements(jintArray  jarray,jboolean *iscopy) {
+        jboolean iscopy2;
+        jint *ret = getEnv()->GetIntArrayElements(jarray,&iscopy2);
+        if(NULL != iscopy) {
+            *iscopy = iscopy2;
+        }
+        return ret;
+    }
+    jlong *GetLongArrayElements(jlongArray  jarray,jboolean *iscopy) {
+        jboolean iscopy2;
+        jlong *ret = getEnv()->GetLongArrayElements(jarray,&iscopy2);
+        if(NULL != iscopy) {
+            *iscopy = iscopy2;
+        }
+        return ret;
+    }
+    jfloat *GetFloatArrayElements(jfloatArray  jarray,jboolean *iscopy) {
+        jboolean iscopy2;
+        jfloat *ret = getEnv()->GetFloatArrayElements(jarray,&iscopy2);
+        if(NULL != iscopy) {
+            *iscopy = iscopy2;
+        }
+        return ret;
+    }
+    jdouble *GetDoubleArrayElements(jdoubleArray  jarray,jboolean *iscopy) {
+        jboolean iscopy2;
+        jdouble *ret = getEnv()->GetDoubleArrayElements(jarray,&iscopy2);
+        if(NULL != iscopy) {
+            *iscopy = iscopy2;
+        }
+        return ret;
+    }
+    
+    void ReleaseBooleanArrayElements(jbooleanArray jarray, jboolean *nativeArray, jint mode) {
+        getEnv()->ReleaseBooleanArrayElements(jarray,nativeArray,mode);
+    }
+    
+    void ReleaseByteArrayElements(jbyteArray jarray, jbyte *nativeArray, jint mode) {
+        getEnv()->ReleaseByteArrayElements(jarray,nativeArray,mode);
+    }
+    
+    void ReleaseCharArrayElements(jcharArray jarray, jchar *nativeArray, jint mode) {
+        getEnv()->ReleaseCharArrayElements(jarray,nativeArray,mode);
+    }
+    
+    void ReleaseShortArrayElements(jshortArray jarray, jshort *nativeArray, jint mode) {
+        getEnv()->ReleaseShortArrayElements(jarray,nativeArray,mode);
+    }
+    void ReleaseIntArrayElements(jintArray jarray, jint *nativeArray, jint mode) {
+        getEnv()->ReleaseIntArrayElements(jarray,nativeArray,mode);
+    }
+    void ReleaseLongArrayElements(jlongArray jarray, jlong *nativeArray, jint mode) {
+        getEnv()->ReleaseLongArrayElements(jarray,nativeArray,mode);
+    }
+    void ReleaseFloatArrayElements(jfloatArray jarray, jfloat *nativeArray, jint mode) {
+        getEnv()->ReleaseFloatArrayElements(jarray,nativeArray,mode);
+    }
+    void ReleaseDoubleArrayElements(jdoubleArray jarray, jdouble *nativeArray, jint mode) {
+        getEnv()->ReleaseDoubleArrayElements(jarray,nativeArray,mode);
+    }
+    
+    
+    void SetDebugJ4Cpp(bool debug) {
         debug_j4cpp = debug;
     }
     
-    extern bool GetDebugJ4Cpp() { 
+    bool GetDebugJ4Cpp() { 
         return debug_j4cpp;
     }
     // end namespace %NAMESPACE%

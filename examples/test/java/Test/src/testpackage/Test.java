@@ -15,6 +15,55 @@ import java.util.List;
  */
 public class Test {
 
+    public int nonstaticIntField = 321;
+    public Integer nonstaticIntegerField = Integer.valueOf(123);
+    public static int staticIntField = 642;
+    public static Integer staticIntegerField = Integer.valueOf(246);
+
+    public static enum MyEnum {
+        A, B, C;
+    }
+
+    private ExternalPublicEnum externalPublicEnumProp = ExternalPublicEnum.ONE;
+
+    /**
+     * Get the value of externalPublicEnumProp
+     *
+     * @return the value of externalPublicEnumProp
+     */
+    public ExternalPublicEnum getExternalPublicEnumProp() {
+        return externalPublicEnumProp;
+    }
+
+    /**
+     * Set the value of externalPublicEnumProp
+     *
+     * @param externalPublicEnumProp new value of externalPublicEnumProp
+     */
+    public void setExternalPublicEnumProp(ExternalPublicEnum externalPublicEnumProp) {
+        this.externalPublicEnumProp = externalPublicEnumProp;
+    }
+
+    private MyEnum enumABC = MyEnum.A;
+
+    /**
+     * Get the value of enumABC
+     *
+     * @return the value of enumABC
+     */
+    public MyEnum getEnumABC() {
+        return enumABC;
+    }
+
+    /**
+     * Set the value of enumABC
+     *
+     * @param enumABC new value of enumABC
+     */
+    public void setEnumABC(MyEnum enumABC) {
+        this.enumABC = enumABC;
+    }
+
     private List<String> listOfStrings = new ArrayList<>();
 
     /**
@@ -65,6 +114,26 @@ public class Test {
     int i = 4;
 
     private byte[] byteArrayProp;
+
+    private boolean[] booleanArrayProp;
+
+    /**
+     * Get the value of booleanArrayProp
+     *
+     * @return the value of booleanArrayProp
+     */
+    public boolean[] getBooleanArrayProp() {
+        return booleanArrayProp;
+    }
+
+    /**
+     * Set the value of booleanArrayProp
+     *
+     * @param booleanArrayProp new value of booleanArrayProp
+     */
+    public void setBooleanArrayProp(boolean[] booleanArrayProp) {
+        this.booleanArrayProp = booleanArrayProp;
+    }
 
     /**
      * Get the value of byteArrayProp
@@ -361,7 +430,7 @@ public class Test {
      * @param strProp new value of strProp
      */
     public void setStrProp(String strProp) {
-        System.out.println("Java Test.setStrProp("+strProp+") called.");
+        System.out.println("Java Test.setStrProp(" + strProp + ") called.");
         this.strProp = strProp;
     }
 
@@ -369,6 +438,7 @@ public class Test {
         this.i = i;
 
     }
+
     public int getI() {
         System.out.println("Java Test.getI() returning: " + i);
         return i;

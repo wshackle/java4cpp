@@ -45,6 +45,10 @@ private/*
 /src/test/resources/test*[0-9].h
 /src/test/resources/crclj*[0-9].cpp
 /src/test/resources/crclj*[0-9].h
+nbactions.xml
+examples/test/java/Test/build/
+examples/test/java/Test/dist/
+examples/test/java/Test/nbproject/private/
 
 
 # CMake files to ignore
@@ -99,3 +103,6 @@ Doxyfile
 /examples/simple/simple0.h
 /examples/simple/simple_fwd.h
 /examples/simple/simple
+/src/test/resources/projects/Test/build/
+/src/test/resources/projects/Test/dist/
+/src/test/resources/projects/Test/nbproject/private/

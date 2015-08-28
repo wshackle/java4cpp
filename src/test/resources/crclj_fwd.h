@@ -29,6 +29,18 @@ namespace crclj {
   namespace utils{
    class DefaultMain;
    class PoseToleranceChecker;
+  } // end namespace utils
+ } // end namespace crcl
+
+ namespace java{
+  namespace lang{
+   class Enum;
+  } // end namespace lang
+ } // end namespace java
+
+ namespace crcl{
+  namespace utils{
+   class SimRobotEnum;
    class PendantClientOuterStub;
   } // end namespace utils
  } // end namespace crcl
@@ -54,6 +66,7 @@ namespace crclj {
 
   namespace base{
    class CloseToolChangerType;
+   class ForceUnitEnumType;
    class ParameterSettingType;
    class CRCLStatusType;
    class MoveScrewType;
@@ -69,6 +82,7 @@ namespace crclj {
    class SetTransAccelType;
    class JointForceTorqueType;
    class PointType;
+   class CommandStateEnumType;
   } // end namespace base
 
   namespace utils{
@@ -102,7 +116,9 @@ namespace crclj {
    class RotAccelType;
    class ActuateJointsType;
    class MessageType;
+   class AngleUnitEnumType;
    class TransAccelAbsoluteType;
+   class TorqueUnitEnumType;
    class TransSpeedType;
    class TransSpeedRelativeType;
    class RunProgramType;
@@ -148,6 +164,7 @@ namespace crclj {
    class CRCLCommandInstanceType;
    class SetRotSpeedType;
    class ParallelGripperStatusType;
+   class LengthUnitEnumType;
    class SetEndEffectorParametersType;
    class ThreeFingerGripperStatusType;
   } // end namespace base
@@ -164,6 +181,7 @@ namespace crclj {
    class JointStatusesType;
    class JointStatusType;
    class MoveThroughToType;
+   class StopConditionEnumType;
   } // end namespace base
 
   namespace utils{
@@ -344,6 +362,17 @@ namespace crclj {
  namespace java{
   namespace util{
    class Optional;
+  } // end namespace util
+ } // end namespace java
+
+ namespace crcl{
+  namespace utils{
+   class PendantClientInnerTrySupplier;
+  } // end namespace utils
+ } // end namespace crcl
+
+ namespace java{
+  namespace util{
    namespace stream{
     class Stream;
    } // end namespace stream

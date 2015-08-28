@@ -16,6 +16,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -368,11 +369,6 @@ public class J4CppMain {
         String mname = m.getName();
 
         Method ma[] = m.getDeclaringClass().getMethods();
-        if (mname.equals("distance") || mname.equals("distance1")) {
-            if (m.getDeclaringClass().getName().contains("MathArrays")) {
-                System.out.println("debug me");
-            }
-        }
         int index = 0;
         boolean index_incremented = false;
         for (int i = 0; i < ma.length; i++) {
@@ -450,7 +446,7 @@ public class J4CppMain {
                 + clssOnlyName
                 + "::"
                 + "get" + f.getName().substring(0, 1).toUpperCase() + f.getName().substring(1)
-                + "() {\n";
+                + "() {";
     }
 
     private static String getCppFieldSetterDefinitionStart(String tabs,
@@ -464,7 +460,7 @@ public class J4CppMain {
                 + "set" + f.getName().substring(0, 1).toUpperCase() + f.getName().substring(1)
                 + "(" + addConstRefIndicator(f.getType(), getCppType(f.getType(), relClass))
                 + " " + classToParamNameDecl(f.getType(), 0)
-                + ") {\n";
+                + ") {";
     }
 
     private static String getCppMethodDefinitionStart(String tabs,
@@ -477,7 +473,7 @@ public class J4CppMain {
                 + "::"
                 + fixMethodName(m)
                 + getCppParamDeclarations(m.getParameterTypes(), relClass)
-                + " {\n";
+                + " {";
     }
 
     private static String getEasyCallCppMethodDefinitionStart(String tabs,
@@ -490,7 +486,7 @@ public class J4CppMain {
                 + "::"
                 + fixMethodName(m)
                 + getEasyCallCppParamDeclarations(m.getParameterTypes(), relClass)
-                + " {\n";
+                + " {";
     }
 
     public static String getOnFailString(Class returnClass, Class relClass) {
@@ -748,9 +744,6 @@ public class J4CppMain {
                 if (null == val) {
                     val = "";
                 }
-                if(str.contains("JAR") && key.contains("JAR")) {
-                    System.out.println("debug me");
-                }
                 str = str.replace(key, val);
             }
         } catch (Throwable t) {
@@ -778,7 +771,7 @@ public class J4CppMain {
 
     private static boolean checkClass(Class<?> clss, List<Class> classes) {
         Class<?> componentClass = clss.getComponentType();
-        return isString(clss)
+        boolean ret = isString(clss)
                 || clss.equals(Object.class)
                 || clss.isPrimitive()
                 || (clss.isArray()
@@ -786,6 +779,16 @@ public class J4CppMain {
                 && !componentClass.isArray()
                 && checkClass(componentClass, classes))
                 || classes.contains(clss);
+        if (!ret) {
+            if (verbose) {
+                if (clss.isArray()) {
+                    System.out.println("checkClass skipping " + clss + " component " + clss.getComponentType());
+                } else {
+                    System.out.println("checkClass skipping " + clss);
+                }
+            }
+        }
+        return ret;
     }
 
     private static boolean checkParameters(Class paramTypes[], List<Class> classes) {
@@ -798,42 +801,58 @@ public class J4CppMain {
     }
 
     private static boolean checkMethod(Method m, List<Class> classes) {
-//        if (m.getName().contains("MsgToTimeStamp")) {
-//            System.out.println("debug me");
-//        }
         if (m.getDeclaringClass().getName().equals(m.getName())) {
+            if (verbose) {
+                System.out.println("checkMethod skipping " + m + " method same as classname.");
+            }
             return false;
         }
         if (m.getDeclaringClass().getName().endsWith("." + m.getName())) {
+            if (verbose) {
+                System.out.println("checkMethod skipping " + m + " method same as classname.");
+            }
             return false;
         }
         if (m.isSynthetic()) {
+            if (verbose) {
+                System.out.println("checkMethod skipping " + m + " isSynthetic.");
+            }
             return false;
         }
-        if (!Modifier.isPublic(m.getModifiers()) //                || Modifier.isAbstract(m.getModifiers())
-                ) {
+        if (!Modifier.isPublic(m.getModifiers())) {
+            if (verbose) {
+                System.out.println("checkMethod skipping " + m + " not public");
+            }
             return false;
         }
         if (!checkClass(m.getReturnType(), classes)) {
+            if (verbose) {
+                System.out.println("checkMethod skipping " + m + " return type not in classes list.");
+            }
             return false;
         }
-        return checkParameters(m.getParameterTypes(), classes);
+        boolean ret = checkParameters(m.getParameterTypes(), classes);
+        if (!ret) {
+            if (verbose) {
+                System.out.println("checkMethod skipping " + m + " a parameter type is not in classes list");
+            }
+        }
+        return ret;
     }
 
     public static boolean isAddableClass(Class<?> clss, Set<Class> excludedClasses) {
         if (clss.isArray()
                 || clss.isSynthetic()
                 || clss.isAnnotation()
-                || clss.isPrimitive()
-                || clss.isEnum()) {
+                || clss.isPrimitive()) {
             return false;
         }
 //        if(clss.getCanonicalName().contains("Dialog") || clss.getName().contains("ModalExlusionType")) {
-//            System.out.println("clss = " + clss);
+//            if(verbose) System.out.println("clss = " + clss);
 //        }
-        if (clss.getEnclosingClass() != null) {
-            return false;
-        }
+//        if (clss.getEnclosingClass() != null) {
+//            return false;
+//        }
         String canonicalName = null;
         try {
             canonicalName = clss.getCanonicalName();
@@ -866,9 +885,7 @@ public class J4CppMain {
     }
 
     private static boolean isMethodToMakeEasy(Method m) {
-//        if(m.getName().contains("printf")) {
-//            System.out.println("debug me");
-//        }
+
         return !Modifier.isStatic(m.getModifiers())
                 && Arrays.stream(m.getParameterTypes())
                 .anyMatch(t -> t.isArray() || isString(t))
@@ -970,20 +987,30 @@ public class J4CppMain {
 
     public static String getHomeDir() throws IOException {
         String userHomeProp = System.getProperty("user.home");
-        System.out.println("userDirProp = " + userHomeProp);
+        if (verbose) {
+            System.out.println("userDirProp = " + userHomeProp);
+        }
         String homeDir = new File(userHomeProp).getCanonicalPath();
-        System.out.println("homeDir = " + homeDir);
+        if (verbose) {
+            System.out.println("homeDir = " + homeDir);
+        }
         return homeDir;
     }
-    
+
     public static String getCurrentDir() throws IOException {
         String userDirProp = System.getProperty("user.dir");
-        System.out.println("userDirProp = " + userDirProp);
+        if (verbose) {
+            System.out.println("userDirProp = " + userDirProp);
+        }
         String currentDir = new File(userDirProp).getCanonicalPath();
-        System.out.println("currentDir = " + currentDir);
+        if (verbose) {
+            System.out.println("currentDir = " + currentDir);
+        }
         return currentDir.replace("\\", "\\\\");
     }
-    
+
+    public static boolean verbose = false;
+
     public static void main(String[] args) {
 
         try {
@@ -1028,34 +1055,59 @@ public class J4CppMain {
                     .desc("Maximum limit on classes to extract from jars.[default=200]")
                     .longOpt("limit")
                     .build());
+            options.addOption(Option.builder("v")
+                    .hasArg()
+                    .desc("enable verbose output")
+                    .longOpt("verbose")
+                    .build());
+            options.addOption(Option.builder()
+                    .hasArg()
+                    .desc("Classes per output file.[default=10]")
+                    .longOpt(CLASSESPEROUTPUT)
+                    .build()
+            );
             String output = null;
             String header = null;
             String jar = null;
             String classname = null;
             String packageprefix = null;
             int limit = DEFAULT_LIMIT;
+            int classes_per_file = 10;
+
             String limitstring = Integer.toString(limit);
 
             try {
                 // parse the command line arguments
                 CommandLine line = new DefaultParser().parse(options, args);
+                verbose = line.hasOption("verbose");
+                if (line.hasOption(CLASSESPEROUTPUT)) {
+                    String cpoStr = line.getOptionValue(CLASSESPEROUTPUT);
+                    try {
+                        int cpoI = Integer.valueOf(cpoStr);
+                        classes_per_file = cpoI;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
 
 //            // validate that block-size has been set
 //            if (line.hasOption("block-size")) {
 //                // print the value of block-size
-//                System.out.println(line.getOptionValue("block-size"));
+//                if(verbose) System.out.println(line.getOptionValue("block-size"));
 //            }
                 jar = line.getOptionValue("jar", jar);
-                System.out.println("jar = " + jar);
+                if (verbose) {
+                    System.out.println("jar = " + jar);
+                }
                 if (null != jar) {
                     if (jar.startsWith("~/")) {
-                        jar = new File(new File(getHomeDir()),jar.substring(2)).getCanonicalPath();
+                        jar = new File(new File(getHomeDir()), jar.substring(2)).getCanonicalPath();
                     }
                     if (jar.startsWith("./")) {
-                        jar = new File(new File(getCurrentDir()),jar.substring(2)).getCanonicalPath();
+                        jar = new File(new File(getCurrentDir()), jar.substring(2)).getCanonicalPath();
                     }
                     if (jar.startsWith("../")) {
-                        jar = new File(new File(getCurrentDir()).getParentFile(),jar.substring(3)).getCanonicalPath();
+                        jar = new File(new File(getCurrentDir()).getParentFile(), jar.substring(3)).getCanonicalPath();
                     }
                 }
                 if (line.hasOption("class")) {
@@ -1076,14 +1128,18 @@ public class J4CppMain {
                         }
                     }
                 }
-                
+
                 namespace = line.getOptionValue("namespace", namespace);
-                System.out.println("namespace = " + namespace);
+                if (verbose) {
+                    System.out.println("namespace = " + namespace);
+                }
                 if (null != namespace) {
                     output = namespace + ".cpp";
                 }
                 output = line.getOptionValue("output", output);
-                System.out.println("output = " + output);
+                if (verbose) {
+                    System.out.println("output = " + output);
+                }
                 if (null != output) {
                     if (output.startsWith("~/")) {
                         output = System.getProperty("user.home") + output.substring(1);
@@ -1093,7 +1149,9 @@ public class J4CppMain {
                     output = "out.cpp";
                 }
                 header = line.getOptionValue("header", header);
-                System.out.println("header = " + header);
+                if (verbose) {
+                    System.out.println("header = " + header);
+                }
                 if (null != header) {
                     if (header.startsWith("~/")) {
                         header = System.getProperty("user.home") + header.substring(1);
@@ -1113,7 +1171,9 @@ public class J4CppMain {
                     printHelpAndExit(options);
                 }
             } catch (ParseException exp) {
-                System.out.println("Unexpected exception:" + exp.getMessage());
+                if (verbose) {
+                    System.out.println("Unexpected exception:" + exp.getMessage());
+                }
                 printHelpAndExit(options);
             }
 
@@ -1159,7 +1219,7 @@ public class J4CppMain {
                         }
                         if (!classes.contains(clss)
                                 && isAddableClass(clss, excludedClasses)) {
-//                        System.out.println("clss = " + clss);
+//                        if(verbose) System.out.println("clss = " + clss);
                             classes.add(clss);
 //                        Class superClass = clss.getSuperclass();
 //                        while (null != superClass
@@ -1174,7 +1234,9 @@ public class J4CppMain {
             }
             if (null != classname && classname.length() > 0 && classes.size() == 0) {
                 URL url = new URL("file://" + System.getProperty("user.dir") + "/");
-                System.out.println("url = " + url);
+                if (verbose) {
+                    System.out.println("url = " + url);
+                }
                 URLClassLoader cl = URLClassLoader.newInstance(new URL[]{url});
                 Class c = cl.loadClass(classname);
                 if (null == c) {
@@ -1184,11 +1246,15 @@ public class J4CppMain {
                     classes.add(c);
                 }
             }
-            System.out.println("Classes found = " + classes.size());
+            if (verbose) {
+                System.out.println("Classes found = " + classes.size());
+            }
             if (classes.size() > limit) {
                 System.err.println("limit=" + limit);
                 System.err.println("Too many classes please use -c or -p options to limit classes or -l to increase limit.");
-                System.out.println("packagesSet = " + packagesSet);
+                if (verbose) {
+                    System.out.println("packagesSet = " + packagesSet);
+                }
                 System.exit(1);
             }
             List<Class> newClasses = new ArrayList<Class>();
@@ -1271,7 +1337,9 @@ public class J4CppMain {
                     ex.printStackTrace();
                 }
             }
-            System.out.println("Dependency classes needed = " + newClasses.size());
+            if (verbose) {
+                System.out.println("Dependency classes needed = " + newClasses.size());
+            }
             classes.addAll(newClasses);
             List<Class> newOrderClasses = new ArrayList<>();
             for (Class clss : classes) {
@@ -1292,7 +1360,9 @@ public class J4CppMain {
                 newOrderClasses.add(clss);
             }
             classes = newOrderClasses;
-            System.out.println("Total number of classes = " + classes.size());
+            if (verbose) {
+                System.out.println("Total number of classes = " + classes.size());
+            }
 
 //            Map<String, Integer> classMap = new HashMap<>();
 //            Map<String, Integer> packageMap = new HashMap<>();
@@ -1350,16 +1420,16 @@ public class J4CppMain {
 //                @Override
 //                public int compare(Class o1, Class o2) {
 //                    if (o1 == null || classMap.get(o1.getCanonicalName()) == null) {
-//                        System.out.println("bad o1=" + o1);
+//                        if(verbose) System.out.println("bad o1=" + o1);
 //                    }
 //                    if (o2 == null || classMap.get(o2.getCanonicalName()) == null) {
-//                        System.out.println("bad o2=" + o2);
+//                        if(verbose) System.out.println("bad o2=" + o2);
 //                    }
 //                    if (o1 == null || packageMap.get(o1.getPackage().getName()) == null) {
-//                        System.out.println("bad o1=" + o1);
+//                        if(verbose) System.out.println("bad o1=" + o1);
 //                    }
 //                    if (o2 == null || packageMap.get(o2.getPackage().getName()) == null) {
-//                        System.out.println("bad o2=" + o2);
+//                        if(verbose) System.out.println("bad o2=" + o2);
 //                    }
 ////                    if(!o1.getPackage().getName().equals(o2.getPackage().getName())) {
 ////                        return packageMap.get(o1.getPackage().getName()) - packageMap.get(o2.getPackage().getName());
@@ -1414,7 +1484,10 @@ public class J4CppMain {
                     .replace(".", "_");
             map.put(HEADER_DEFINE, headerDefine);
             map.put(NAMESPACE, namespace);
-            int num_class_segments = (classes.size() + 5) / 5;
+            if (classes_per_file < 1) {
+                classes_per_file = classes.size();
+            }
+            final int num_class_segments = (classes.size() + classes_per_file - 1) / classes_per_file;
             String fmt = "%d";
             if (num_class_segments > 10) {
                 fmt = "%02d";
@@ -1445,10 +1518,21 @@ public class J4CppMain {
                     pw.println("// Never include this file (" + header_segment_file + ") directly. include " + header + " instead.");
                     pw.println();
                     Class lastClass = null;
-                    List<Class> classesSegList = classes.subList(segment_index * 5,
-                            Math.min(segment_index * 5 + 5, classes.size()));
+                    final int start_segment_index = segment_index * classes_per_file;
+                    final int end_segment_index = Math.min(segment_index * classes_per_file + classes_per_file, classes.size());
+                    List<Class> classesSegList = classes.subList(start_segment_index,
+                            end_segment_index);
+                    pw.println();
+                    pw.println(tabs + "// start_segment_index = " + start_segment_index); 
+                    pw.println(tabs + "// start_segment_index = " + end_segment_index); 
+                    pw.println(tabs + "// segment_index = " + segment_index);
+                    pw.println(tabs + "// classesSegList=" + classesSegList);
+                    pw.println();
                     for (int class_index = 0; class_index < classesSegList.size(); class_index++) {
                         Class clss = classesSegList.get(class_index);
+                        pw.println();
+                        pw.println(tabs + "// class_index = " + class_index + " clss=" + clss);
+                        pw.println();
                         String clssName = clss.getCanonicalName();
                         tabs = openClassNamespace(clss, pw, tabs, lastClass);
                         String clssOnlyName = getCppClassName(clss);
@@ -1459,9 +1543,6 @@ public class J4CppMain {
                         processTemplate(pw, map, HEADER_CLASS_STARTH, tabs);
                         tabs += TAB_STRING;
 
-//                    if (clssName.contains("Component")) {
-//                        System.out.println("debug me");
-//                    }
                         Constructor constructors[] = clss.getDeclaredConstructors();
                         if (clssOnlyName.contains("DataTypeThing")) {
 
@@ -1502,7 +1583,7 @@ public class J4CppMain {
                             }
                             if (c.getParameterTypes().length == 1) {
                                 if (c.getParameterTypes()[0].getName().equals(clss.getName())) {
-//                                    System.out.println("skipping constructor.");
+//                                    if(verbose) System.out.println("skipping constructor.");
                                     continue;
                                 }
                             }
@@ -1530,6 +1611,11 @@ public class J4CppMain {
                         Method methods[] = clss.getDeclaredMethods();
                         for (int j = 0; j < methods.length; j++) {
                             Method method = methods[j];
+                            if (method.getName().contains("getEnumABC")) {
+                                if (verbose) {
+                                    System.out.println("debug me");
+                                }
+                            }
                             if (!checkMethod(method, classes)) {
                                 continue;
                             }
@@ -1575,11 +1661,22 @@ public class J4CppMain {
                     } else {
                         processTemplate(pw, map, CPP_TEMPLATE_STARTCPP, tabs);
                     }
-                    List<Class> classesSegList = classes.subList(segment_index * 5,
-                            Math.min(segment_index * 5 + 5, classes.size()));
+                    final int start_segment_index = segment_index * classes_per_file;
+                    final int end_segment_index = Math.min(segment_index * classes_per_file + classes_per_file, classes.size());
+                    List<Class> classesSegList = classes.subList(start_segment_index,
+                            end_segment_index);
+                    pw.println();
+                    pw.println(tabs + "// start_segment_index = " + start_segment_index); 
+                    pw.println(tabs + "// start_segment_index = " + end_segment_index); 
+                    pw.println(tabs + "// segment_index = " + segment_index);
+                    pw.println(tabs + "// classesSegList=" + classesSegList);
+                    pw.println();
                     Class lastClass = null;
                     for (int class_index = 0; class_index < classesSegList.size(); class_index++) {
                         Class clss = classesSegList.get(class_index);
+                        pw.println();
+                        pw.println(tabs + "// class_index = " + class_index + " clss=" + clss);
+                        pw.println();
                         String clssName = clss.getCanonicalName();
                         tabs = TAB_STRING;
                         tabs = openClassNamespace(clss, pw, tabs, lastClass);
@@ -1592,9 +1689,7 @@ public class J4CppMain {
                         map.put(OBJECT_CLASS_FULL_NAME, getCppRelativeName(Object.class, clss));
                         processTemplate(pw, map, CPP_START_CLASSCPP, tabs);
                         Constructor constructors[] = clss.getDeclaredConstructors();
-//                        if (clssName.contains("Component")) {
-//                            System.out.println("debug me");
-//                        }
+
                         if (!hasNoArgConstructor(constructors)) {
                             if (!Modifier.isAbstract(clss.getModifiers())
                                     && !clss.isInterface()) {
@@ -1673,6 +1768,8 @@ public class J4CppMain {
                         for (int findex = 0; findex < fa.length; findex++) {
                             Field field = fa[findex];
                             if (addGetterMethod(field, clss, classes)) {
+                                pw.println();
+                                pw.println(tabs + "// Field getter for " + field.getName());
                                 pw.println(getCppFieldGetterDefinitionStart(tabs, clssOnlyName, field, clss));
                                 map.put("%FIELD_NAME%", field.getName());
                                 map.put(JNI_SIGNATURE, classToJNISignature(field.getType()));
@@ -1693,6 +1790,8 @@ public class J4CppMain {
                                 pw.println(tabs + "}");
                             }
                             if (addSetterMethod(field, clss, classes)) {
+                                pw.println();
+                                pw.println(tabs + "// Field setter for " + field.getName());
                                 pw.println(getCppFieldSetterDefinitionStart(tabs, clssOnlyName, field, clss));
                                 pw.println(tabs + "}");
                             }
@@ -1700,13 +1799,17 @@ public class J4CppMain {
                         Method methods[] = clss.getDeclaredMethods();
                         for (int j = 0; j < methods.length; j++) {
                             Method method = methods[j];
-                            if (!checkMethod(method, classes)) {
-                                continue;
-                            }
-                            int modifiers = method.getModifiers();
-                            if (Modifier.isPublic(modifiers)) {
+
+                            if (checkMethod(method, classes)) {
+                                pw.println();
                                 pw.println(getCppMethodDefinitionStart(tabs, clssOnlyName, method, clss));
                                 map.put(METHOD_NAME, fixMethodName(method));
+                                if (fixMethodName(method).contains("equals2")) {
+                                    if (verbose) {
+                                        System.out.println("debug me");
+                                    }
+                                }
+                                map.put("%JAVA_METHOD_NAME%", method.getName());
                                 Class[] paramClasses = method.getParameterTypes();
                                 String methodArgs = getCppParamNames(paramClasses);
                                 map.put(METHOD_ARGS, (paramClasses.length > 0 ? "," : "") + methodArgs);
@@ -1720,17 +1823,21 @@ public class J4CppMain {
                                 String retStore = isVoid(returnClass) ? "" : "retVal= (" + getMethodReturnVarType(returnClass) + ") ";
                                 map.put("%METHOD_RETURN_STORE%", retStore);
                                 map.put("%METHOD_RETURN_GET%", getMethodReturnGet(tabs, returnClass, clss));
-                                if (!Modifier.isStatic(modifiers)) {
+                                tabs += TAB_STRING;
+                                if (!Modifier.isStatic(method.getModifiers())) {
                                     processTemplate(pw, map, CPP_METHODCPP, tabs);
                                 } else {
                                     processTemplate(pw, map, CPP_STATIC_METHODCPP, tabs);
                                 }
+                                tabs = tabs.substring(0, tabs.length() - TAB_STRING.length());
                                 pw.println(tabs + "}");
                                 if (isArrayStringMethod(method)) {
                                     map.put(METHOD_RETURN_STORE, isVoid(returnClass) ? "" : getCppType(returnClass, clss) + " returnVal=");
                                     map.put(METHOD_RETURN_GET, isVoid(returnClass) ? "return ;" : "return returnVal;");
                                     processTemplate(pw, map, CPP_EASY_STRING_ARRAY_METHODCPP, tabs);
                                 } else if (isMethodToMakeEasy(method)) {
+                                    pw.println();
+                                    pw.println(tabs + "// Easy call alternative for " + method.getName());
                                     pw.println(getEasyCallCppMethodDefinitionStart(tabs, clssOnlyName, method, clss));
                                     tabs += TAB_STRING;
                                     map.put("%RETURN_VAR_DECLARE%", getMethodReturnVarDeclareOut(returnClass, clss));
@@ -1810,6 +1917,7 @@ public class J4CppMain {
         }
 
     }
+    private static final String CLASSESPEROUTPUT = "classes-per-output";
 
     private static boolean checkConstructor(Constructor c, Class clss, List<Class> classes) {
         if (!Modifier.isPublic(c.getModifiers())) {

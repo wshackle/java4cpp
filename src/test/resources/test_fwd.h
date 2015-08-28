@@ -16,8 +16,19 @@ namespace test {
  class ClassInDefaultPackage;
  namespace testpackage{
   class A;
+ } // end namespace testpackage
+
+ namespace java{
+  namespace lang{
+   class Enum;
+  } // end namespace lang
+ } // end namespace java
+
+ namespace testpackage{
+  class ExternalPublicEnum;
   class MyClient;
   class Test;
+  class TestMyEnum;
  } // end namespace testpackage
 
  namespace java{
