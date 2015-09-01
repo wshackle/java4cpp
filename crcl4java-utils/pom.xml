@@ -8,7 +8,7 @@
     <parent>
         <relativePath>..</relativePath>
         <groupId>com.github.wshackle</groupId>
-        <artifactId>CRCLJavaParent</artifactId>
+        <artifactId>crcl4java</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <dependencies>
@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.wshackle</groupId>
-            <artifactId>CRCLJavaBase</artifactId>
+            <artifactId>crcl4java-base</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

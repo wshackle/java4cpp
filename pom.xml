@@ -41,9 +41,9 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git@github.com:usnistgov/crac.git</connection>
-        <developerConnection>scm:git:git@github.com:usnistgov/crac.git</developerConnection>
-        <url>https://github.com/usnistgov/crac</url>
+        <connection>https://github.com/wshackle/crcl4java.git</connection>
+        <developerConnection>git@github.com:wshackle/crcl4java.git</developerConnection>
+        <url>https://github.com/wshackle/crcl4java</url>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>

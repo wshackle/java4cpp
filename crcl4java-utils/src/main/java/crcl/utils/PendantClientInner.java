@@ -994,7 +994,7 @@ public class PendantClientInner {
     private boolean testDwellEffect(DwellType dwell, long startTime) {
         long elapsed = System.currentTimeMillis() - startTime;
         long expected = (long) (dwell.getDwellTime().doubleValue() * 1000.0);
-        if (Math.abs(elapsed - expected) > 1500) {
+        if (Math.abs(elapsed - expected) > 3500) {
             outer.showMessage("Dwell expected to take " + expected + " ms but took " + elapsed + " ms.");
             return false;
         }
