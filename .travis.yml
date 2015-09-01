@@ -1,15 +1,15 @@
 language: java
 
-sudo: required
+sudo: false
 
 jdk:
   - oraclejdk8
 
 install: true
 
-script:
-  - sudo apt-get update && sudo apt-get install oracle-java8-installer
-  - java -version
+#script:
+#  - sudo apt-get update && sudo apt-get install oracle-java8-installer
+ # - java -version
   
 notifications:
   email:
