@@ -18,21 +18,12 @@ jclass cls = env->GetObjectClass(jthis);
 if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",jthis);
 %RETURN_VAR_DECLARE%
 if (cls != NULL) {
-    static jmethodID mid = env->GetMethodID(cls, "%METHOD_NAME%", "%JNI_SIGNATURE%");
-    if (NULL == mid) {
-        std::cerr << "Class %FULL_CLASS_NAME% has no method named %METHOD_NAME% with signature %JNI_SIGNATURE%." << std::endl;
+    static jfieldID fid = env->GetFieldID(cls, "%FIELD_NAME%", "%JNI_SIGNATURE%");
+    if (NULL == fid) {
+        std::cerr << "Class %FULL_CLASS_NAME% has no field named %FIELD_NAME% with signature %JNI_SIGNATURE%." << std::endl;
         %METHOD_ONFAIL%
     } else {
-        %METHOD_RETURN_STORE% env->Call%METHOD_CALL_TYPE%Method(jthis, mid %METHOD_ARGS% );
-        jthrowable t = env->ExceptionOccurred();
-        if(t != NULL) {
-            if(GetDebugJ4Cpp()) {
-                DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",t);
-                env->ExceptionDescribe();
-            }
-//            env->ExceptionClear();
-            throw t;
-        }
+        %METHOD_RETURN_STORE%  env->Get%METHOD_CALL_TYPE%Field( jthis, fid %METHOD_ARGS% );
     }
 }
 releaseEnv(env);

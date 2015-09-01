@@ -28,16 +28,6 @@ namespace test {
  namespace testpackage{
   class ExternalPublicEnum;
   class MyClient;
- } // end namespace testpackage
-
- namespace java{
-  namespace lang{
-   class Number;
-   class Integer;
-  } // end namespace lang
- } // end namespace java
-
- namespace testpackage{
   class TestMyEnum;
  } // end namespace testpackage
 

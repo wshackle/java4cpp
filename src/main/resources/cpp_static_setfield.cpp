@@ -13,19 +13,12 @@ JNIEnv *env =getEnv();
 static jclass cls = get%CLASS_NAME%Class();
 %RETURN_VAR_DECLARE%
 if (cls != NULL) {
-    static jmethodID mid = env->GetStaticMethodID(cls, "%METHOD_NAME%", "%JNI_SIGNATURE%");
-    if (NULL == mid) {
-        std::cerr << "Class %FULL_CLASS_NAME% has no method named %METHOD_NAME% with signature %JNI_SIGNATURE%." << std::endl;
+    static jfieldID fid = env->GetStaticFieldID(cls, "%FIELD_NAME%", "%JNI_SIGNATURE%");
+    if (NULL == fid) {
+        std::cerr << "Class %FULL_CLASS_NAME% has no field named %FIELD_NAME% with signature %JNI_SIGNATURE%." << std::endl;
         %METHOD_ONFAIL%
     } else {
-        %METHOD_RETURN_STORE% env->CallStatic%METHOD_CALL_TYPE%Method( cls, mid %METHOD_ARGS% );
-        jthrowable t = env->ExceptionOccurred();
-        if(t != NULL) {
-            DebugPrintJObject(__FILE__,__LINE__," %CLASS_NAME%::%METHOD_NAME% jthis=",t);
-            if(GetDebugJ4Cpp()) env->ExceptionDescribe();
-//            env->ExceptionClear();
-            throw t;
-        }
+        env->SetStatic%METHOD_CALL_TYPE%Field( cls, fid %METHOD_ARGS% );
     }
 }
 releaseEnv(env);

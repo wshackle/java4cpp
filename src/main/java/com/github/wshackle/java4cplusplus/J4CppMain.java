@@ -1268,6 +1268,16 @@ public class J4CppMain {
                         newClasses.add(superClass);
                         superClass = superClass.getSuperclass();
                     }
+                    for (Field f : clss.getDeclaredFields()) {
+                        if (Modifier.isPublic(f.getModifiers())) {
+                            Class fClass = f.getType();
+                            if (!classes.contains(fClass)
+                                    && !newClasses.contains(fClass)
+                                    && isAddableClass(fClass, excludedClasses)) {
+                                newClasses.add(fClass);
+                            }
+                        }
+                    }
                     for (Method m : clss.getDeclaredMethods()) {
                         if (m.isSynthetic()) {
                             continue;
@@ -1277,42 +1287,20 @@ public class J4CppMain {
                             continue;
                         }
                         Class retType = m.getReturnType();
-                        Method ma[] = null;
-                        try {
-                            ma = clss.getDeclaredMethods();
-                        } catch (Throwable t) {
-                            // leaving ma null is enough
-                        }
-                        if (null == ma) {
-                            continue;
+                        System.out.println("m = " + m);
+                        System.out.println("retType = " + retType);
+                        if (retType.getName().contains("Int")) {
+                            System.out.println("debug me");
                         }
                         if (!classes.contains(retType)
                                 && !newClasses.contains(retType)
                                 && isAddableClass(retType, excludedClasses)) {
                             newClasses.add(retType);
                             superClass = retType.getSuperclass();
-                            ma = null;
-                            try {
-                                ma = clss.getDeclaredMethods();
-                            } catch (Throwable t) {
-                                // leaving ma null is enough
-                            }
-                            if (null == ma) {
-                                continue;
-                            }
                             while (null != superClass
                                     && !classes.contains(superClass)
                                     && !newClasses.contains(superClass)
                                     && isAddableClass(superClass, excludedClasses)) {
-                                ma = null;
-                                try {
-                                    ma = superClass.getDeclaredMethods();
-                                } catch (Throwable t) {
-                                    // leaving ma null is enough
-                                }
-                                if (null == ma) {
-                                    break;
-                                }
                                 newClasses.add(superClass);
                                 superClass = superClass.getSuperclass();
                             }
@@ -1523,8 +1511,8 @@ public class J4CppMain {
                     List<Class> classesSegList = classes.subList(start_segment_index,
                             end_segment_index);
                     pw.println();
-                    pw.println(tabs + "// start_segment_index = " + start_segment_index); 
-                    pw.println(tabs + "// start_segment_index = " + end_segment_index); 
+                    pw.println(tabs + "// start_segment_index = " + start_segment_index);
+                    pw.println(tabs + "// start_segment_index = " + end_segment_index);
                     pw.println(tabs + "// segment_index = " + segment_index);
                     pw.println(tabs + "// classesSegList=" + classesSegList);
                     pw.println();
@@ -1666,8 +1654,8 @@ public class J4CppMain {
                     List<Class> classesSegList = classes.subList(start_segment_index,
                             end_segment_index);
                     pw.println();
-                    pw.println(tabs + "// start_segment_index = " + start_segment_index); 
-                    pw.println(tabs + "// start_segment_index = " + end_segment_index); 
+                    pw.println(tabs + "// start_segment_index = " + start_segment_index);
+                    pw.println(tabs + "// start_segment_index = " + end_segment_index);
                     pw.println(tabs + "// segment_index = " + segment_index);
                     pw.println(tabs + "// classesSegList=" + classesSegList);
                     pw.println();
@@ -1775,6 +1763,7 @@ public class J4CppMain {
                                 map.put(JNI_SIGNATURE, classToJNISignature(field.getType()));
                                 Class returnClass = field.getType();
                                 map.put(METHOD_ONFAIL, getOnFailString(returnClass, clss));
+                                map.put(METHOD_ARGS, "");
                                 map.put("%METHOD_RETURN%", isVoid(returnClass) ? "" : "return");
                                 map.put("%METHOD_CALL_TYPE%", getMethodCallString(returnClass));
                                 map.put("%METHOD_RETURN_TYPE%", getCppType(returnClass, clss));
@@ -1785,6 +1774,8 @@ public class J4CppMain {
 
                                 if (Modifier.isStatic(field.getModifiers())) {
                                     processTemplate(pw, map, "cpp_static_getfield.cpp", tabs);
+                                } else {
+                                    processTemplate(pw, map, "cpp_getfield.cpp", tabs);
                                 }
 
                                 pw.println(tabs + "}");
@@ -1793,6 +1784,27 @@ public class J4CppMain {
                                 pw.println();
                                 pw.println(tabs + "// Field setter for " + field.getName());
                                 pw.println(getCppFieldSetterDefinitionStart(tabs, clssOnlyName, field, clss));
+                                map.put("%FIELD_NAME%", field.getName());
+                                map.put(JNI_SIGNATURE, classToJNISignature(field.getType()));
+                                Class returnClass = void.class;
+                                map.put(METHOD_ONFAIL, getOnFailString(returnClass, clss));
+                                Class[] paramClasses = new Class[]{field.getType()};
+                                String methodArgs = getCppParamNames(paramClasses);
+                                map.put(METHOD_ARGS, (paramClasses.length > 0 ? "," : "") + methodArgs);
+                                map.put("%METHOD_RETURN%", isVoid(returnClass) ? "" : "return");
+                                map.put("%METHOD_CALL_TYPE%", getMethodCallString(field.getType()));
+                                map.put("%METHOD_RETURN_TYPE%", getCppType(returnClass, clss));
+                                map.put("%RETURN_VAR_DECLARE%", getMethodReturnVarDeclare(returnClass));
+                                String retStore = isVoid(returnClass) ? "" : "retVal= (" + getMethodReturnVarType(returnClass) + ") ";
+                                map.put("%METHOD_RETURN_STORE%", retStore);
+                                map.put("%METHOD_RETURN_GET%", getMethodReturnGet(tabs, returnClass, clss));
+
+                                if (Modifier.isStatic(field.getModifiers())) {
+                                    processTemplate(pw, map, "cpp_static_setfield.cpp", tabs);
+                                } else {
+                                    processTemplate(pw, map, "cpp_setfield.cpp", tabs);
+                                }
+
                                 pw.println(tabs + "}");
                             }
                         }

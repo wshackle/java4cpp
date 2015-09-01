@@ -7,6 +7,7 @@
 
 using namespace test::testpackage;
 using namespace test;
+using namespace test::java::lang;
 using namespace std;
 
 int main(int argc, const char **argv) {
@@ -169,11 +170,45 @@ int main(int argc, const char **argv) {
         PrintObject("t1.getExternalPublicEnumProp()= ", t1.getExternalPublicEnumProp());
 
         Test t2;
-        t2.setI(2);
+        t2.setI(52);
         PrintObject("t2=", t2);
         cout << "Assign t1=t2 " << endl;
         t1 = t2;
 
+        if (t1.getI() != 52) {
+            cerr << __FILE__ << ":" << __LINE__ << " value of t1 not set after assignment to t2 " << endl;
+            exit(1);
+        }
+        
+        t2.setNonstaticIntField(4321);
+        if(t2.getNonstaticIntField() != 4321) {
+            cerr << __FILE__ << ":" << __LINE__ << " t2.getNonstaticIntField() != 4321" << endl;
+            exit(1);
+        }
+        
+        t2.setNonstaticIntegerField(Integer::valueOf(987));
+        if(t2.getNonstaticIntegerField().intValue() != 987) {
+            cerr << __FILE__ << ":" << __LINE__ << " t2.getNonstaticIntegerField().getValue() != 987" << endl;
+            exit(1);
+        }
+        
+        t2.setStaticIntField(753);
+        if(t2.getStaticIntField() != 753) {
+            cerr << __FILE__ << ":" << __LINE__ << " t2.getStaticIntField() != 753" << endl;
+            exit(1);
+        }
+        
+        t2.setStaticIntegerField(Integer::valueOf(951));
+        if(t2.getStaticIntegerField().intValue() != 951) {
+            cerr << __FILE__ << ":" << __LINE__ << " t2.getStaticIntegerField().intValue() != 951" << endl;
+            exit(1);
+        }
+        
+        t2.setEnumABC(TestMyEnum::getA());
+        if(!t2.getEnumABC().equals(TestMyEnum::getA())) {
+            cerr << __FILE__ << ":" << __LINE__ << " !t2.getEnumABC().equals(TestMyEnum::getA()" << endl;
+            exit(1);
+        }
         //    MyClient mc("localhost",8080);
         //    PrintObject("mc=",mc);
         //    

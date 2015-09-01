@@ -16,9 +16,9 @@ fi
 rm test[0-9]*.h test[0-9]*.cpp 2>/dev/null || true
 
 export BASE_DIR=`( cd ../../..; pwd )`;
-export TEST_PROJECT_DIR="${BASE_DIR}/examples/test/java/Test";
+export TEST_PROJECT_DIR="${BASE_DIR}/examples/test/java/test";
 
-export TEST_JAR="${TEST_PROJECT_DIR}/dist/Test.jar";
+export TEST_JAR="${TEST_PROJECT_DIR}/target/test-1.0-SNAPSHOT.jar";
 
 if test "x${JAVA_HOME}" = "x"; then
     export JAVA_HOME=/usr/local/jdk1.8.0_60/ ;
@@ -28,7 +28,7 @@ echo JAVA_HOME="${JAVA_HOME}"
 ls -ld "${JAVA_HOME}"; 
 
 if test ! -f  "${TEST_JAR}" ; then
-    (cd "${TEST_PROJECT_DIR}"; ant -Dplatforms.JDK_1.7.home="${JAVA_HOME}"  jar );
+    (cd "${TEST_PROJECT_DIR}"; mvn package );
 fi
 
 echo TEST_JAR="${TEST_JAR}"
