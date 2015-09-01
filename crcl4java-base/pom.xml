@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.github.wshackle</groupId>
+    <artifactId>crcl4java-base</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <parent>
+        <relativePath>..</relativePath>
+        <groupId>com.github.wshackle</groupId>
+        <artifactId>CRCLJavaParent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <crcl.schemaBaseUrl>https://raw.githubusercontent.com/ros-industrial/crcl/master/schemas/</crcl.schemaBaseUrl>
+    </properties>
+    <repositories>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-Xdiags:verbose</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.8</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.18.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${main.class}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.12.3</version>
+                <!-- <executions>
+                    <execution>
+                        <id>xjc</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions> -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            
+                <configuration>
+                    <!-- <forceRegenerate>true</forceRegenerate> -->
+                    <generatePackage>crcl.base</generatePackage>
+                    <schemaDirectory>${project.basedir}/src/main/resources/</schemaDirectory>                                           
+                    <!-- <schemas>                                                                                      
+                        <schema>
+                            <url>${crcl.schemaBaseUrl}CRCLCommandInstance.xsd</url>
+                        </schema>
+                        <schema>
+                            <url>${crcl.schemaBaseUrl}CRCLCommands.xsd</url>
+                        </schema>
+                        <schema>
+                            <url>${crcl.schemaBaseUrl}CRCLProgramInstance.xsd</url>
+                        </schema>
+                        <schema>
+                            <url>${crcl.schemaBaseUrl}CRCLStatus.xsd</url>
+                        </schema>                                                                      
+                    </schemas> -->
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- We use this plugin to ensure that our usage of the
+                maven-jaxb2-plugin is JDK 8 compatible in absence of a fix
+                for https://java.net/jira/browse/MAVEN_JAXB2_PLUGIN-80. -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <id>set-additional-system-properties</id>
+                        <goals>
+                            <goal>set-system-properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <properties>
+                        <property>
+                            <name>javax.xml.accessExternalSchema</name>
+                            <value>file,http</value>
+                        </property>
+                    </properties>
+                </configuration>
+            </plugin>
+            
+        </plugins>
+    </build>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+    <profiles>
+        <profile>
+            <id>newSchema</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <id>download-files</id>
+                                <phase>initialize</phase>
+                                <configuration>
+
+                                    <target>
+                                        <echo message="crcl.schemaBaseUrl=${crcl.schemaBaseUrl}" />
+                                        <echo message="dest=${basedir}/src/main/resources/" />
+                                        <get src="${crcl.schemaBaseUrl}/CRCLCommandInstance.xsd"
+                                             dest="${basedir}/src/main/resources/"
+                                             verbose="true"
+                                             usetimestamp="false"/>
+                                        <get src="${crcl.schemaBaseUrl}/CRCLCommands.xsd"
+                                             dest="${basedir}/src/main/resources/"
+                                             verbose="true"
+                                             usetimestamp="false"/>
+                                        <get src="${crcl.schemaBaseUrl}/CRCLStatus.xsd"
+                                             dest="${basedir}/src/main/resources/"
+                                             verbose="true"
+                                             usetimestamp="false"/>
+                                        <get src="${crcl.schemaBaseUrl}/CRCLProgramInstance.xsd"
+                                             dest="${basedir}/src/main/resources/"
+                                             verbose="true"
+                                             usetimestamp="false"/>
+                                        <get src="${crcl.schemaBaseUrl}/DataPrimitives.xsd"
+                                             dest="${basedir}/src/main/resources/"
+                                             verbose="true"
+                                             usetimestamp="false"/>
+                                    </target>
+
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>doclint-java8-disable</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.10.3</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none -quiet</additionalparam>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <name>crcl4java-base</name>
+</project>
