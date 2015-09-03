@@ -12,6 +12,7 @@ script:
   - lsb_release -a
   - uname -a
   - java -version
+  - mvn -version
   - mvn -U test
   
 notifications:
