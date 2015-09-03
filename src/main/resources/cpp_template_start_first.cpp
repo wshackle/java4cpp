@@ -11,6 +11,16 @@
 
 #include "%HEADER%"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+ 
+static void registerNativeMethods(JNIEnv *);
+
+#ifdef __cplusplus
+}
+#endif
+
 namespace %NAMESPACE% {
 
     JNIEnv *getEnv();

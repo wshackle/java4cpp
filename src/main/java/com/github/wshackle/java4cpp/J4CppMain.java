@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.github.wshackle.java4cplusplus;
+package com.github.wshackle.java4cpp;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,7 +16,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -31,9 +30,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
+import java.util.StringJoiner;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -120,6 +121,7 @@ public class J4CppMain {
         } else {
             return "jobject *";
         }
+//        ClassLoader.getSystemClassLoader();
     }
 
     public static String namespace = "JavaForCpp";
@@ -1064,13 +1066,20 @@ public class J4CppMain {
                     .hasArg()
                     .desc("Classes per output file.[default=10]")
                     .longOpt(CLASSESPEROUTPUT)
-                    .build()
-            );
+                    .build());
+            options.addOption(Option.builder()
+                    .hasArg()
+                    .desc("Comma seperated list of nativeclass=javaclass native where nativeclass will be generated as an extension/implementation of the java class.")
+                    .longOpt("natives")
+                    .build());
             String output = null;
             String header = null;
             String jar = null;
             String classname = null;
             String packageprefix = null;
+
+            Map<String, String> nativesNameMap = null;
+            Map<String, Class> nativesClassMap = null;
             int limit = DEFAULT_LIMIT;
             int classes_per_file = 10;
 
@@ -1090,6 +1099,27 @@ public class J4CppMain {
                     }
                 }
 
+                if (line.hasOption("natives")) {
+                    String nativesStr = line.getOptionValue("natives");
+                    String natives[] = natives = nativesStr.split(",");
+                    nativesNameMap = new HashMap<>();
+                    nativesClassMap = new HashMap<>();
+                    for (int i = 0; i < natives.length; i++) {
+                        int eq_index = natives[i].indexOf('=');
+                        String nativeClassName = natives[i].substring(0, eq_index).trim();
+                        String javaClassName = natives[i].substring(eq_index + 1).trim();
+                        Class javaClass = null;
+                        try {
+                            javaClass = Class.forName(javaClassName);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        nativesNameMap.put(javaClassName, nativeClassName);
+                        if (javaClass != null) {
+                            nativesClassMap.put(nativeClassName, javaClass);
+                        }
+                    }
+                }
 //            // validate that block-size has been set
 //            if (line.hasOption("block-size")) {
 //                // print the value of block-size
@@ -1208,6 +1238,9 @@ public class J4CppMain {
                             continue;
                         }
                         Class clss = cl.loadClass(className);
+                        if (nativesNameMap.containsKey(className)) {
+                            nativesClassMap.put(nativesNameMap.get(className), clss);
+                        }
                         if (packageprefix != null
                                 && packageprefix.length() > 0
                                 && !clss.getPackage().getName().startsWith(packageprefix)) {
@@ -1323,6 +1356,27 @@ public class J4CppMain {
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                }
+            }
+            if (null != nativesClassMap) {
+                for (Class clss : nativesClassMap.values()) {
+                    try {
+                        if (null != clss) {
+                            if (!classes.contains(clss) && !newClasses.contains(clss)) {
+                                newClasses.add(clss);
+                            }
+                            Class superClass = clss.getSuperclass();
+                            while (null != superClass
+                                    && !classes.contains(superClass)
+                                    && !newClasses.contains(superClass)
+                                    && !excludedClasses.contains(superClass)) {
+                                newClasses.add(superClass);
+                                superClass = superClass.getSuperclass();
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             if (verbose) {
@@ -1445,6 +1499,30 @@ public class J4CppMain {
                     .replace(".", "_");
             map.put(HEADER_DEFINE, headerDefine);
             map.put(NAMESPACE, namespace);
+            if (null != nativesClassMap) {
+                for (Entry<String, Class> e : nativesClassMap.entrySet()) {
+                    final Class javaClass = e.getValue();
+                    final String nativeClassName = e.getKey();
+                    try (PrintWriter pw = new PrintWriter(new FileWriter(nativeClassName + ".java"))) {
+                        if (javaClass.isInterface()) {
+                            pw.println("public class " + nativeClassName + " implements " + javaClass.getCanonicalName() + "{");
+                        } else {
+                            pw.println("public class " + nativeClassName + " extends " + javaClass.getCanonicalName() + "{");
+                        }
+                        Method ma[] = javaClass.getDeclaredMethods();
+                        for (Method m : ma) {
+                            int modifiers = m.getModifiers();
+                            if (Modifier.isAbstract(modifiers) && Modifier.isPublic(modifiers)) {
+                                pw.println("native public " + m.getReturnType().getCanonicalName() + " " + m.getName() + "("
+                                        + Arrays.stream(m.getParameterTypes())
+                                        .map(Class::getCanonicalName)
+                                        .collect(Collectors.joining(",")) + ");");
+                            }
+                        }
+                        pw.println("}");
+                    }
+                }
+            }
             try (PrintWriter pw = new PrintWriter(new FileWriter(forward_header))) {
                 processTemplate(pw, map, "header_fwd_template_start.h", tabs);
                 Class lastClass = null;
@@ -1497,6 +1575,31 @@ public class J4CppMain {
                     String header_segment_file = header_file_base + String.format(fmt, segment_index) + ".h";
                     pw.println("#include \"" + header_segment_file + "\"");
                 }
+                if (null != nativesClassMap) {
+                    for (Entry<String, Class> e : nativesClassMap.entrySet()) {
+                        final Class javaClass = e.getValue();
+                        final String nativeClassName = e.getKey();
+                        map.put(CLASS_NAME, nativeClassName);
+                        map.put("%BASE_CLASS_FULL_NAME%", "::" + namespace + getModifiedClassName(javaClass).replace(".", "::"));
+                        map.put(OBJECT_CLASS_FULL_NAME, "::" + namespace + "::java::lang::Object");
+                        tabs += TAB_STRING;
+                        processTemplate(pw, map, HEADER_CLASS_STARTH, tabs);
+                        pw.println(tabs + "public:");
+                        pw.println(tabs + nativeClassName + "();");
+                        pw.println(tabs + "~" + nativeClassName + "();");
+                        tabs = tabs.substring(TAB_STRING.length());
+                        Method methods[] = javaClass.getDeclaredMethods();
+                        for (int j = 0; j < methods.length; j++) {
+                            Method method = methods[j];
+                            int modifiers = method.getModifiers();
+                            if (!Modifier.isPublic(modifiers)) {
+                                continue;
+                            }
+                            pw.println(tabs + getCppDeclaration(method, javaClass));
+                        }
+                        pw.println(tabs + "}; // end class " + nativeClassName);
+                    }
+                }
                 processTemplate(pw, map, HEADER_TEMPLATE_ENDH, tabs);
             }
             for (int segment_index = 0; segment_index < num_class_segments; segment_index++) {
@@ -1532,9 +1635,6 @@ public class J4CppMain {
                         tabs += TAB_STRING;
 
                         Constructor constructors[] = clss.getDeclaredConstructors();
-                        if (clssOnlyName.contains("DataTypeThing")) {
-
-                        }
                         if (!hasNoArgConstructor(constructors)) {
                             if (Modifier.isAbstract(clss.getModifiers())
                                     || clss.isInterface()) {
@@ -1599,11 +1699,6 @@ public class J4CppMain {
                         Method methods[] = clss.getDeclaredMethods();
                         for (int j = 0; j < methods.length; j++) {
                             Method method = methods[j];
-                            if (method.getName().contains("getEnumABC")) {
-                                if (verbose) {
-                                    System.out.println("debug me");
-                                }
-                            }
                             if (!checkMethod(method, classes)) {
                                 continue;
                             }
@@ -1620,7 +1715,7 @@ public class J4CppMain {
                                 pw.println(tabs + getEasyCallCppDeclaration(method, clss));
                             }
                         }
-                        tabs = tabs.substring(0, tabs.length() - 1);
+                        tabs = tabs.substring(TAB_STRING.length());
                         pw.println(tabs + "}; // end class " + clssOnlyName);
                         tabs = tabs.substring(0, tabs.length() - 1);
                         Class nextClass = (class_index < (classesSegList.size() - 1))
