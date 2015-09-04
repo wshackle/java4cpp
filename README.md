@@ -88,3 +88,4 @@ So that the C++ code to use the class could be just this:
 For complete compile and link instructions, Visual Studio Solution and Project files etc. see the examples/simple subdirectory. For more advanced options see the other examples directories( TO BE DEVELOPED ) and/or wiki (https://github.com/wshackle/java4cpp/wiki) 
 
 
+[![Build Status](https://travis-ci.org/wshackle/java4cpp.svg)](https://travis-ci.org/wshackle/java4cpp)
