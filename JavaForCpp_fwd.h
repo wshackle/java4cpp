@@ -13,6 +13,12 @@ namespace JavaForCpp {
    
 
     
+ namespace java{
+  namespace lang{
+   class Runnable;
+  } // end namespace lang
+ } // end namespace java
+
 
 
 // end namespace JavaForCpp

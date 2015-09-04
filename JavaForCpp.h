@@ -68,6 +68,19 @@ namespace JavaForCpp {
 
 
     
+#include "JavaForCpp0.h"
+ 
+ class NativeRunnable : public ::JavaForCpp::java::lang::Runnable {
+     public:
+         NativeRunnable(jobject _jthis, bool copy);
+         NativeRunnable(const NativeRunnable &);
+         static NativeRunnable cast(const ::JavaForCpp::java::lang::Object &);
+         
+ public:
+ NativeRunnable();
+ ~NativeRunnable();
+void run();
+}; // end class NativeRunnable
 
 
 // end namespace JavaForCpp

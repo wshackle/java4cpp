@@ -1406,87 +1406,6 @@ public class J4CppMain {
                 System.out.println("Total number of classes = " + classes.size());
             }
 
-//            Map<String, Integer> classMap = new HashMap<>();
-//            Map<String, Integer> packageMap = new HashMap<>();
-//            for (Class clss : classes) {
-//                classMap.put(clss.getCanonicalName(), 0);
-//            }
-//            for (Class clss : classes) {
-//                packageMap.put(clss.getPackage().getName(), 0);
-//            }
-//            int minval = 0;
-//            for (Class clss : classes) {
-//                Class superClass = clss.getSuperclass();
-//                int val = -1;
-//                int pval = -1;
-//                while (null != superClass && classMap.containsKey(superClass.getCanonicalName())) {
-//                    if(classMap.get(superClass.getCanonicalName()) > val) {
-//                        classMap.put(superClass.getCanonicalName(), val);
-//                    }
-//                    if(!clss.getPackage().getName().equals(superClass.getPackage().getName())) {
-//                        if(packageMap.get(superClass.getPackage().getName()) > pval) {
-//                            packageMap.put(superClass.getPackage().getName(), pval);
-//                        }
-//                        pval--;
-//                    }
-//                    clss = superClass;
-//                    superClass = superClass.getSuperclass();
-//                    val--;
-//                    if(val < minval) {
-//                        minval = val;
-//                    }
-//                }
-//            }
-//            Map<String,Integer> finalClassMap = new HashMap<>();
-//            for (Class clss : classes) {
-//                finalClassMap.put(clss.getCanonicalName(), classMap.get(clss.getCanonicalName()) - 
-//                        (minval-1)*packageMap.get(clss.getPackage().getName()));
-//            }
-//            java.awt.Rectangle r;
-//            List<Class> classesToRemove = new ArrayList<>();
-//            for (Class clss : classes) {
-//                Class superClass = clss.getSuperclass();
-//                if(null != superClass && classes.contains(superClass)) {
-//                    int superVal = finalClassMap.get(superClass.getCanonicalName());
-//                    int myVal = finalClassMap.get(clss.getCanonicalName());
-//                    if(superVal >= myVal) {
-////                        classesToRemove.add(clss);
-////                        System.err.println("Removing "+clss +" superVal="+superVal+", myVal="+myVal);
-//                        finalClassMap.put(clss.getCanonicalName(), superVal-1);
-//                    }
-//                }
-//            }
-////            classes.removeAll(classesToRemove);
-//            Collections.sort(classes, new Comparator<Class>() {
-//
-//                @Override
-//                public int compare(Class o1, Class o2) {
-//                    if (o1 == null || classMap.get(o1.getCanonicalName()) == null) {
-//                        if(verbose) System.out.println("bad o1=" + o1);
-//                    }
-//                    if (o2 == null || classMap.get(o2.getCanonicalName()) == null) {
-//                        if(verbose) System.out.println("bad o2=" + o2);
-//                    }
-//                    if (o1 == null || packageMap.get(o1.getPackage().getName()) == null) {
-//                        if(verbose) System.out.println("bad o1=" + o1);
-//                    }
-//                    if (o2 == null || packageMap.get(o2.getPackage().getName()) == null) {
-//                        if(verbose) System.out.println("bad o2=" + o2);
-//                    }
-////                    if(!o1.getPackage().getName().equals(o2.getPackage().getName())) {
-////                        return packageMap.get(o1.getPackage().getName()) - packageMap.get(o2.getPackage().getName());
-////                    }
-//                    int diff = finalClassMap.get(o1.getCanonicalName()) - finalClassMap.get(o2.getCanonicalName());
-////                    if(!o1.isAssignableFrom(o2) && !o2.isAssignableFrom(o1)
-////                            && !o1.getPackage().getName().equals(o2.getPackage().getName())) {
-////                        diff = 0;
-////                    }
-////                    if(diff == 0) {
-////                        return o1.getCanonicalName().compareTo(o2.getCanonicalName());
-////                    }
-//                    return diff;
-//                }
-//            });
             String forward_header = header.substring(0, header.lastIndexOf('.')) + "_fwd.h";
             Map<String, String> map = new HashMap<>();
             map.put(JAR, jar != null ? jar : getCurrentDir());
@@ -1509,11 +1428,14 @@ public class J4CppMain {
                         } else {
                             pw.println("public class " + nativeClassName + " extends " + javaClass.getCanonicalName() + "{");
                         }
+                        pw.println(TAB_STRING+"public " + nativeClassName + "() {");
+                        pw.println(TAB_STRING+"}");
+                        pw.println();
                         Method ma[] = javaClass.getDeclaredMethods();
                         for (Method m : ma) {
                             int modifiers = m.getModifiers();
                             if (Modifier.isAbstract(modifiers) && Modifier.isPublic(modifiers)) {
-                                pw.println("native public " + m.getReturnType().getCanonicalName() + " " + m.getName() + "("
+                                pw.println(TAB_STRING+ "native public " + m.getReturnType().getCanonicalName() + " " + m.getName() + "("
                                         + Arrays.stream(m.getParameterTypes())
                                         .map(Class::getCanonicalName)
                                         .collect(Collectors.joining(",")) + ");");
@@ -1532,9 +1454,6 @@ public class J4CppMain {
                     tabs = openClassNamespace(clss, pw, tabs, lastClass);
                     tabs += TAB_STRING;
                     pw.println(tabs + "class " + clssOnlyName + ";");
-////"+classMap.get(clss.getCanonicalName())
-//                            +","+packageMap.get(clss.getPackage().getName())
-//                            + ","+finalClassMap.get(clss.getCanonicalName()));
                     tabs = tabs.substring(0, tabs.length() - 1);
                     Class nextClass = (class_index < (classes.size() - 1))
                             ? classes.get(class_index + 1) : null;
@@ -1580,7 +1499,7 @@ public class J4CppMain {
                         final Class javaClass = e.getValue();
                         final String nativeClassName = e.getKey();
                         map.put(CLASS_NAME, nativeClassName);
-                        map.put("%BASE_CLASS_FULL_NAME%", "::" + namespace + getModifiedClassName(javaClass).replace(".", "::"));
+                        map.put("%BASE_CLASS_FULL_NAME%", "::" + namespace + "::" + getModifiedClassName(javaClass).replace(".", "::"));
                         map.put(OBJECT_CLASS_FULL_NAME, "::" + namespace + "::java::lang::Object");
                         tabs += TAB_STRING;
                         processTemplate(pw, map, HEADER_CLASS_STARTH, tabs);
@@ -2005,6 +1924,44 @@ public class J4CppMain {
                         lastClass = clss;
                     }
 
+                    if (null != nativesClassMap) {
+                        for (Entry<String, Class> e : nativesClassMap.entrySet()) {
+                            final Class javaClass = e.getValue();
+                            final String nativeClassName = e.getKey();
+                            map.put(CLASS_NAME, nativeClassName);
+                            map.put("%BASE_CLASS_FULL_NAME%", "::" + namespace + "::" + getModifiedClassName(javaClass).replace(".", "::"));
+                            map.put(OBJECT_CLASS_FULL_NAME, "::" + namespace + "::java::lang::Object");
+                            tabs += TAB_STRING;
+
+                            processTemplate(pw, map, CPP_START_CLASSCPP, tabs);
+                            pw.println(tabs + nativeClassName + "::" + nativeClassName + "() : " + getModifiedClassName(javaClass).replace(".", "::") + "((jobject)NULL,false) {");
+                            map.put(JNI_SIGNATURE, "()V");
+                            map.put(CONSTRUCTOR_ARGS, "");
+                            processTemplate(pw, map, CPP_NEWCPP, tabs);
+                            pw.println(tabs + "}");
+                            pw.println();
+                            pw.println(tabs + "// Destructor for " + nativeClassName);
+                            pw.println(tabs + nativeClassName + "::~" + nativeClassName + "() {");
+                            pw.println(tabs + "\t// Place-holder for later extensibility.");
+                            pw.println(tabs + "}");
+                            pw.println();
+//                            pw.println(tabs + "public:");
+//                            pw.println(tabs + nativeClassName + "();");
+//                            pw.println(tabs + "~" + nativeClassName + "();");
+                            tabs = tabs.substring(TAB_STRING.length());
+//                            Method methods[] = javaClass.getDeclaredMethods();
+//                            for (int j = 0; j < methods.length; j++) {
+//                                Method method = methods[j];
+//                                int modifiers = method.getModifiers();
+//                                if (!Modifier.isPublic(modifiers)) {
+//                                    continue;
+//                                }
+//                                pw.println(tabs + getCppDeclaration(method, javaClass));
+//                            }
+//                            pw.println(tabs + "}; // end class " + nativeClassName);
+                            processTemplate(pw, map, CPP_END_CLASSCPP, tabs);
+                        }
+                    }
                     if (segment_index < 1) {
                         processTemplate(pw, map, "cpp_template_end_first.cpp", tabs);
                     } else {
@@ -2057,7 +2014,7 @@ public class J4CppMain {
         return false;
     }
     private static final int DEFAULT_LIMIT = 200;
-    private static final String TAB_STRING = " "; // used to be "\t"
+    private static final String TAB_STRING = "    "; // used to be "\t"
     private static final String OBJECT_CLASS_FULL_NAME = "%OBJECT_CLASS_FULL_NAME%";
 
     private static String getMethodReturnGet(String tabs, Class returnClass, Class relClass) {
