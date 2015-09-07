@@ -1228,6 +1228,10 @@ public class CRCLSocket implements AutoCloseable {
         }
     }
 
+    public CRCLStatusType readStatus() throws JAXBException, IOException, EXIException {
+        return readStatus(false);
+    }
+    
     public CRCLStatusType readStatus(boolean validate)
             throws JAXBException, IOException, EXIException {
         if (this.isEXIEnabled()) {
@@ -1406,6 +1410,10 @@ public class CRCLSocket implements AutoCloseable {
         return this.lastProgramString;
     }
 
+    public void writeCommand(CRCLCommandInstanceType cmd) throws JAXBException, IOException, InterruptedException, EXIException {
+        writeCommand(cmd,false);
+    }
+    
     public synchronized void writeCommand(CRCLCommandInstanceType cmd, boolean validate) throws JAXBException, IOException, InterruptedException, EXIException {
         final CRCLCommandType cc = cmd.getCRCLCommand();
         final boolean EXI = this.isEXIEnabled();

@@ -20,6 +20,7 @@
  */
 package crcl.utils;
 
+import com.siemens.ct.exi.exceptions.EXIException;
 import crcl.base.CRCLCommandInstanceType;
 import crcl.base.CRCLStatusType;
 import crcl.base.CommandStatusType;
@@ -31,11 +32,13 @@ import crcl.base.MoveToType;
 import crcl.base.PointType;
 import crcl.base.PoseType;
 import crcl.base.VectorType;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBException;
 
 /**
  *
@@ -54,7 +57,7 @@ public class CRCLSocketExample {
             InitCanonType init = new InitCanonType();
             init.setCommandID(BigInteger.valueOf(7));
             instance.setCRCLCommand(init);
-            s.writeCommand(instance,false);
+            s.writeCommand(instance);
             
             // Create and send MoveTo command.
             MoveToType moveTo = new MoveToType();
@@ -100,7 +103,7 @@ public class CRCLSocketExample {
             List<JointStatusType> l = jst.getJointStatus();
             System.out.println("Joints:");
             l.forEach(js -> System.out.println("Num="+js.getJointNumber()+" Pos="+js.getJointPosition()));
-        } catch (Exception ex) {
+        } catch (IOException | JAXBException | InterruptedException | EXIException ex) {
             Logger.getLogger(CRCLSocketExample.class.getName()).log(Level.SEVERE, null, ex);
         }
         
