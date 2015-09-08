@@ -17,8 +17,9 @@
  * versions bear some notice that they have been modified.
  * 
  */
-package crcl.utils;
+package crcl.ui;
 
+import crcl.utils.PendantClientOuterStub;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

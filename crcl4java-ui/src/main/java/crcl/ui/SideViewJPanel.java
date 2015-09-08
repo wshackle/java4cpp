@@ -18,8 +18,13 @@
  * versions bear some notice that they have been modified.
  * 
  */
-package crcl.utils;
+package crcl.ui;
 
+import crcl.utils.SimRobotEnum;
+import static crcl.utils.SimRobotEnum.PLAUSIBLE;
+import static crcl.utils.SimRobotEnum.SIMPLE;
+import crcl.utils.SimulatedKinematicsPlausible;
+import crcl.utils.SimulatedKinematicsSimple;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -30,9 +35,9 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author Will Shackleford {@literal <william.shackleford@nist.gov> }
+ * @author Will Shackleford {@literal <william.shackleford@nist.gov>}
  */
-public class OverHeadJPanel extends JPanel {
+public class SideViewJPanel extends JPanel {
 
     private SimRobotEnum robotType = SimRobotEnum.SIMPLE;
 
@@ -78,6 +83,15 @@ public class OverHeadJPanel extends JPanel {
     private double[] seglengths = SimulatedKinematicsPlausible.DEFAULT_SEGLENGTHS;
 
     /**
+     * Get the value of seglengths
+     *
+     * @return the value of seglengths
+     */
+    public double[] getSeglengths() {
+        return seglengths;
+    }
+
+    /**
      * Set the value of seglengths
      *
      * @param seglengths new value of seglengths
@@ -111,15 +125,14 @@ public class OverHeadJPanel extends JPanel {
     }
 
     Arc2D.Double j1circle = new Arc2D.Double(-10.0, -10.0 // x,y
-            , 20, 20 // w,h
-            , 0, 360, Arc2D.CHORD);
+            , seglengths[3], seglengths[3] // w,h
+            , 0, 360.0, Arc2D.CHORD);
 
     Arc2D.Double j2circle = new Arc2D.Double(-6, -6.0 // x,y
             , 12, 12 // w,h
             , 0, 360, Arc2D.CHORD);
 
-    Rectangle2D.Double jrect = new Rectangle2D.Double(0.0, -5.0, 10.0, 10.0);
-
+    //Rectangle2D.Double jrect = new Rectangle2D.Double(0.0, -5.0, 10.0, 10.0);
     Rectangle2D.Double l0rect = new Rectangle2D.Double(0.0, -5.0, seglengths[0], 10.0);
     Rectangle2D.Double l1rect = new Rectangle2D.Double(0.0, -5.0, seglengths[1], 10.0);
     Rectangle2D.Double l2rect = new Rectangle2D.Double(0.0, -5.0, seglengths[2], 10.0);
@@ -145,16 +158,14 @@ public class OverHeadJPanel extends JPanel {
                     if (paintSimpleRobot(d, g2d)) {
                         return;
                     }
-                    break;
-                
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
-    private double maxSimpleJv0 = 0;
 
+    private double maxSimpleJv0 = 0;
+    
     private boolean paintSimpleRobot(Dimension d, Graphics2D g2d) {
         if(null == jointvals || jointvals.length < SimulatedKinematicsSimple.NUM_JOINTS) {
             return true;
@@ -164,15 +175,15 @@ public class OverHeadJPanel extends JPanel {
         g2d.scale(sfactor, -1.0 * sfactor);
         g2d.setColor(Color.gray);
         g2d.fill(j1circle);
-        l0rect.width = Math.cos(Math.toRadians(jointvals[2])) * jointvals[0];
-        g2d.rotate(Math.toRadians(jointvals[1]));
+        l0rect.width = jointvals[0];
+        g2d.rotate(Math.toRadians(jointvals[2]));
         g2d.setColor(Color.yellow);
         g2d.fill(l0rect);
         g2d.translate(l0rect.width, 0.0);
         g2d.setColor(Color.gray);
         g2d.fill(j1circle);
-        l1rect.width = Math.cos(Math.toRadians(jointvals[4])) * SimulatedKinematicsSimple.DEFAULT_SEGLENGTHS[0];
-        g2d.rotate(Math.toRadians(jointvals[5] - jointvals[2]));
+        l1rect.width = Math.cos(Math.toRadians(jointvals[5] - jointvals[2])) * SimulatedKinematicsSimple.DEFAULT_SEGLENGTHS[0];
+        g2d.rotate(Math.toRadians(jointvals[4] - jointvals[2]));
         g2d.setColor(Color.yellow);
         g2d.fill(l1rect);
         return false;
@@ -186,49 +197,38 @@ public class OverHeadJPanel extends JPanel {
         if (null == jointvals) {
             return true;
         }
-        g2d.rotate(Math.toRadians(jointvals[0]));
+        g2d.rotate(Math.toRadians(jointvals[1]));
         g2d.setColor(Color.yellow);
-        double angle = jointvals[1];
-        l0rect.width = seglengths[0] * Math.cos(Math.toRadians(angle));
         g2d.fill(l0rect);
         g2d.translate(l0rect.width, 0.0);
-        g2d.setColor(Color.yellow);
-        angle += jointvals[2];
-        l1rect.width = seglengths[1] * Math.cos(Math.toRadians(angle));
-        if (l1rect.width <= 0) {
-            return true;
-        }
-        g2d.fill(l1rect);
         g2d.setColor(Color.gray);
-        g2d.fill(jrect);
+        g2d.fill(j1circle);
+        g2d.rotate(Math.toRadians(jointvals[2]));
+        g2d.setColor(Color.yellow);
+        g2d.fill(l1rect);
         g2d.translate(l1rect.width, 0.0);
-        angle += jointvals[3];
-        l2rect.width = seglengths[2] * Math.cos(Math.toRadians(angle));
-        if (l2rect.width <= 0) {
-            return true;
-        }
+        g2d.setColor(Color.gray);
+        g2d.fill(j1circle);
+        g2d.rotate(Math.toRadians(jointvals[3]));
         g2d.setColor(Color.yellow);
         g2d.fill(l2rect);
-        g2d.setColor(Color.gray);
-        g2d.fill(jrect);
         g2d.translate(l2rect.width, 0.0);
-        l3rect.width = seglengths[3] * Math.cos(Math.toRadians(angle));
+        l3rect.width = this.seglengths[3] * Math.cos(Math.toRadians(jointvals[4]));
         if (l3rect.width <= 0) {
             return true;
         }
-        g2d.rotate(Math.toRadians(jointvals[4]));
         g2d.setColor(Color.yellow);
         g2d.fill(l3rect);
         g2d.setColor(Color.gray);
         g2d.fill(j2circle);
         g2d.translate(l3rect.width, 0.0);
         g2d.setColor(Color.BLACK);
-        l4rect.height = seglengths[3] * Math.abs(Math.sin(Math.toRadians(jointvals[5])));
-        l4rect.y = -0.5 * l5rect.height;
+        l4rect.height = seglengths[4] * Math.abs(Math.cos(Math.toRadians(jointvals[5])));
+        l4rect.y = -0.5 * l4rect.height;
         g2d.fill(l4rect);
-        g2d.translate(0.0, l5rect.height / 2.0);
+        g2d.translate(0.0, l4rect.height / 2.0);
         g2d.fill(l5rect);
-        g2d.translate(0.0, -l5rect.height);
+        g2d.translate(0.0, -l4rect.height);
         g2d.fill(l5rect);
         return false;
     }

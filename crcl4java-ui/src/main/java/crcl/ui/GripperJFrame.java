@@ -17,7 +17,7 @@
  * versions bear some notice that they have been modified.
  * 
  */
-package crcl.utils;
+package crcl.ui;
 
 
 import com.siemens.ct.exi.exceptions.EXIException;
@@ -32,6 +32,7 @@ import crcl.base.InitCanonType;
 import crcl.base.ParallelGripperStatusType;
 import crcl.base.ThreeFingerGripperStatusType;
 import crcl.base.VacuumGripperStatusType;
+import crcl.utils.CRCLSocket;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;

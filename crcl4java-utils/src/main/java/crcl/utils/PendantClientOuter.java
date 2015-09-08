@@ -51,4 +51,5 @@ public interface PendantClientOuter {
     public boolean isRecordPoseSelected();
     public boolean isEXISelected();
     public boolean isUseReadStatusThreadSelected();
+    public boolean checkUserText(String text);
 }

@@ -18,10 +18,12 @@
  * versions bear some notice that they have been modified.
  * 
  */
-package crcl.utils;
+package crcl.ui;
 
 import crcl.base.CRCLCommandType;
 import crcl.base.CRCLStatusType;
+import crcl.utils.CRCLSocket;
+import crcl.utils.XpathUtils;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
@@ -423,7 +425,6 @@ public class ObjTableJPanel<T> extends javax.swing.JPanel {
 //        }
 //
 //    };
-
     private static String removeTypeParams(String type) {
         String typenoparams = type;
         int ltindex = typenoparams.indexOf("<");
@@ -965,7 +966,7 @@ public class ObjTableJPanel<T> extends javax.swing.JPanel {
         return editObjectPriv(dialog, _obj, xpu, isValid);
     }
 
-    public static <T> T editObject(T _obj, XpathUtils xpu, java.util.function.Predicate isValid) {
+    public static <T> T editObject(T _obj, XpathUtils xpu, Predicate isValid) {
         JDialog dialog = new JDialog();
         dialog.setTitle(_obj.getClass().getCanonicalName());
         dialog.setModal(true);
@@ -1213,7 +1214,7 @@ public class ObjTableJPanel<T> extends javax.swing.JPanel {
 
     static private List<Class> addClasses(String prefix, File dir, List<Class> classes) {
         File fa[] = dir.listFiles();
-        if(fa == null) {
+        if (fa == null) {
             return classes;
         }
         for (File f : fa) {
@@ -1237,7 +1238,7 @@ public class ObjTableJPanel<T> extends javax.swing.JPanel {
                     }
                 } catch (Exception ex) {
                     Logger.getLogger(ObjTableJPanel.class
-                            .getName()).log(Level.SEVERE, "clssNameToLookup="+clssNameToLookup);
+                            .getName()).log(Level.SEVERE, "clssNameToLookup=" + clssNameToLookup);
                     Logger.getLogger(ObjTableJPanel.class
                             .getName()).log(Level.SEVERE, null, ex);
                 }
@@ -1252,8 +1253,10 @@ public class ObjTableJPanel<T> extends javax.swing.JPanel {
         List<Class> classes = new ArrayList<>();
         try {
             for (String classpathEntry : System.getProperty("java.class.path").split(System.getProperty("path.separator"))) {
-//            System.out.println("classpathEntry = " + classpathEntry);
-                if (classpathEntry.endsWith(".jar") 
+//                System.out.println("classpathEntry = " + classpathEntry);
+                if (classpathEntry.endsWith(".jar")
+                        && !classpathEntry.contains("commons-io")
+                        && !classpathEntry.contains("commons-math")
                         && !classpathEntry.contains("xerces")
                         && !classpathEntry.contains("exificient")) {
                     JarInputStream is = null;
@@ -1262,6 +1265,9 @@ public class ObjTableJPanel<T> extends javax.swing.JPanel {
                         is = new JarInputStream(new FileInputStream(jar));
                         JarEntry entry;
                         while ((entry = is.getNextJarEntry()) != null) {
+                            if(!entry.getName().startsWith("crcl")) {
+                                continue;
+                            }
                             if (entry.getName().endsWith(".class")) {
                                 name = entry.getName();
                                 name = name.substring(0, name.length() - 6);
@@ -1277,13 +1283,13 @@ public class ObjTableJPanel<T> extends javax.swing.JPanel {
                                             && !clss.isAnonymousClass()
                                             && !clss.isMemberClass()) {
                                         classes.add(clss);
-                                        
+
                                     }
                                 } catch (ClassNotFoundException ex) {
                                     Logger.getLogger(ObjTableJPanel.class
                                             .getName()).log(Level.SEVERE, null, ex);
                                 }
-                                
+
                             }
                         }
                     } catch (IOException ex) {
@@ -1291,12 +1297,12 @@ public class ObjTableJPanel<T> extends javax.swing.JPanel {
                                 .getName()).log(Level.SEVERE, null, ex);
                     } finally {
                         try {
-                            if(null != is) {
+                            if (null != is) {
                                 is.close();
                             }
                         } catch (IOException ex) {
                             Logger.getLogger(ObjTableJPanel.class
-                                    .getName()).log(Level.SEVERE, null, ex);
+                                    .getName()).log(Level.SEVERE, "classpathEntry=" + classpathEntry, ex);
                         }
                     }
                 } else {
@@ -1305,10 +1311,10 @@ public class ObjTableJPanel<T> extends javax.swing.JPanel {
                 }
             }
         } catch (Throwable t) {
-            System.err.println("name = "+ name);
-            System.err.println("jar = "+jar);
+            System.err.println("name = " + name);
+            System.err.println("jar = " + jar);
             Logger.getLogger(ObjTableJPanel.class
-                                    .getName()).log(Level.SEVERE, null, t);
+                    .getName()).log(Level.SEVERE, null, t);
         }
 //        classes.add(javax.xml.datatype.XMLGregorianCalendar.class);
 //        classes.add(javax.xml.datatype.Duration.class);

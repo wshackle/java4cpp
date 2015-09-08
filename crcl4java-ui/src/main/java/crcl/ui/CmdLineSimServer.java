@@ -16,8 +16,11 @@
  * bear some notice that they are derived from it, and any modified
  * versions bear some notice that they have been modified.
  */
-package crcl.utils;
+package crcl.ui;
 
+import crcl.ui.SimServerInner;
+import crcl.utils.CRCLPosemath;
+import crcl.utils.SimServerOuterStub;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;

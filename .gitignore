@@ -14,3 +14,5 @@ hs_err_pid*
 /crcl4java-base/target/
 /crcl4java-utils/target/
 /crcl4java-utils/nbproject/
+/crcl-ui/target/
+/crcl4java-ui/target/

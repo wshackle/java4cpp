@@ -39,7 +39,6 @@ import crcl.base.ObjectFactory;
 import crcl.base.PointType;
 import crcl.base.PoseType;
 import crcl.base.VectorType;
-import java.awt.Component;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -65,15 +64,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -96,7 +91,7 @@ import org.xml.sax.XMLReader;
  */
 public class CRCLSocket implements AutoCloseable {
 
-    CRCLSocket() {
+    public CRCLSocket() {
         this(null);
     }
 
@@ -127,6 +122,11 @@ public class CRCLSocket implements AutoCloseable {
                 .replaceAll("<CommandState>Done</CommandState>", "<CommandState>CRCL_Done</CommandState>")
                 .replaceAll("<CommandState>Error</CommandState>", "<CommandState>CRCL_Error</CommandState>")
                 .replaceAll("<CommandState>Ready</CommandState>", "<CommandState>CRCL_Ready</CommandState>");
+    }
+
+    static public interface UnaryOperator<T> {
+
+        public T apply(T t);
     }
 
     static final public UnaryOperator<String> addCRCLToState = new UnaryOperator<String>() {
@@ -342,6 +342,11 @@ public class CRCLSocket implements AutoCloseable {
         return statSchema;
     }
 
+    static interface Supplier<T> {
+
+        public T get();
+    }
+
     /**
      * Set the value of statSchema
      *
@@ -361,15 +366,19 @@ public class CRCLSocket implements AutoCloseable {
         Marshaller tmp_m_prog = null;
         Unmarshaller tmp_u_prog = null;
         try {
-            Supplier<JAXBContext> jc = () -> {
-                try {
-                    JAXBContext jc2 = JAXBContext.newInstance("crcl.base");
-                    return jc2;
-                } catch (JAXBException ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
+            Supplier<JAXBContext> jc = new Supplier<JAXBContext>() {
+                @Override
+                public JAXBContext get() {
+                    try {
+                        JAXBContext jc2 = JAXBContext.newInstance("crcl.base");
+                        return jc2;
+                    } catch (JAXBException ex) {
+//                    LOGGER.log(Level.SEVERE, null, ex);
+                        throw new RuntimeException(ex);
+                    }
                 }
-                return null;
             };
+
             tmp_u_cmd = jc.get().createUnmarshaller();
             tmp_m_cmd = jc.get().createMarshaller();
 //            tmp_m_cmd.setProperty(Marshaller.JAXB_FRAGMENT, jaxbFragment);
@@ -442,12 +451,12 @@ public class CRCLSocket implements AutoCloseable {
     private final Marshaller m_stat;
     private final Unmarshaller u_stat;
 
-    static JointStatusType getJointStatus(CRCLStatusType _status, int i) {
+    public static JointStatusType getJointStatus(CRCLStatusType _status, int i) {
         BigInteger bi = BigInteger.valueOf(i);
         return getJointStatus(_status, bi);
     }
 
-    static JointStatusType getJointStatus(CRCLStatusType _status, BigInteger bi) {
+    public static JointStatusType getJointStatus(CRCLStatusType _status, BigInteger bi) {
         if (null == _status) {
             return null;
         }
@@ -488,8 +497,7 @@ public class CRCLSocket implements AutoCloseable {
                     Level lvl = rips.length() > 0 ? Level.SEVERE : Level.FINE;
                     final int brF = bytes_read;
                     final String ripsF = rips;
-                    LOGGER.log(lvl,
-                            () -> "CRCLSocket.readUntilEndTag(" + tag + "): read returned " + brF + " before end of tag was found. str = " + ripsF);
+                    LOGGER.log(lvl,"CRCLSocket.readUntilEndTag(" + tag + "): read returned " + brF + " before end of tag was found. str = " + ripsF);
                     throw new SocketException("socket closed after read returned:" + bytes_read);
                 }
                 if (ba1[0] == 0) {
@@ -525,7 +533,7 @@ public class CRCLSocket implements AutoCloseable {
         final String threadName = Thread.currentThread().getName();
         final String skipped_str_f = skipped_str;
         LOGGER.log(Level.FINER,
-                () -> "readUntilEndTag(" + tag + ") called with skipped_str=\"" + skipped_str_f + "\"  from Thread: " + threadName);
+                "readUntilEndTag(" + tag + ") called with skipped_str=\"" + skipped_str_f + "\"  from Thread: " + threadName);
         return str;
     }
 
@@ -572,8 +580,7 @@ public class CRCLSocket implements AutoCloseable {
                 final CRCLCommandInstanceType c = this.readCommandFromEXIStream(getBufferedInputStream());
                 final CRCLCommandType cc = c.getCRCLCommand();
                 final Level loglevel = (cc instanceof GetStatusType) ? Level.FINER : Level.FINE;
-                LOGGER.log(loglevel,
-                        () -> "readCommand() returning " + cc + " ID=" + cc.getCommandID() + " called from Thread: " + threadName);
+                LOGGER.log(loglevel,"readCommand() returning " + cc + " ID=" + cc.getCommandID() + " called from Thread: " + threadName);
                 return c;
             } else {
                 byte sizeba[] = new byte[4];
@@ -592,7 +599,7 @@ public class CRCLSocket implements AutoCloseable {
                 final CRCLCommandType cc = c.getCRCLCommand();
                 final Level loglevel = (cc instanceof GetStatusType) ? Level.FINER : Level.FINE;
                 LOGGER.log(loglevel,
-                        () -> "readCommand() returning " + cc
+                        "readCommand() returning " + cc
                         + " ID=" + cc.getCommandID()
                         + " called from Thread: " + threadName);
                 return c;
@@ -607,7 +614,7 @@ public class CRCLSocket implements AutoCloseable {
         final CRCLCommandType cc = cmd.getCRCLCommand();
         final Level loglevel = (cc instanceof GetStatusType) ? Level.FINER : Level.FINE;
         LOGGER.log(loglevel,
-                () -> "readCommand() returning " + cc + " ID=" + cc.getCommandID() + "str=" + str + "  called from Thread: " + threadName);
+                "readCommand() returning " + cc + " ID=" + cc.getCommandID() + "str=" + str + "  called from Thread: " + threadName);
         this.lastCommandString = str;
         return cmd;
     }
@@ -806,10 +813,20 @@ public class CRCLSocket implements AutoCloseable {
     }
 
     private static String jointStatusListToDebugString(final List<JointStatusType> l) {
-        return l == null ? "null" : l.toString() + " { "
-                + l.stream()
-                .map(CRCLSocket::jointStatusToDebugString)
-                .collect(Collectors.joining(",")) + " } ";
+//        return l == null ? "null" : l.toString() + " { "
+//                + l.stream()
+//                .map(CRCLSocket::jointStatusToDebugString)
+//                .collect(Collectors.joining(",")) + " } ";
+        StringBuilder sb = new StringBuilder();
+        Iterator<JointStatusType> it = l.iterator();
+        while(it.hasNext()) {
+            JointStatusType jst = it.next();
+            sb.append(CRCLSocket.jointStatusToDebugString(jst));
+            if(it.hasNext()) {
+                sb.append(',');
+            }
+        }
+        return sb.toString();
     }
 
     private static String jointStatusesToDebugString(final JointStatusesType j) {
@@ -1231,7 +1248,7 @@ public class CRCLSocket implements AutoCloseable {
     public CRCLStatusType readStatus() throws JAXBException, IOException, EXIException {
         return readStatus(false);
     }
-    
+
     public CRCLStatusType readStatus(boolean validate)
             throws JAXBException, IOException, EXIException {
         if (this.isEXIEnabled()) {
@@ -1411,22 +1428,22 @@ public class CRCLSocket implements AutoCloseable {
     }
 
     public void writeCommand(CRCLCommandInstanceType cmd) throws JAXBException, IOException, InterruptedException, EXIException {
-        writeCommand(cmd,false);
+        writeCommand(cmd, false);
     }
-    
+
     public synchronized void writeCommand(CRCLCommandInstanceType cmd, boolean validate) throws JAXBException, IOException, InterruptedException, EXIException {
         final CRCLCommandType cc = cmd.getCRCLCommand();
         final boolean EXI = this.isEXIEnabled();
         final String threadName = Thread.currentThread().getName();
         final Level loglevel = (cc instanceof GetStatusType) ? Level.FINER : Level.FINE;
         LOGGER.log(loglevel,
-                () -> "writeCommand(" + cc + " ID=" + cc.getCommandID() + ") with EXI = " + EXI + " called from Thread: " + threadName);
+                "writeCommand(" + cc + " ID=" + cc.getCommandID() + ") with EXI = " + EXI + " called from Thread: " + threadName);
         if (this.isEXIEnabled()) {
             if (!this.isPrefixEXISizeEnabled()) {
                 this.writeEXICommandToStream(sock.getOutputStream(), cmd);
             } else {
                 final byte ba[] = this.commandToEXI(cmd);
-                LOGGER.log(loglevel, () -> "writeCommand() : ba = " + Arrays.toString(ba));
+                LOGGER.log(loglevel,"writeCommand() : ba = " + Arrays.toString(ba));
                 ByteBuffer bb = ByteBuffer.allocate(ba.length + 4);
                 bb.putInt(ba.length);
 //                LOGGER.log(Level.FINEST,() ->"writeCommand: ba.length = " + ba.length);
@@ -1442,7 +1459,7 @@ public class CRCLSocket implements AutoCloseable {
         }
         final String str = commandToString(cmd, validate);
         LOGGER.log(loglevel,
-                () -> "writeCommand(" + cc + " ID=" + cc.getCommandID() + ") with str = " + str + " called from Thread: " + threadName);
+                "writeCommand(" + cc + " ID=" + cc.getCommandID() + ") with str = " + str + " called from Thread: " + threadName);
         writeWithFill(str);
         this.lastCommandString = str;
     }
@@ -1602,7 +1619,7 @@ public class CRCLSocket implements AutoCloseable {
 
     static {
         File startFile = new File(System.getProperty("user.home"));
-        crclSchemaDirFile = new File(startFile, String.join(File.separator, "crclXmlSchemas"));
+        crclSchemaDirFile = new File(startFile, "crclXmlSchemas");
     }
 
     public static File[] findSchemaFiles() {

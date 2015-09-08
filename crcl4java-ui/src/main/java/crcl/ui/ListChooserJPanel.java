@@ -1,39 +1,49 @@
-/* 
- * This is public domain software, however it is preferred
+/*
+ * This software is public domain software, however it is preferred
  * that the following disclaimers be attached.
- * 
  * Software Copywrite/Warranty Disclaimer
  * 
  * This software was developed at the National Institute of Standards and
  * Technology by employees of the Federal Government in the course of their
  * official duties. Pursuant to title 17 Section 105 of the United States
  * Code this software is not subject to copyright protection and is in the
- * public domain. This software is experimental.
- * NIST assumes no responsibility whatsoever for its use by other
+ * public domain. NIST Real-Time Control System software is an experimental
+ * system. NIST assumes no responsibility whatsoever for its use by other
  * parties, and makes no guarantees, expressed or implied, about its
  * quality, reliability, or any other characteristic. We would appreciate
- * acknowledgment if the software is used. This software can be
+ * acknowledgement if the software is used. This software can be
  * redistributed and/or modified freely provided that any derivative works
  * bear some notice that they are derived from it, and any modified
  * versions bear some notice that they have been modified.
  * 
+ *  See http://www.copyright.gov/title17/92chap1.html#105
+ * 
  */
-package crcl.utils;
+package crcl.ui;
 
 import java.awt.Frame;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 
 /**
  *
- * @author Will Shackleford{@literal <william.shackleford@nist.gov> }
+ * @author Will Shackleford {@literal <william.shackleford@nist.gov>}
  */
-public class MultiLineStringJPanel extends javax.swing.JPanel {
+public class ListChooserJPanel<TT> extends javax.swing.JPanel {
 
     /**
-     * Creates new form MultiLineStringJPanel
+     * Creates new form ListChooserJPanel
      */
-    public MultiLineStringJPanel() {
+    private ListChooserJPanel(JDialog _dialog, TT[] choices, TT defaultChoice) {
         initComponents();
+        this.dialog = _dialog;
+        this.defaultChoice = defaultChoice;
+        this.selectedChoice = defaultChoice;
+        this.choices = choices;
+        this.dialog.add(this);
+        this.jComboBox1.setModel(new DefaultComboBoxModel<TT>(choices));
+        this.jComboBox1.setSelectedItem(defaultChoice);
+        this.dialog.pack();
     }
 
     /**
@@ -45,23 +55,19 @@ public class MultiLineStringJPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jComboBox1 = new javax.swing.JComboBox<TT>();
         jButtonCancel = new javax.swing.JButton();
         jButtonOK = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
 
         FormListener formListener = new FormListener();
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jButtonCancel.setText("Cancel");
         jButtonCancel.addActionListener(formListener);
 
         jButtonOK.setText("OK");
         jButtonOK.addActionListener(formListener);
-
-        jTextArea1.setColumns(20);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -70,24 +76,24 @@ public class MultiLineStringJPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGap(0, 253, Short.MAX_VALUE)
                         .addComponent(jButtonOK)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonCancel))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 592, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButtonCancel)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonCancel)
                     .addComponent(jButtonOK))
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }
 
@@ -97,87 +103,43 @@ public class MultiLineStringJPanel extends javax.swing.JPanel {
         FormListener() {}
         public void actionPerformed(java.awt.event.ActionEvent evt) {
             if (evt.getSource() == jButtonCancel) {
-                MultiLineStringJPanel.this.jButtonCancelActionPerformed(evt);
+                ListChooserJPanel.this.jButtonCancelActionPerformed(evt);
             }
             else if (evt.getSource() == jButtonOK) {
-                MultiLineStringJPanel.this.jButtonOKActionPerformed(evt);
+                ListChooserJPanel.this.jButtonOKActionPerformed(evt);
             }
         }
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOKActionPerformed
-        this.cancelled = false;
+        this.selectedChoice = (TT) this.jComboBox1.getSelectedItem();
         this.dialog.setVisible(false);
     }//GEN-LAST:event_jButtonOKActionPerformed
 
     private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
-       this.cancelled = true;
-       this.dialog.setVisible(false);
+        this.selectedChoice = this.defaultChoice;
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
+    private final JDialog dialog;
+    private final TT[] choices;
+    private final TT defaultChoice;
+    private TT selectedChoice;
+    
+    public TT getSelectedChoice() {
+        return selectedChoice;
+    }
+    
+    public static <T> T Choose(Frame owner, String title, T[] choices, T defaultChoice ) {
+        JDialog dialog = new JDialog(owner, title,true);
+        ListChooserJPanel<T> panel = new ListChooserJPanel<T>(dialog,choices,defaultChoice);
+        dialog.setVisible(true);
+        return panel.getSelectedChoice();
+    }
+    
 
-    private JDialog dialog = null;
-    private boolean cancelled = false;
-    
-    private static String editTextPrivate(JDialog _dialog, String init) {
-        MultiLineStringJPanel panel = new MultiLineStringJPanel();
-        panel.jTextArea1.setText(init);
-        panel.jScrollPane1.getVerticalScrollBar().setValue(0);
-        panel.jTextArea1.setCaretPosition(0);
-        panel.dialog = _dialog;
-        _dialog.add(panel);
-        _dialog.pack();
-        _dialog.setVisible(true);
-        if(panel.cancelled) {
-            return null;
-        }
-        return panel.jTextArea1.getText();
-    }
-    
-    public static String editText(String init, Frame _owner,
-            String _title,
-            boolean _modal) {
-        JDialog dialog = new JDialog(_owner, _title, _modal);
-        return editTextPrivate(dialog, init);
-    }
-
-    public static String editText(String init) {
-        JDialog dialog = new JDialog();
-        dialog.setModal(true);
-        return editTextPrivate(dialog, init);
-    }
-    
-    
-    private static boolean showTextPrivate(JDialog _dialog, String init) {
-        MultiLineStringJPanel panel = new MultiLineStringJPanel();
-        panel.jTextArea1.setText(init);
-//        panel.jTextArea1.setEditable(false);
-        panel.jScrollPane1.getVerticalScrollBar().setValue(0);
-        panel.jTextArea1.setCaretPosition(0);
-        panel.dialog = _dialog;
-        _dialog.add(panel);
-        _dialog.pack();
-        _dialog.setVisible(true);
-        return !panel.cancelled;
-    }
-    
-    public static boolean showText(String init, Frame _owner,
-            String _title,
-            boolean _modal) {
-        JDialog dialog = new JDialog(_owner, _title, _modal);
-        return showTextPrivate(dialog, init);
-    }
-
-    public static boolean showText(String init) {
-        JDialog dialog = new JDialog();
-        dialog.setModal(true);
-        return showTextPrivate(dialog, init);
-    }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonOK;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JComboBox<TT> jComboBox1;
     // End of variables declaration//GEN-END:variables
 }

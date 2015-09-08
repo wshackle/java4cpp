@@ -17,7 +17,7 @@
  * versions bear some notice that they have been modified.
  * 
  */
-package crcl.utils;
+package crcl.ui;
 
 import com.siemens.ct.exi.exceptions.EXIException;
 import crcl.base.ActuateJointType;
@@ -71,6 +71,13 @@ import crcl.base.TransAccelType;
 import crcl.base.TransSpeedAbsoluteType;
 import crcl.base.TransSpeedRelativeType;
 import crcl.base.TransSpeedType;
+import crcl.utils.CRCLSocket;
+import crcl.utils.PoseToleranceChecker;
+import crcl.utils.SimRobotEnum;
+import crcl.utils.SimServerOuter;
+import crcl.utils.SimulatedKinematicsPlausible;
+import crcl.utils.SimulatedKinematicsSimple;
+import crcl.utils.XpathUtils;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;

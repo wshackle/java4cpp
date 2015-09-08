@@ -19,7 +19,7 @@
  *  See http://www.copyright.gov/title17/92chap1.html#105
  * 
  */
-package crcl.utils;
+package crcl.ui;
 
 import com.siemens.ct.exi.exceptions.EXIException;
 import crcl.base.CRCLCommandInstanceType;
@@ -35,6 +35,7 @@ import crcl.base.PointType;
 import crcl.base.PoseType;
 import crcl.base.VacuumGripperStatusType;
 import crcl.base.VectorType;
+import crcl.utils.CRCLSocket;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -104,23 +105,17 @@ public class PerfTest {
             byte ba[] = csTst.statusToEXI(stat0);
             System.out.println("ba.length = " + ba.length);
             System.out.println("ba = " + Arrays.toString(ba));
-            final ExecutorService exServ = Executors.newCachedThreadPool();
+            ExecutorService exServ = Executors.newWorkStealingPool();
             try (ServerSocket ss = new ServerSocket(44004)) {
                 System.out.println("ss.getLocalPort() = " + ss.getLocalPort());
-                exServ.execute(new Runnable(){
-                    
-                    @Override
-                    public void run() {
+                exServ.execute(() -> {
                     while (!Thread.currentThread().isInterrupted() && !exServ.isShutdown()) {
                         try {
                             Socket s = ss.accept();
                             final CRCLSocket cs = new CRCLSocket(s);
                             cs.setEXIEnabled(enableEXI);
                             final CRCLStatusType status = createStatus();
-                            exServ.execute(new Runnable() {
-                                
-                                @Override
-                                public void run() {
+                            exServ.execute(() -> {
                                 try {
                                     while (!Thread.currentThread().isInterrupted() && !exServ.isShutdown()) {
                                         CRCLCommandInstanceType cmdInstance = cs.readCommand(false);
@@ -139,7 +134,6 @@ public class PerfTest {
                                         Logger.getLogger(PerfTest.class.getName()).log(Level.SEVERE, null, ex);
                                     }
                                 }
-                            }
                             });
                         } catch (IOException | EXIException ex) {
                             if(null != ss && !ss.isClosed()) {
@@ -147,7 +141,6 @@ public class PerfTest {
                             }
                         }
                     }
-                }
                 });
                 CRCLSocket cs = new CRCLSocket("localhost", ss.getLocalPort());
                 cs.setEXIEnabled(enableEXI);

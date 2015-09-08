@@ -45,6 +45,7 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -179,12 +180,18 @@ public class CRCLSocketTest {
 //                returnCmd.getCRCLCommand().getCommandID());
 //        }
         System.setProperty("crcl.prefixEXISizeEnabled", "false");
-        ServerSocket ss = new ServerSocket(0);
-        ExecutorService serv = Executors.newWorkStealingPool();
+        final ServerSocket ss = new ServerSocket(0);
+        ExecutorService serv = Executors.newCachedThreadPool();
         for (int i = 0; i < 10; i++) {
             LOGGER.log(Level.INFO, "i = " + i);
-            Future<Socket> f = serv.submit(() -> ss.accept());
-            CRCLSocket csClient = new CRCLSocket("127.0.0.1", ss.getLocalPort());
+            Future<Socket> f = serv.submit(new Callable<Socket>() {
+
+                @Override
+                public Socket call() throws Exception {
+                    return ss.accept();
+                }
+            });
+            final CRCLSocket csClient = new CRCLSocket("127.0.0.1", ss.getLocalPort());
             csClient.setPrefixEXISizeEnabled(false);
             csClient.setEXIEnabled(true);
             CRCLSocket csServer = new CRCLSocket(f.get());
@@ -193,28 +200,32 @@ public class CRCLSocketTest {
             final CRCLCommandInstanceType initCmdInstanceF = initCmdInstance;
             final CRCLCommandInstanceType getStatusCmdInstanceF = getStatusCmdInstance;
             final int MAX_J = 2;
-            Runnable r = () -> {
-                Random rand = new Random(138);
+            Runnable r = new Runnable() {
+
+                @Override
+                public void run() {
+                    Random rand = new Random(138);
 //                try { Thread.sleep(2000); } catch(Exception e) {};
-                for (int j = 0; j < MAX_J; j++) {
-                    try {
-                        csClient.writeCommand(initCmdInstanceF, true);
-                        csClient.writeCommand(getStatusCmdInstanceF, true);
-                        if (rand.nextBoolean()) {
-                            try {
-                                Thread.sleep(rand.nextInt(50));
-                            } catch (Exception e) {
-                            };
+                    for (int j = 0; j < MAX_J; j++) {
+                        try {
+                            csClient.writeCommand(initCmdInstanceF, true);
+                            csClient.writeCommand(getStatusCmdInstanceF, true);
+                            if (rand.nextBoolean()) {
+                                try {
+                                    Thread.sleep(rand.nextInt(50));
+                                } catch (Exception e) {
+                                };
+                            }
+                            LOGGER.log(Level.INFO, "j = " + j);
+                        } catch (JAXBException ex) {
+                            Logger.getLogger(CRCLSocketTest.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IOException ex) {
+                            Logger.getLogger(CRCLSocketTest.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(CRCLSocketTest.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (EXIException ex) {
+                            Logger.getLogger(CRCLSocketTest.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        LOGGER.log(Level.INFO, "j = " + j);
-                    } catch (JAXBException ex) {
-                        Logger.getLogger(CRCLSocketTest.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (IOException ex) {
-                        Logger.getLogger(CRCLSocketTest.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(CRCLSocketTest.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (EXIException ex) {
-                        Logger.getLogger(CRCLSocketTest.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             };
@@ -224,14 +235,14 @@ public class CRCLSocketTest {
                 LOGGER.log(Level.INFO, "i = " + i);
                 LOGGER.log(Level.INFO, "j = " + j);
                 csServer.setEXIEnabled(true);
-                LOGGER.log(Level.INFO, () -> "csServer.available() = " + csServer.available());
+                LOGGER.log(Level.INFO, "csServer.available() = " + csServer.available());
                 returnCmd = csServer.readCommand(true);
                 LOGGER.log(Level.INFO, "returnCmd = " + returnCmd);
                 CRCLCommandType c = returnCmd.getCRCLCommand();
                 LOGGER.log(Level.INFO, "c = " + c);
                 assertEquals(init.getCommandID(),
                         returnCmd.getCRCLCommand().getCommandID());
-                LOGGER.log(Level.INFO, () -> "csServer.available() = " + csServer.available());
+                LOGGER.log(Level.INFO, "csServer.available() = " + csServer.available());
                 returnCmd = csServer.readCommand(true);
                 LOGGER.log(Level.INFO, "returnCmd = " + returnCmd);
                 c = returnCmd.getCRCLCommand();
@@ -264,7 +275,7 @@ public class CRCLSocketTest {
             getStatusCmdInstance.setCRCLCommand(getStatus);
             instance.writeEXICommandToStream(outputStream, getStatusCmdInstance);
             byte ba[] = outputStream.toByteArray();
-            LOGGER.log(Level.INFO, () -> "ba = " + Arrays.toString(ba));
+            LOGGER.log(Level.INFO,"ba = " + Arrays.toString(ba));
             Assert.assertArrayEquals(ba, Arrays.copyOf(twocmdsArray, twocmdsArray.length - 1));
         }
     }
@@ -338,7 +349,7 @@ public class CRCLSocketTest {
         assertEquals(new BigInteger("2"), c.getCommandID());
         assertEquals(new BigInteger("2"), moveCommand.getNumPositions());
     }
-    
+
     /**
      * Test of stringToStatus method, of class CRCLSocket.
      */
@@ -415,25 +426,25 @@ public class CRCLSocketTest {
         InputStream is = new ByteArrayInputStream(STATUS_XML.getBytes());
         boolean validate = false;
         CRCLSocket instance = new CRCLSocket();
-        String str = instance.readUntilEndTag("CRCLStatus",is);
+        String str = instance.readUntilEndTag("CRCLStatus", is);
         CRCLStatusType result = instance.stringToStatus(str, validate);
         assertEquals(BigInteger.ONE, result.getCommandStatus().getCommandID());
         assertEquals(BigInteger.ONE, result.getCommandStatus().getStatusID());
-        is = new ByteArrayInputStream((STATUS_XML+STATUS_XML).getBytes());
-        str = instance.readUntilEndTag("CRCLStatus",is);
+        is = new ByteArrayInputStream((STATUS_XML + STATUS_XML).getBytes());
+        str = instance.readUntilEndTag("CRCLStatus", is);
         result = instance.stringToStatus(str, validate);
         assertEquals(BigInteger.ONE, result.getCommandStatus().getCommandID());
         assertEquals(BigInteger.ONE, result.getCommandStatus().getStatusID());
-        str = instance.readUntilEndTag("CRCLStatus",is);
+        str = instance.readUntilEndTag("CRCLStatus", is);
         result = instance.stringToStatus(str, validate);
         assertEquals(BigInteger.ONE, result.getCommandStatus().getCommandID());
         assertEquals(BigInteger.ONE, result.getCommandStatus().getStatusID());
-        str = instance.readUntilEndTag("CRCLStatus", 
+        str = instance.readUntilEndTag("CRCLStatus",
                 new ByteArrayInputStream("  <CRCLStatus name=\"foo\" /> ".getBytes()));
         assertEquals(str, "<CRCLStatus name=\"foo\" />");
-        str = instance.readUntilEndTag("CRCLStatus", 
+        str = instance.readUntilEndTag("CRCLStatus",
                 new ByteArrayInputStream("  <CRCLStatus name=\"foo\" >  </CRCLStatus garbage-here  >  ".getBytes()));
         assertEquals(str, "<CRCLStatus name=\"foo\" >  </CRCLStatus garbage-here  >");
     }
-    
+
 }

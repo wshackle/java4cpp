@@ -47,18 +47,18 @@ import org.xml.sax.SAXException;
  * @author Will Shackleford{@literal <william.shackleford@nist.gov> }
  */
 public class XpathUtils {
-    
+
     final TransformerFactory transformerFactory;
     final DocumentBuilderFactory documentBuilderFactory;
     final DocumentBuilder documentBuilder;
-    
-    XpathUtils() throws ParserConfigurationException {
+
+    public XpathUtils() throws ParserConfigurationException {
         transformerFactory = TransformerFactory.newInstance();
         documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilder = documentBuilderFactory.newDocumentBuilder();
     }
-    
-        private File[] schemaFiles = null;
+
+    private File[] schemaFiles = null;
 
     /**
      * Get the value of schemaFiles
@@ -79,11 +79,10 @@ public class XpathUtils {
     }
 
     public String getDocumentation(String name) throws SAXException, IOException, XPathExpressionException, ParserConfigurationException {
-        return queryXml(schemaFiles, "/schema/complexType[@name=\""+name+"\"]/annotation/documentation/text()");
+        return queryXml(schemaFiles, "/schema/complexType[@name=\"" + name + "\"]/annotation/documentation/text()");
     }
-    
-    final 
-    public  String nodeToString(Node node) {
+
+    final public String nodeToString(Node node) {
         StringWriter sw = new StringWriter();
         try {
             Transformer t = transformerFactory.newTransformer();
@@ -96,7 +95,7 @@ public class XpathUtils {
         return sw.toString();
     }
 
-    public  String queryXml(File xsdFile, String query) throws SAXException, IOException, XPathExpressionException, ParserConfigurationException {
+    public String queryXml(File xsdFile, String query) throws SAXException, IOException, XPathExpressionException, ParserConfigurationException {
         Document doc = documentBuilder.parse(xsdFile);
         final XPathFactory xPathfactory = XPathFactory.newInstance();
         final XPath xpath = xPathfactory.newXPath();
@@ -104,15 +103,15 @@ public class XpathUtils {
         return nodeListToString(nl);
     }
 
-    public  String queryXml(File fa[], String query) throws SAXException, IOException, XPathExpressionException, ParserConfigurationException {
+    public String queryXml(File fa[], String query) throws SAXException, IOException, XPathExpressionException, ParserConfigurationException {
         StringBuilder sb = new StringBuilder();
-        for(File f : fa) {
+        for (File f : fa) {
             sb.append(queryXml(f, query));
         }
         return sb.toString();
     }
-    
-    public  String nodeListToString(NodeList nl) {
+
+    public String nodeListToString(NodeList nl) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < nl.getLength(); i++) {
             Node n = nl.item(i);
@@ -121,13 +120,13 @@ public class XpathUtils {
         }
         return sb.toString();
     }
-    
-    public  String queryXmlString(String string, String query) throws SAXException, IOException, XPathExpressionException, ParserConfigurationException {
+
+    public String queryXmlString(String string, String query) throws SAXException, IOException, XPathExpressionException, ParserConfigurationException {
         Document doc = documentBuilder.parse(new ByteArrayInputStream(string.getBytes()));
         final XPathFactory xPathfactory = XPathFactory.newInstance();
         final XPath xpath = xPathfactory.newXPath();
         NodeList nl = (NodeList) xpath.evaluate(query, doc, XPathConstants.NODESET);
         return nodeListToString(nl);
     }
-    
+
 }

@@ -18,8 +18,9 @@
  * versions bear some notice that they have been modified.
  * 
  */
-package crcl.utils;
+package crcl.ui;
 
+import static crcl.ui.ObjTableJPanel.getAssignableClasses;
 import crcl.base.ActuateJointType;
 import crcl.base.ActuateJointsType;
 import crcl.base.CRCLCommandInstanceType;
@@ -37,9 +38,11 @@ import crcl.base.MiddleCommandType;
 import crcl.base.MoveToType;
 import crcl.base.PointType;
 import crcl.base.PoseType;
-import crcl.base.PoseType;
 import crcl.base.VectorType;
-import static crcl.utils.ObjTableJPanel.getAssignableClasses;
+import crcl.utils.AnnotatedPose;
+import crcl.utils.CRCLPosemath;
+import crcl.utils.CRCLSocket;
+import crcl.utils.PendantClientOuter;
 import diagapplet.plotter.PlotData;
 import diagapplet.plotter.plotterJFrame;
 import java.awt.Color;
@@ -78,7 +81,6 @@ import javax.swing.JViewport;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.xml.bind.JAXBException;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.xml.sax.SAXException;
@@ -2835,6 +2837,11 @@ public class PendantClient extends javax.swing.JFrame implements PendantClientOu
             dtm.setValueAt(millis, row, 2);
             dtm.setValueAt(dist, row, 3);
         }
+    }
+
+    @Override
+    public boolean checkUserText(String text) {
+        return MultiLineStringJPanel.showText(text);
     }
     
     

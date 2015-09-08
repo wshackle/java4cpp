@@ -17,10 +17,12 @@
  * versions bear some notice that they have been modified.
  * 
  */
-package crcl.utils;
+package crcl.ui;
 
 
 import crcl.base.CRCLProgramType;
+import crcl.utils.CRCLSocket;
+import crcl.utils.PendantClientOuter;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;

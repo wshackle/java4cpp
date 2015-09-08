@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.wshackle</groupId>
-    <artifactId>crcl4java-utils</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
     <parent>
         <relativePath>..</relativePath>
         <groupId>com.github.wshackle</groupId>
         <artifactId>crcl4java</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+    <artifactId>crcl4java-ui</artifactId>
+    <packaging>jar</packaging>
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <main.class>crcl.ui.DefaultMain</main.class>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crcl4java-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.github.wshackle</groupId>
             <artifactId>rcslib</artifactId>
@@ -21,11 +31,6 @@
             <groupId>com.github.wshackle</groupId>
             <artifactId>poseList3DPlot</artifactId>
             <version>1.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.wshackle</groupId>
-            <artifactId>crcl4java-base</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -50,28 +55,12 @@
             <artifactId>exificient</artifactId>
             <version>0.9.4</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crcl4java-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
-    <properties>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <!-- <main.class>crcl.utils.DefaultMain</main.class> -->
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
-    <repositories>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
     <build>
         <plugins>
             <plugin>
@@ -112,7 +101,7 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
-            <!-- <plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.6</version>
@@ -123,14 +112,14 @@
                         </manifest>
                     </archive>
                 </configuration>
-            </plugin> -->
+            </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.5.5</version>
                 <configuration>
                     <archive>
                         <manifest>
-                            <!-- <mainClass>${main.class}</mainClass> -->
+                            <mainClass>${main.class}</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -357,5 +346,5 @@
             </build>
         </profile>
     </profiles>
-    <name>crcl4java-utils</name>
+    <name>crcl4java-ui</name>
 </project>

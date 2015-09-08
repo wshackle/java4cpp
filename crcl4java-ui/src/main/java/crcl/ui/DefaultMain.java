@@ -19,7 +19,7 @@
  *  See http://www.copyright.gov/title17/92chap1.html#105
  * 
  */
-package crcl.utils;
+package crcl.ui;
 
 /**
  *

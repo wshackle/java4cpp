@@ -102,7 +102,9 @@ public class CRCLSocketExample {
             JointStatusesType jst = stat.getJointStatuses();
             List<JointStatusType> l = jst.getJointStatus();
             System.out.println("Joints:");
-            l.forEach(js -> System.out.println("Num="+js.getJointNumber()+" Pos="+js.getJointPosition()));
+            for(JointStatusType js : l) {
+                System.out.println("Num="+js.getJointNumber()+" Pos="+js.getJointPosition());
+            }
         } catch (IOException | JAXBException | InterruptedException | EXIException ex) {
             Logger.getLogger(CRCLSocketExample.class.getName()).log(Level.SEVERE, null, ex);
         }

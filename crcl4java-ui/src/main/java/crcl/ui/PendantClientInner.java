@@ -17,7 +17,7 @@
  * versions bear some notice that they have been modified.
  * 
  */
-package crcl.utils;
+package crcl.ui;
 
 import com.siemens.ct.exi.exceptions.EXIException;
 import crcl.base.ActuateJointType;
@@ -46,6 +46,12 @@ import crcl.base.SetEndPoseToleranceType;
 import crcl.base.SetIntermediatePoseToleranceType;
 import crcl.base.StopConditionEnumType;
 import crcl.base.StopMotionType;
+import crcl.utils.AnnotatedPose;
+import crcl.utils.CRCLPosemath;
+import crcl.utils.CRCLSocket;
+import crcl.utils.PendantClientOuter;
+import crcl.utils.PoseToleranceChecker;
+import crcl.utils.XpathUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

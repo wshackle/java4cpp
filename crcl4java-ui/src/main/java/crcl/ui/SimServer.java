@@ -18,7 +18,7 @@
  * versions bear some notice that they have been modified.
  * 
  */
-package crcl.utils;
+package crcl.ui;
 
 import com.siemens.ct.exi.exceptions.EXIException;
 import crcl.base.CRCLCommandInstanceType;
@@ -29,6 +29,9 @@ import crcl.base.JointStatusType;
 import crcl.base.JointStatusesType;
 import crcl.base.LengthUnitEnumType;
 import crcl.base.PoseType;
+import crcl.utils.CRCLSocket;
+import crcl.utils.SimRobotEnum;
+import crcl.utils.SimServerOuter;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -109,9 +112,9 @@ public class SimServer extends javax.swing.JFrame implements SimServerOuter {
 
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
-        overHeadJPanel1 = new crcl.utils.OverHeadJPanel();
+        overHeadJPanel1 = new crcl.ui.OverHeadJPanel();
         jPanel2 = new javax.swing.JPanel();
-        sideViewJPanel1 = new crcl.utils.SideViewJPanel();
+        sideViewJPanel1 = new crcl.ui.SideViewJPanel();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextAreaErrors = new javax.swing.JTextArea();
@@ -171,7 +174,7 @@ public class SimServer extends javax.swing.JFrame implements SimServerOuter {
         overHeadJPanel1.setLayout(overHeadJPanel1Layout);
         overHeadJPanel1Layout.setHorizontalGroup(
             overHeadJPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 279, Short.MAX_VALUE)
+            .addGap(0, 281, Short.MAX_VALUE)
         );
         overHeadJPanel1Layout.setVerticalGroup(
             overHeadJPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -183,13 +186,11 @@ public class SimServer extends javax.swing.JFrame implements SimServerOuter {
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Side View"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        sideViewJPanel1.addComponentListener(formListener);
-
         javax.swing.GroupLayout sideViewJPanel1Layout = new javax.swing.GroupLayout(sideViewJPanel1);
         sideViewJPanel1.setLayout(sideViewJPanel1Layout);
         sideViewJPanel1Layout.setHorizontalGroup(
             sideViewJPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 279, Short.MAX_VALUE)
+            .addGap(0, 281, Short.MAX_VALUE)
         );
         sideViewJPanel1Layout.setVerticalGroup(
             sideViewJPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -499,7 +500,7 @@ public class SimServer extends javax.swing.JFrame implements SimServerOuter {
 
     // Code for dispatching events from components to event handlers.
 
-    private class FormListener implements java.awt.event.ActionListener, java.awt.event.ComponentListener {
+    private class FormListener implements java.awt.event.ActionListener {
         FormListener() {}
         public void actionPerformed(java.awt.event.ActionEvent evt) {
             if (evt.getSource() == jTextFieldPort) {
@@ -532,21 +533,6 @@ public class SimServer extends javax.swing.JFrame implements SimServerOuter {
             else if (evt.getSource() == jCheckBoxMenuItemEXI) {
                 SimServer.this.jCheckBoxMenuItemEXIActionPerformed(evt);
             }
-        }
-
-        public void componentHidden(java.awt.event.ComponentEvent evt) {
-        }
-
-        public void componentMoved(java.awt.event.ComponentEvent evt) {
-        }
-
-        public void componentResized(java.awt.event.ComponentEvent evt) {
-            if (evt.getSource() == sideViewJPanel1) {
-                SimServer.this.sideViewJPanel1ComponentResized(evt);
-            }
-        }
-
-        public void componentShown(java.awt.event.ComponentEvent evt) {
         }
     }// </editor-fold>//GEN-END:initComponents
 
@@ -714,6 +700,7 @@ public class SimServer extends javax.swing.JFrame implements SimServerOuter {
         }
     }//GEN-LAST:event_jCheckBoxMenuItemIncludeGripperStatusActionPerformed
 
+    
     private void setRobotType(SimRobotEnum robotType) {
         this.inner.setRobotType(robotType);
         this.overHeadJPanel1.setJointvals(inner.getJointPositions());
@@ -817,8 +804,15 @@ public class SimServer extends javax.swing.JFrame implements SimServerOuter {
         this.jTextFieldCycleCount.setText(Integer.toString(_newCycleCount));
     }
 
-    private Predicate<CRCLStatusType> checkStatusValidPredicate
-            = this::checkStatusValid;
+    
+    private final Predicate<CRCLStatusType> checkStatusValidPredicate = new Predicate<CRCLStatusType>() {
+        @Override
+        public boolean test(CRCLStatusType t) {
+            return checkStatusValid(t);
+        }  
+    };
+            
+//            = this::checkStatusValid;
 
     public boolean checkStatusValid(CRCLStatusType statusObj) {
         try {
@@ -1023,8 +1017,8 @@ public class SimServer extends javax.swing.JFrame implements SimServerOuter {
     private javax.swing.JTextField jTextFieldEndEffector;
     private javax.swing.JTextField jTextFieldNumWaypoints;
     private javax.swing.JTextField jTextFieldPort;
-    private crcl.utils.OverHeadJPanel overHeadJPanel1;
-    private crcl.utils.SideViewJPanel sideViewJPanel1;
+    private crcl.ui.OverHeadJPanel overHeadJPanel1;
+    private crcl.ui.SideViewJPanel sideViewJPanel1;
     // End of variables declaration//GEN-END:variables
 
     @Override
