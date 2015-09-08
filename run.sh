@@ -1,6 +1,7 @@
 #!/bin/sh
 
-if test ! -f ./run.sh ; then 
+#CRCL4JAVARUN.sh
+if test ! -f ./run.sh || grep -v '#CRCL4JAVARUN.sh'  ./run.sh  ; then 
     cd "${0%%run.sh}";
 fi
 
