@@ -22,6 +22,11 @@ core.[0-9]*
 /test
 /src/test/resources/test
 crclj_test
+crclj*.h
+test*.h
+crclj*.cpp
+test*.cpp
+JavaForCpp*.h
 
 # Visual Studio generated files
 *.tlog

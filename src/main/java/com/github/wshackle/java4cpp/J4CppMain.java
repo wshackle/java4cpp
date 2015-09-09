@@ -1058,7 +1058,6 @@ public class J4CppMain {
                     .longOpt("limit")
                     .build());
             options.addOption(Option.builder("v")
-                    .hasArg()
                     .desc("enable verbose output")
                     .longOpt("verbose")
                     .build());
@@ -1198,13 +1197,13 @@ public class J4CppMain {
                     limit = Integer.valueOf(limitstring);
                 }
                 if (line.hasOption("help")) {
-                    printHelpAndExit(options);
+                    printHelpAndExit(options,args);
                 }
             } catch (ParseException exp) {
                 if (verbose) {
                     System.out.println("Unexpected exception:" + exp.getMessage());
                 }
-                printHelpAndExit(options);
+                printHelpAndExit(options,args);
             }
 
             List<Class> classes = new ArrayList<>();
@@ -1225,6 +1224,7 @@ public class J4CppMain {
                     if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
                         // This ZipEntry represents a class. Now, what class does it represent?
                         String entryName = entry.getName();
+                        if(verbose) System.out.println("entryName = " + entryName);
                         if (entryName.indexOf('$') >= 0) {
                             continue;
                         }
@@ -1235,27 +1235,31 @@ public class J4CppMain {
                         if (classname != null
                                 && classname.length() > 0
                                 && !classname.equals(className)) {
+                            if(verbose) {
+                                System.out.println("skipping className="+className+" because it does not match classname="+classname);
+                            }
                             continue;
                         }
-                        Class clss = cl.loadClass(className);
-                        if (null != nativesClassMap 
-                                && null != nativesNameMap
-                                && nativesNameMap.containsKey(className)) {
-                            nativesClassMap.put(nativesNameMap.get(className), clss);
-                        }
-                        if (packageprefix != null
-                                && packageprefix.length() > 0
-                                && !clss.getPackage().getName().startsWith(packageprefix)) {
-                            continue;
-                        }
-                        Package p = clss.getPackage();
-                        if (null != p) {
-                            packagesSet.add(clss.getPackage().getName());
-                        }
-                        if (!classes.contains(clss)
-                                && isAddableClass(clss, excludedClasses)) {
+                        try {
+                            Class clss = cl.loadClass(className);
+                            if (null != nativesClassMap
+                                    && null != nativesNameMap
+                                    && nativesNameMap.containsKey(className)) {
+                                nativesClassMap.put(nativesNameMap.get(className), clss);
+                            }
+                            if (packageprefix != null
+                                    && packageprefix.length() > 0
+                                    && !clss.getPackage().getName().startsWith(packageprefix)) {
+                                continue;
+                            }
+                            Package p = clss.getPackage();
+                            if (null != p) {
+                                packagesSet.add(clss.getPackage().getName());
+                            }
+                            if (!classes.contains(clss)
+                                    && isAddableClass(clss, excludedClasses)) {
 //                        if(verbose) System.out.println("clss = " + clss);
-                            classes.add(clss);
+                                classes.add(clss);
 //                        Class superClass = clss.getSuperclass();
 //                        while (null != superClass
 //                                && !classes.contains(superClass)
@@ -1263,6 +1267,9 @@ public class J4CppMain {
 //                            classes.add(superClass);
 //                            superClass = superClass.getSuperclass();
 //                        }
+                            }
+                        } catch (ClassNotFoundException  | NoClassDefFoundError ex) {
+                            System.err.println("Caught "+ ex.getClass().getName()+":"+ex.getMessage()+" for className=" + className + ", entryName=" + entryName + ", jarPath=" + jarPath);
                         }
                     }
                 }
@@ -1430,14 +1437,14 @@ public class J4CppMain {
                         } else {
                             pw.println("public class " + nativeClassName + " extends " + javaClass.getCanonicalName() + "{");
                         }
-                        pw.println(TAB_STRING+"public " + nativeClassName + "() {");
-                        pw.println(TAB_STRING+"}");
+                        pw.println(TAB_STRING + "public " + nativeClassName + "() {");
+                        pw.println(TAB_STRING + "}");
                         pw.println();
                         Method ma[] = javaClass.getDeclaredMethods();
                         for (Method m : ma) {
                             int modifiers = m.getModifiers();
                             if (Modifier.isAbstract(modifiers) && Modifier.isPublic(modifiers)) {
-                                pw.println(TAB_STRING+ "native public " + m.getReturnType().getCanonicalName() + " " + m.getName() + "("
+                                pw.println(TAB_STRING + "native public " + m.getReturnType().getCanonicalName() + " " + m.getName() + "("
                                         + Arrays.stream(m.getParameterTypes())
                                         .map(Class::getCanonicalName)
                                         .collect(Collectors.joining(",")) + ");");
@@ -1448,6 +1455,7 @@ public class J4CppMain {
                 }
             }
             try (PrintWriter pw = new PrintWriter(new FileWriter(forward_header))) {
+                tabs="";
                 processTemplate(pw, map, "header_fwd_template_start.h", tabs);
                 Class lastClass = null;
                 for (int class_index = 0; class_index < classes.size(); class_index++) {
@@ -1491,6 +1499,7 @@ public class J4CppMain {
                 header_file_base = header_file_base.substring(0, header_file_base.length() - 4);
             }
             try (PrintWriter pw = new PrintWriter(new FileWriter(header))) {
+                tabs="";
                 processTemplate(pw, map, HEADER_TEMPLATE_STARTH, tabs);
                 for (int segment_index = 0; segment_index < num_class_segments; segment_index++) {
                     String header_segment_file = header_file_base + String.format(fmt, segment_index) + ".h";
@@ -1526,6 +1535,7 @@ public class J4CppMain {
             for (int segment_index = 0; segment_index < num_class_segments; segment_index++) {
                 String header_segment_file = header_file_base + String.format(fmt, segment_index) + ".h";
                 try (PrintWriter pw = new PrintWriter(new FileWriter(header_segment_file))) {
+                    tabs="";
                     //processTemplate(pw, map, HEADER_TEMPLATE_STARTH, tabs);
                     pw.println("// Never include this file (" + header_segment_file + ") directly. include " + header + " instead.");
                     pw.println();
@@ -1659,7 +1669,7 @@ public class J4CppMain {
                 }
                 output_segment_file += "" + String.format(fmt, segment_index) + ".cpp";
                 try (PrintWriter pw = new PrintWriter(new FileWriter(output_segment_file))) {
-
+                    tabs="";
                     if (segment_index < 1) {
                         processTemplate(pw, map, "cpp_template_start_first.cpp", tabs);
                     } else {
@@ -2178,7 +2188,8 @@ public class J4CppMain {
     private static final String CPP_NEWCPP = "cpp_new.cpp";
     private static final String CPP_METHODCPP = "cpp_method.cpp";
 
-    private static void printHelpAndExit(Options options) {
+    private static void printHelpAndExit(Options options, String args[]) {
+        System.out.println("args = " + Arrays.toString(args));
         new HelpFormatter().printHelp("java4cpp", options);
         System.exit(1);
     }

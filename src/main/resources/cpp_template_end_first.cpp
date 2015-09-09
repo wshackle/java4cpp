@@ -14,28 +14,28 @@ extern "C" {
     
 
 
-JNIEXPORT jint JNICALL JNI_OnLoad_L(JavaVM *vm, void *reserved) {
-    std::cout << "JNI_OnLoad() called" << std::endl; 
-    return JNI_OK;
-}
-
-
-JNIEXPORT jint JNICALL JNI_OnUnload_L(JavaVM *vm, void *reserved) {
-    std::cout << "JNI_OnUnLoad_L() called" << std::endl;
-    return JNI_OK;
-}
-
-/*
- * Class:     com_github_wshackle_java4cplusplus_NativeRunnable
- * Method:    run
- * Signature: ()V
- */
-JNIEXPORT void JNICALL 
-Java_NativeRunnable_run(JNIEnv *env, jobject jobj) {
-    std::cout << "Java_com_github_wshackle_java4cplusplus_NativeRunnable_run() called" << std::endl;
-    std::cout << "env=" << env << std::endl;
-    std::cout << "jobj=" << jobj << std::endl;    
-}
+//JNIEXPORT jint JNICALL JNI_OnLoad_L(JavaVM *vm, void *reserved) {
+//    std::cout << "JNI_OnLoad() called" << std::endl; 
+//    return JNI_OK;
+//}
+//
+//
+//JNIEXPORT jint JNICALL JNI_OnUnload_L(JavaVM *vm, void *reserved) {
+//    std::cout << "JNI_OnUnLoad_L() called" << std::endl;
+//    return JNI_OK;
+//}
+//
+///*
+// * Class:     com_github_wshackle_java4cplusplus_NativeRunnable
+// * Method:    run
+// * Signature: ()V
+// */
+//JNIEXPORT void JNICALL 
+//Java_NativeRunnable_run(JNIEnv *env, jobject jobj) {
+//    std::cout << "Java_com_github_wshackle_java4cplusplus_NativeRunnable_run() called" << std::endl;
+//    std::cout << "env=" << env << std::endl;
+//    std::cout << "jobj=" << jobj << std::endl;    
+//}
 
 #ifdef __cplusplus
 }
@@ -131,22 +131,22 @@ Java_NativeRunnable_run(JNIEnv *env, jobject jobj) {
             jvmOptionsEnv = NULL;
         }
 #endif
-        static JNINativeMethod methods[1];
-        jclass loaderclass = env->FindClass("java/lang/ClassLoader");
-        std::cout << "loaderclass = " << loaderclass << std::endl;
-        jmethodID mid = env->GetStaticMethodID(loaderclass,"getSystemClassLoader","()Ljava/lang/ClassLoader;");
-        std::cout << "mid = " << mid << std::endl;
-        jobject loader = env->CallStaticObjectMethod(loaderclass,mid);
-        std::cout << "loader = " << loader << std::endl;
-        jclass rn_clss = env->FindClass("NativeRunnable");
-        std::cout << "rn_clss = " << rn_clss << std::endl;
-        if(NULL != rn_clss) {
-            methods[0].name = (char *) "run";
-            methods[0].signature = (char *) "()V";
-            methods[0].fnPtr = (void *) Java_NativeRunnable_run;
-            jint rn_ret = env->RegisterNatives(rn_clss,methods,1);
-            std::cout << "rn_ret = " << rn_ret << std::endl;
-        }
+//        static JNINativeMethod methods[1];
+//        jclass loaderclass = env->FindClass("java/lang/ClassLoader");
+//        std::cout << "loaderclass = " << loaderclass << std::endl;
+//        jmethodID mid = env->GetStaticMethodID(loaderclass,"getSystemClassLoader","()Ljava/lang/ClassLoader;");
+//        std::cout << "mid = " << mid << std::endl;
+//        jobject loader = env->CallStaticObjectMethod(loaderclass,mid);
+//        std::cout << "loader = " << loader << std::endl;
+//        jclass rn_clss = env->FindClass("NativeRunnable");
+//        std::cout << "rn_clss = " << rn_clss << std::endl;
+//        if(NULL != rn_clss) {
+//            methods[0].name = (char *) "run";
+//            methods[0].signature = (char *) "()V";
+//            methods[0].fnPtr = (void *) Java_NativeRunnable_run;
+//            jint rn_ret = env->RegisterNatives(rn_clss,methods,1);
+//            std::cout << "rn_ret = " << rn_ret << std::endl;
+//        }
         return env;
     }
 
