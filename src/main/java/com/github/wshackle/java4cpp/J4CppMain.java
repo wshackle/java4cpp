@@ -1238,7 +1238,9 @@ public class J4CppMain {
                             continue;
                         }
                         Class clss = cl.loadClass(className);
-                        if (nativesNameMap.containsKey(className)) {
+                        if (null != nativesClassMap 
+                                && null != nativesNameMap
+                                && nativesNameMap.containsKey(className)) {
                             nativesClassMap.put(nativesNameMap.get(className), clss);
                         }
                         if (packageprefix != null
