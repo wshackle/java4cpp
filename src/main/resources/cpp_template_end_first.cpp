@@ -131,6 +131,7 @@ extern "C" {
             jvmOptionsEnv = NULL;
         }
 #endif
+        registerNativeMethods(env);
 //        static JNINativeMethod methods[1];
 //        jclass loaderclass = env->FindClass("java/lang/ClassLoader");
 //        std::cout << "loaderclass = " << loaderclass << std::endl;
@@ -190,6 +191,24 @@ extern "C" {
         return StringClass;
     }
 
+    static jclass getNewRuntimeExceptionClass() {
+        jclass clss = getEnv()->FindClass("java/lang/RuntimeException");
+        if (NULL == clss) {
+            std::cerr << " Can't find class java/lang/RuntimeException" << std::endl;
+        }
+        return clss;
+    }
+
+    static jclass RuntimeExceptionClass = NULL;
+
+    jclass getRuntimeExceptionClass() {
+        if (RuntimeExceptionClass != NULL) {
+            return StringClass;
+        }
+        RuntimeExceptionClass = getNewRuntimeExceptionClass();
+        return RuntimeExceptionClass;
+    }
+    
     static jclass getNewClassClass() {
         jclass clss = getEnv()->FindClass("java/lang/Class");
         if (NULL == clss) {

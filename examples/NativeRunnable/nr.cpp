@@ -4,11 +4,12 @@
 
 using namespace JavaForCpp;
 
-void NativeRunnable::run() {
-     std::cout << "ran NativeRunnable::run()" << std::endl;
+void NativeRunnable::runNative() {
+     std::cout << "Ran NativeRunnable::run()" << std::endl;
 }
 
 int main(int argc, const char **argv) {
     NativeRunnable nr;
-    nr.run();
+    CallRunnable cr;
+    cr.call(nr);
 }

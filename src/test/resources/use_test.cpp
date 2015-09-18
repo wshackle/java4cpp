@@ -10,12 +10,20 @@ using namespace test;
 using namespace test::java::lang;
 using namespace std;
 
+void NativeRunnable::runNative() {
+    cout << "C+++ runNative() called." << endl;
+}
+
 int main(int argc, const char **argv) {
 
     try {
 
 
         Test t1;
+        NativeRunnable nr;
+        t1.setRunnable(nr);
+        t1.runRunnable();
+        
         t1.setI(13);
         PrintObject("t1=", t1);
         jint i = t1.getI();

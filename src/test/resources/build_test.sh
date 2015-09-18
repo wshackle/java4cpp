@@ -34,7 +34,7 @@ fi
 echo TEST_JAR="${TEST_JAR}"
 ls -l "${TEST_JAR}"
 
-java -jar ../../../target/java4cpp-1.0-SNAPSHOT-jar-with-dependencies.jar -n test -j "${TEST_JAR}";
+java -jar ../../../target/java4cpp-1.0-SNAPSHOT-jar-with-dependencies.jar -v --natives NativeRunnable=java.lang.Runnable -n test -j "${TEST_JAR}";
 
 
 . ./compile_test.sh

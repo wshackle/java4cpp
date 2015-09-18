@@ -20,6 +20,36 @@ public class Test {
     public static int staticIntField = 642;
     public static Integer staticIntegerField = Integer.valueOf(246);
 
+        private Runnable runnable = null;
+
+    /**
+     * Get the value of runnable
+     *
+     * @return the value of runnable
+     */
+    public Runnable getRunnable() {
+        return runnable;
+    }
+
+    /**
+     * Set the value of runnable
+     *
+     * @param runnable new value of runnable
+     */
+    public void setRunnable(Runnable runnable) {
+        System.out.println("runnable = " + runnable);
+        this.runnable = runnable;
+    }
+
+    public void runRunnable() {
+        if(this.runnable == null) {
+            System.out.println("runnable == null");
+        }
+        System.out.println("Java Test.runRunnable() calling runnable ...");
+        this.runnable.run();
+        System.out.println("Java Test.runRunnable() ran runnable.");   
+    }
+    
     public static enum MyEnum {
         A, B, C;
     }
