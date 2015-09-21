@@ -22,19 +22,20 @@ if (cls != NULL) {
         std::cerr << "Class %FULL_CLASS_NAME% has no field named nativeAddress with signature J." << std::endl;
         env->ThrowNew(getRuntimeExceptionClass(),"Class %FULL_CLASS_NAME% has no field named nativeAddress with signature J.");
         %METHOD_ONFAIL%
+    }
+    jfieldID fidB = env->GetFieldID(cls, "nativeDeleteOnClose", "Z");
+    if(NULL == fidB) {
+        std::cerr << "Class %FULL_CLASS_NAME% has no field named nativeAddress with signature J." << std::endl;
+        env->ThrowNew(getRuntimeExceptionClass(),"Class %FULL_CLASS_NAME% has no field named nativeAddress with signature J.");
+        %METHOD_ONFAIL%
     } else {
-        
         nativeAddress =  (%CLASS_NAME% *) env->GetLongField( jthis, fid );
-        jfieldID fidB = env->GetFieldID(cls, "nativeDeleteOnClose", "Z");
-        if(0 == nativeAddress && NULL != fidB) {
+        jboolean nativeDeleteOnClose = env->GetBooleanField(jthis,fidB);
+        if(NULL == nativeAddress || nativeDeleteOnClose != JNI_TRUE) {
             if(GetDebugJ4Cpp()) {
-                std::cout << __FILE__ << ":" << __LINE__ << " calling new %CLASS_NAME%(jthis,false)" << std::endl;
+                std::cerr << __FILE__ << ":" << __LINE__ <<" Ignoring all to deleteNative with nativeDeleteOnClose = " << nativeDeleteOnClose << std::endl;
             }
-            nativeAddress = new %CLASS_NAME%(jthis,false);
-            env->SetLongField(jthis,fid,(jlong)nativeAddress);
-            env->SetBooleanField(jthis,fidB,JNI_TRUE);
-            nativeAddress->context = NULL;
-            nativeAddress->initContext(NULL,false);
+            %METHOD_ONFAIL%
         }
     }
 }
@@ -56,5 +57,5 @@ if(nativeAddress->jthis != jthis && !env->IsSameObject(nativeAddress->jthis,jthi
     %METHOD_ONFAIL%
 }
 
-if(GetDebugJ4Cpp()) std::cout << __FILE__ << ":" << __LINE__ <<" Call of method %METHOD_NAME% of %FULL_CLASS_NAME% with nativeAddress=" << nativeAddress << std::endl;
-nativeAddress->%METHOD_NAME%Native();
+if(GetDebugJ4Cpp()) std::cout << __FILE__ << ":" << __LINE__ <<" Call of delete %FULL_CLASS_NAME% with nativeAddress=" << nativeAddress << std::endl;
+delete nativeAddress;

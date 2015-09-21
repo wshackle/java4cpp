@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <code-assistance-data xmlns="http://www.netbeans.org/ns/make-project-private/1">
+        <code-model-enabled>true</code-model-enabled>
+    </code-assistance-data>
+    <data xmlns="http://www.netbeans.org/ns/make-project-private/1">
+        <activeConfTypeElem>0</activeConfTypeElem>
+        <activeConfIndexElem>0</activeConfIndexElem>
+    </data>
+    <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
+        <module name="org-netbeans-modules-cnd-discovery">
+            <property name="rootFolder" value="/home/shackle/java4cpp/examples/NativeRunnable"/>
+            <property name="make-log-file" value="/home/shackle/java4cpp/examples/NbProjects/NativeRunnable/../../NativeRunnable/nr*/home/shackle/java4cpp/examples/NativeRunnable"/>
+            <property name="model-folder" value="/home/shackle/java4cpp/examples/NativeRunnable"/>
+        </module>
+    </preferences>
+</project-private>

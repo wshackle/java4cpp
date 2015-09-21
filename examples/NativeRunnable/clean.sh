@@ -11,6 +11,6 @@ if test ! -f ./clean.sh || grep -v '#CLEANNATIVERUNNABLE.sh'  ./clean.sh  ; then
 fi
 
 cd $this_dir;
-\rm -rf nr nr.exe JavaForCpp* *.class *.o *.obj NativeRunnable.java > /dev/null 2>/dev/null || true
+\rm -rf nr nr.exe JavaForCpp* core hs_err*.log *.class *.o *.obj NativeRunnable.java > /dev/null 2>/dev/null || true
 
 cd $orig_dir;

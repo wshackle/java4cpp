@@ -10,10 +10,11 @@
 static inline jclass get%CLASS_NAME%Class();
 
 %CLASS_NAME%::%CLASS_NAME%(jobject _jthis, bool copy): %BASE_CLASS_FULL_NAME%(_jthis,copy) {
-        // Place holder for future extensibility
+        %INITIALIZE_CONTEXT%
 }
 
 %CLASS_NAME%::%CLASS_NAME%(const %CLASS_NAME% &objref): %BASE_CLASS_FULL_NAME%((jobject)NULL,false) {
+    %INITIALIZE_CONTEXT_REF%
     jobject _jthis = objref.jthis;
     if(GetDebugJ4Cpp()) DebugPrintJObject(__FILE__,__LINE__,"Copy Constructor for class %CLASS_NAME% _jthis=",_jthis);
     if (_jthis != NULL) {

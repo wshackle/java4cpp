@@ -1084,11 +1084,17 @@ public class J4CppMain {
                     .desc("Comma seperated list of nativeclass=javaclass native where nativeclass will be generated as an extension/implementation of the java class.")
                     .longOpt("natives")
                     .build());
+            options.addOption(Option.builder()
+                    .hasArg()
+                    .desc("library name for System.loadLibrary(...) for native extension classes")
+                    .longOpt("loadlibname")
+                    .build());
             String output = null;
             String header = null;
             String jar = null;
             Set<String> classnamesToFind = null;
             Set<String> packageprefixes = null;
+            String loadlibname = null;
 
             Map<String, String> nativesNameMap = null;
             Map<String, Class> nativesClassMap = null;
@@ -1101,6 +1107,7 @@ public class J4CppMain {
             try {
                 // parse the command line arguments
                 CommandLine line = new DefaultParser().parse(options, args);
+                loadlibname = line.getOptionValue("loadlibname");
                 verbose = line.hasOption("verbose");
                 if (line.hasOption(CLASSESPEROUTPUT)) {
                     String cpoStr = line.getOptionValue(CLASSESPEROUTPUT);
@@ -1115,7 +1122,7 @@ public class J4CppMain {
                 if (line.hasOption("natives")) {
                     String nativesStr = line.getOptionValue("natives");
                     String natives[] = natives = nativesStr.split(",");
-                    if(verbose) {
+                    if (verbose) {
                         System.out.println("natives = " + Arrays.toString(natives));
                     }
                     nativesNameMap = new HashMap<>();
@@ -1162,11 +1169,11 @@ public class J4CppMain {
                 if (line.hasOption("classes")) {
                     classnamesToFind = new HashSet<String>();
                     String classStrings[] = line.getOptionValues("classes");
-                    if(verbose) {
+                    if (verbose) {
                         System.out.println("classStrings = " + Arrays.toString(classStrings));
                     }
                     classnamesToFind.addAll(Arrays.asList(classStrings));
-                    if(verbose) {
+                    if (verbose) {
                         System.out.println("classnamesToFind = " + classnamesToFind);
                     }
                 }
@@ -1309,11 +1316,11 @@ public class J4CppMain {
                 }
             }
             if (null != classnamesToFind) {
-                if(verbose) {
+                if (verbose) {
                     System.out.println("Checking classnames arguments");
                 }
                 for (String classname : classnamesToFind) {
-                    if(verbose) {
+                    if (verbose) {
                         System.out.println("classname = " + classname);
                     }
                     if (null != classname && classname.length() > 0) {
@@ -1323,7 +1330,7 @@ public class J4CppMain {
                         }
                         URLClassLoader cl = URLClassLoader.newInstance(new URL[]{url});
                         Class c = cl.loadClass(classname);
-                        if(verbose) {
+                        if (verbose) {
                             System.out.println("c = " + c);
                         }
                         if (null == c) {
@@ -1334,7 +1341,7 @@ public class J4CppMain {
                         }
                     }
                 }
-                if(verbose) {
+                if (verbose) {
                     System.out.println("Finished checking classnames arguments");
                 }
             }
@@ -1487,19 +1494,43 @@ public class J4CppMain {
                     final String nativeClassName = e.getKey();
                     try (PrintWriter pw = new PrintWriter(new FileWriter(nativeClassName + ".java"))) {
                         if (javaClass.isInterface()) {
-                            pw.println("public class " + nativeClassName + " implements " + javaClass.getCanonicalName() + "{");
+                            pw.println("public class " + nativeClassName + " implements " + javaClass.getCanonicalName() + ", AutoCloseable{");
                         } else {
-                            pw.println("public class " + nativeClassName + " extends " + javaClass.getCanonicalName() + "{");
+                            pw.println("public class " + nativeClassName + " extends " + javaClass.getCanonicalName() + " implements AutoCloseable{");
+                        }
+                        if (null != loadlibname && loadlibname.length() > 0) {
+                            pw.println(TAB_STRING + "static {");
+                            pw.println(TAB_STRING + TAB_STRING + "System.loadLibrary(\"" + loadlibname + "\");");
+                            pw.println(TAB_STRING + "}");
+                            pw.println();
                         }
                         pw.println(TAB_STRING + "public " + nativeClassName + "() {");
                         pw.println(TAB_STRING + "}");
                         pw.println();
                         pw.println(TAB_STRING + "private long nativeAddress=0;");
+                        pw.println(TAB_STRING + "private boolean nativeDeleteOnClose=false;");
                         pw.println();
 
                         pw.println(TAB_STRING + "protected " + nativeClassName + "(final long nativeAddress) {");
                         pw.println(TAB_STRING + TAB_STRING + "this.nativeAddress = nativeAddress;");
                         pw.println(TAB_STRING + "}");
+
+                        pw.println(TAB_STRING + "private native void nativeDelete();");
+                        pw.println();
+                        pw.println(TAB_STRING + "@Override");
+                        pw.println(TAB_STRING + "public synchronized void  close() {");
+//                        pw.println(TAB_STRING + TAB_STRING + "if(nativeAddress != 0 && nativeDeleteOnClose) {");
+                        pw.println(TAB_STRING + TAB_STRING + "nativeDelete();");
+//                        pw.println(TAB_STRING + TAB_STRING + "}");
+//                        pw.println(TAB_STRING + TAB_STRING + "nativeAddress=0;");
+//                        pw.println(TAB_STRING + TAB_STRING + "nativeDeleteOnClose=false;");
+                        pw.println(TAB_STRING + "}");
+
+                        pw.println();
+                        pw.println(TAB_STRING + "protected void finalizer() {");
+                        pw.println(TAB_STRING + TAB_STRING + "close();");
+                        pw.println(TAB_STRING + "}");
+
                         pw.println();
                         Method ma[] = javaClass.getDeclaredMethods();
                         for (Method m : ma) {
@@ -1570,18 +1601,21 @@ public class J4CppMain {
                     pw.println("#include \"" + header_segment_file + "\"");
                 }
                 if (null != nativesClassMap) {
+                    tabs = TAB_STRING;
                     for (Entry<String, Class> e : nativesClassMap.entrySet()) {
                         final Class javaClass = e.getValue();
                         final String nativeClassName = e.getKey();
+                        pw.println();
+                        pw.println(tabs + "class " + nativeClassName + "Context;");
+                        pw.println();
                         map.put(CLASS_NAME, nativeClassName);
                         map.put("%BASE_CLASS_FULL_NAME%", "::" + namespace + "::" + getModifiedClassName(javaClass).replace(".", "::"));
                         map.put(OBJECT_CLASS_FULL_NAME, "::" + namespace + "::java::lang::Object");
-                        tabs += TAB_STRING;
                         processTemplate(pw, map, HEADER_CLASS_STARTH, tabs);
-                        pw.println(tabs + "public:");
+                        tabs += TAB_STRING;
+                        pw.println(tabs + nativeClassName + "Context *context;");
                         pw.println(tabs + nativeClassName + "();");
                         pw.println(tabs + "~" + nativeClassName + "();");
-                        tabs = tabs.substring(TAB_STRING.length());
                         Method methods[] = javaClass.getDeclaredMethods();
                         for (int j = 0; j < methods.length; j++) {
                             Method method = methods[j];
@@ -1591,9 +1625,13 @@ public class J4CppMain {
                             }
                             pw.println(tabs + getNativeMethodCppDeclaration(method, javaClass));
                         }
+                        pw.println(tabs + "void initContext("+nativeClassName+"Context *ctx,bool isref);");
+                        pw.println(tabs + "void deleteContext();");
+                        tabs = tabs.substring(TAB_STRING.length());
                         pw.println(tabs + "}; // end class " + nativeClassName);
                     }
                 }
+                tabs="";
                 processTemplate(pw, map, HEADER_TEMPLATE_ENDH, tabs);
             }
             for (int segment_index = 0; segment_index < num_class_segments; segment_index++) {
@@ -1770,6 +1808,8 @@ public class J4CppMain {
                             System.out.println("fcjs = " + fcjs);
                         }
                         map.put(OBJECT_CLASS_FULL_NAME, getCppRelativeName(Object.class, clss));
+                        map.put("%INITIALIZE_CONTEXT%", "");
+                        map.put("%INITIALIZE_CONTEXT_REF%", "");
                         processTemplate(pw, map, CPP_START_CLASSCPP, tabs);
                         Constructor constructors[] = clss.getDeclaredConstructors();
 
@@ -2015,18 +2055,28 @@ public class J4CppMain {
                                 map.put(FULL_CLASS_JNI_SIGNATURE, nativeClassName);
                                 map.put("%BASE_CLASS_FULL_NAME%", "::" + namespace + "::" + getModifiedClassName(javaClass).replace(".", "::"));
                                 map.put(OBJECT_CLASS_FULL_NAME, "::" + namespace + "::java::lang::Object");
+                                map.put("%INITIALIZE_CONTEXT%", "context=NULL; initContext(NULL,false);");
+                                map.put("%INITIALIZE_CONTEXT_REF%", "context=NULL; initContext(objref.context,true);");
                                 tabs += TAB_STRING;
 
                                 processTemplate(pw, map, CPP_START_CLASSCPP, tabs);
+                                pw.println();
                                 pw.println(tabs + nativeClassName + "::" + nativeClassName + "() : " + getModifiedClassName(javaClass).replace(".", "::") + "((jobject)NULL,false) {");
+                                tabs += TAB_STRING;
+                                pw.println(tabs + "context=NULL;");
+                                pw.println(tabs + "initContext(NULL,false);");
                                 map.put(JNI_SIGNATURE, "()V");
                                 map.put(CONSTRUCTOR_ARGS, "");
                                 processTemplate(pw, map, "cpp_new_native.cpp", tabs);
+                                tabs = tabs.substring(TAB_STRING.length());
                                 pw.println(tabs + "}");
                                 pw.println();
                                 pw.println(tabs + "// Destructor for " + nativeClassName);
                                 pw.println(tabs + nativeClassName + "::~" + nativeClassName + "() {");
-                                pw.println(tabs + "\t// Place-holder for later extensibility.");
+                                pw.println(tabs + TAB_STRING + "if(NULL != context) {");
+                                pw.println(tabs + TAB_STRING + TAB_STRING + "deleteContext();");
+                                pw.println(tabs + TAB_STRING + "}");
+                                pw.println(tabs + TAB_STRING + "context=NULL;");
                                 pw.println(tabs + "}");
                                 pw.println();
 //                            pw.println(tabs + "public:");
@@ -2076,14 +2126,23 @@ public class J4CppMain {
                                     }
                                     map.put(METHOD_NAME, method.getName());
                                     pw.println(tabs + "JNIEXPORT void JNICALL Java_" + nativeClassName + "_" + method.getName() + "(JNIEnv *env, jobject jthis) {");
+                                    tabs += TAB_STRING;
                                     processTemplate(pw, map, "cpp_native_wrap.cpp", tabs);
+                                    tabs = tabs.substring(TAB_STRING.length());
                                     pw.println(tabs + "}");
+                                    pw.println();
                                 }
+                                pw.println(tabs + "JNIEXPORT void JNICALL Java_" + nativeClassName + "_nativeDelete(JNIEnv *env, jobject jthis) {");
+                                tabs += TAB_STRING;
+                                processTemplate(pw, map, "cpp_native_delete.cpp", tabs);
+                                tabs = tabs.substring(TAB_STRING.length());
+                                pw.println(tabs + "}");
+                                pw.println();
                             }
                             pw.println("#ifdef __cplusplus");
                             pw.println("} // end extern \"C\"");
                             pw.println("#endif");
-                            map.put("%MAX_METHOD_COUNT%", Integer.toString(max_method_count));
+                            map.put("%MAX_METHOD_COUNT%", Integer.toString(max_method_count + 1));
                             processTemplate(pw, map, "cpp_start_register_native.cpp", tabs);
                             for (Entry<String, Class> e : nativesClassMap.entrySet()) {
                                 final Class javaClass = e.getValue();
@@ -2108,6 +2167,10 @@ public class J4CppMain {
                                     processTemplate(pw, map, "cpp_register_native_item.cpp", tabs);
                                     method_number++;
                                 }
+                                map.put("%METHOD_NUMBER%", Integer.toString(method_number));
+                                map.put(METHOD_NAME, "nativeDelete");
+                                map.put(JNI_SIGNATURE, "()V");
+                                processTemplate(pw, map, "cpp_register_native_item.cpp", tabs);
                                 map.put("%NUM_NATIVE_METHODS%", Integer.toString(method_number));
                                 processTemplate(pw, map, "cpp_end_register_native_class.cpp", tabs);
                                 tabs = tabs.substring(TAB_STRING.length());

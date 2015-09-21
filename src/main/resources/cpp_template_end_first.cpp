@@ -6,41 +6,7 @@
 //%%%% "%JAR%" will be replaced with name of Jar this was created from.
 
 
-    static JavaVM *jvm = NULL; /* denotes a Java VM */
-    
-#ifdef __cplusplus
-extern "C" {
-#endif
-    
-
-
-//JNIEXPORT jint JNICALL JNI_OnLoad_L(JavaVM *vm, void *reserved) {
-//    std::cout << "JNI_OnLoad() called" << std::endl; 
-//    return JNI_OK;
-//}
-//
-//
-//JNIEXPORT jint JNICALL JNI_OnUnload_L(JavaVM *vm, void *reserved) {
-//    std::cout << "JNI_OnUnLoad_L() called" << std::endl;
-//    return JNI_OK;
-//}
-//
-///*
-// * Class:     com_github_wshackle_java4cplusplus_NativeRunnable
-// * Method:    run
-// * Signature: ()V
-// */
-//JNIEXPORT void JNICALL 
-//Java_NativeRunnable_run(JNIEnv *env, jobject jobj) {
-//    std::cout << "Java_com_github_wshackle_java4cplusplus_NativeRunnable_run() called" << std::endl;
-//    std::cout << "env=" << env << std::endl;
-//    std::cout << "jobj=" << jobj << std::endl;    
-//}
-
-#ifdef __cplusplus
-}
-#endif
-
+static JavaVM *jvm = NULL; /* denotes a Java VM */
 
     static JNIEnv *getNewEnv() {
         
