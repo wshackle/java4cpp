@@ -1392,10 +1392,9 @@ public class J4CppMain {
                             continue;
                         }
                         Class retType = m.getReturnType();
-                        System.out.println("m = " + m);
-                        System.out.println("retType = " + retType);
-                        if (retType.getName().contains("Int")) {
-                            System.out.println("debug me");
+                        if(verbose) {
+                            System.out.println("m = " + m);
+                            System.out.println("retType = " + retType);
                         }
                         if (!classes.contains(retType)
                                 && !newClasses.contains(retType)
