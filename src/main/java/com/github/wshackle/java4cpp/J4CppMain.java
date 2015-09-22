@@ -1224,7 +1224,7 @@ public class J4CppMain {
                     header = "out.h";
                 }
 
-                if (line.hasOption("package")) {
+                if (line.hasOption("packages")) {
                     packageprefixes = new HashSet<String>();
                     packageprefixes.addAll(Arrays.asList(line.getOptionValues("packages")));
                 }
