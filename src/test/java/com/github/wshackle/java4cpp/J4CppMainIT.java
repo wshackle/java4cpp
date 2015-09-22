@@ -127,7 +127,7 @@ public class J4CppMainIT {
      * Test of main method, of class J4CppMain.
      */
     @Test
-    public void testMain() throws IOException, InterruptedException {
+    public void testMain() throws IOException, InterruptedException, ClassNotFoundException {
         final String orig_user_dir = System.getProperty("user.dir");
         try {
             final String testDir
@@ -135,11 +135,21 @@ public class J4CppMainIT {
             File testDirFile = new File(testDir);
             System.setProperty("user.dir", testDirFile.getAbsolutePath());
             final String testJar
-                    = System.getProperty("testproject.jar", "examples/test/java/test/target/test-1.0-SNAPSHOT.jar");
+                    = System.getProperty("testproject.jar", "../../../examples/test/java/test/target/test-1.0-SNAPSHOT.jar");
             System.out.println("testJar = " + testJar);
+            File testJarFile = new File(testDirFile,testJar);
+            if(!testJarFile.exists()) {
+                final String testJarPrep = System.getProperty("testJarPrepScript");
+                assertTrue(testJarPrep != null && testJarPrep.length() > 0);
+                ProcessBuilder pbTestPrep = new ProcessBuilder(testJarPrep);
+                pbTestPrep.inheritIO();
+                int testPrepRet = pbTestPrep.start().waitFor();
+                assertEquals(testPrepRet, 0);
+            }
             final String args[]
                     = new String[]{"-v", "--natives", "NativeRunnable=java.lang.Runnable", "-n", "test", "-j", testJar};
             J4CppMain.main(args);
+            assertTrue(J4CppMain.main_completed);
             final String testRunScript
                     = System.getProperty("test.run.script", "./run_test.sh");
 

@@ -120,3 +120,5 @@ Doxyfile
 /src/test/resources/projects/Test/nbproject/private/
 /examples/test/java/test/target/
 /nbproject/
+/NativeRunnable.java
+/src/test/resources/test

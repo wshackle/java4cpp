@@ -22,12 +22,6 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>test</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <properties>
         <main.class>com.github.wshackle.java4cpp.J4CppMain</main.class>
@@ -145,6 +139,7 @@
                                 <testproject.dir>${basedir}/examples/test/java/test</testproject.dir>
                                 <testproject.jar>${basedir}/examples/test/java/test/target/test-1.0-SNAPSHOT.jar</testproject.jar>
                                 <test.run.script>./run_test.sh</test.run.script>
+                                <testJarPrepScript>./prep_test.sh</testJarPrepScript>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
