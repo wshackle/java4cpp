@@ -10,10 +10,6 @@ using namespace test;
 using namespace test::java::lang;
 using namespace std;
 
-void NativeRunnable::runNative() {
-    cout << "C+++ runNative() called." << endl;
-}
-
 int main(int argc, const char **argv) {
 
     try {

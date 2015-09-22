@@ -70,18 +70,23 @@ namespace test {
     
 #include "test0.h"
 #include "test1.h"
+
+    class NativeRunnableContext;
+
     
     class NativeRunnable : public ::test::java::lang::Runnable {
-        public:
-            NativeRunnable(jobject _jthis, bool copy);
-            NativeRunnable(const NativeRunnable &);
-            static NativeRunnable cast(const ::test::java::lang::Object &);
-            
     public:
-    NativeRunnable();
-    ~NativeRunnable();
-void runNative();
-}; // end class NativeRunnable
+        NativeRunnable(jobject _jthis, bool copy);
+        NativeRunnable(const NativeRunnable &);
+        static NativeRunnable cast(const ::test::java::lang::Object &);
+            
+        NativeRunnableContext *context;
+        NativeRunnable();
+        ~NativeRunnable();
+        void runNative();
+        void initContext(NativeRunnableContext *ctx,bool isref);
+        void deleteContext();
+    }; // end class NativeRunnable
 
 
 // end namespace test

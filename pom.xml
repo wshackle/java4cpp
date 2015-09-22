@@ -22,6 +22,12 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <properties>
         <main.class>com.github.wshackle.java4cpp.J4CppMain</main.class>
@@ -29,6 +35,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        
     </properties>
     <description>
         Utiliity to create C++ Wrapper for Java JAR library.
@@ -121,6 +128,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.18.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${basedir}/src/test/resources</workingDirectory>
+                            <systemPropertyVariables>
+                                <test.dir>${basedir}/src/test/resources</test.dir>
+                                <testproject.dir>${basedir}/examples/test/java/test</testproject.dir>
+                                <testproject.jar>${basedir}/examples/test/java/test/target/test-1.0-SNAPSHOT.jar</testproject.jar>
+                                <test.run.script>./run_test.sh</test.run.script>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -189,6 +218,36 @@
                 </plugins>
             </build>
         </profile>
+        <!---l192> <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>compile-cpp</id>
+                                <phase>integration-test</phase>
+                                <goals> 
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <basedir>${project.testResources[0].directory}</basedir>
+                                    <executable>run_test.sh</executable>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile> <\l192-->
         <profile> 
             <id>release</id>
             <build>

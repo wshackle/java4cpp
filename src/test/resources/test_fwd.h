@@ -13,28 +13,33 @@ namespace test {
    
 
     
-    class ClassInDefaultPackage;
-       namespace testpackage{
-           class A;
-                 class Test;
-                } // end namespace testpackage
+    namespace java{
+        namespace lang{
+            class Runnable;
+           } // end namespace lang
+          } // end namespace java
 
-                   namespace java{
-                       namespace lang{
-                           class Enum;
-                          } // end namespace lang
-                         } // end namespace java
+             class ClassInDefaultPackage;
+                namespace testpackage{
+                    class A;
+                          class Test;
+                         } // end namespace testpackage
 
-                            namespace testpackage{
-                                class ExternalPublicEnum;
-                                      class MyClient;
-                                     } // end namespace testpackage
+                            namespace java{
+                                namespace lang{
+                                    class Enum;
+                                   } // end namespace lang
+                                  } // end namespace java
 
-                                        namespace java{
-                                            namespace lang{
-                                                class Number;
-                                                         class Integer;
-                                                                  class Runnable;
+                                     namespace testpackage{
+                                         class ExternalPublicEnum;
+                                               class MyClient;
+                                              } // end namespace testpackage
+
+                                                 namespace java{
+                                                     namespace lang{
+                                                         class Number;
+                                                                  class Integer;
                                                                  } // end namespace lang
                                                                 } // end namespace java
 

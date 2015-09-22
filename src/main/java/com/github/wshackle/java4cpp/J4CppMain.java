@@ -1106,6 +1106,7 @@ public class J4CppMain {
 
             try {
                 // parse the command line arguments
+                System.out.println("args = " + Arrays.toString(args));
                 CommandLine line = new DefaultParser().parse(options, args);
                 loadlibname = line.getOptionValue("loadlibname");
                 verbose = line.hasOption("verbose");
@@ -1287,11 +1288,15 @@ public class J4CppMain {
                                     classes.add(clss);
                                 }
                             }
-                            final String pkgName = clss.getPackage().getName();
                             if (packageprefixes != null
-                                    && packageprefixes.size() > 0
-                                    && packageprefixes.stream().noneMatch(prefix -> pkgName.startsWith(prefix))) {
-                                continue;
+                                    && packageprefixes.size() > 0 ) {
+                                if(null == clss.getPackage()) {
+                                    continue;
+                                }
+                                final String pkgName = clss.getPackage().getName();
+                                if(packageprefixes.stream().noneMatch(prefix -> pkgName.startsWith(prefix))) {
+                                    continue;
+                                }
                             }
                             Package p = clss.getPackage();
                             if (null != p) {
@@ -1476,7 +1481,8 @@ public class J4CppMain {
 
             String forward_header = header.substring(0, header.lastIndexOf('.')) + "_fwd.h";
             Map<String, String> map = new HashMap<>();
-            map.put(JAR, jar != null ? jar : getCurrentDir());
+            map.put(JAR, jar != null ? jar : "");
+            map.put("%CLASSPATH_PREFIX%", getCurrentDir()+((jar != null) ? (File.pathSeparator+jar) : ""));
             map.put("%FORWARD_HEADER%", forward_header);
             map.put("%HEADER%", header);
             map.put("%PATH_SEPERATOR%", File.pathSeparator);
