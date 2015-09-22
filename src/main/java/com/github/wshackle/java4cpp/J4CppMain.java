@@ -1048,7 +1048,7 @@ public class J4CppMain {
             options.addOption(Option.builder("p")
                     .hasArgs()
                     .desc("Java Package prefix to extract")
-                    .longOpt("package")
+                    .longOpt("packages")
                     .build());
             options.addOption(Option.builder("o")
                     .hasArg()
