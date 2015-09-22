@@ -1393,8 +1393,7 @@ public class J4CppMain {
                         }
                         Class retType = m.getReturnType();
                         if(verbose) {
-                            System.out.println("m = " + m);
-                            System.out.println("retType = " + retType);
+                            System.out.println("Checking dependancies for Method = " + m);
                         }
                         if (!classes.contains(retType)
                                 && !newClasses.contains(retType)
