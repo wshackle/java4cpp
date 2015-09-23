@@ -22,9 +22,9 @@ core.[0-9]*
 /test
 /src/test/resources/test
 crclj_test
-crclj*.h
-test*.h
-crclj*.cpp
+crclj[0-9]*.h
+test[0-9]*.h
+crclj[0-9]*.cpp
 test[0-9]*.cpp
 JavaForCpp*.h
 

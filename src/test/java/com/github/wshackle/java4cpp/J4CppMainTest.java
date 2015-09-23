@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.github.wshackle.java4cplusplus;
+package com.github.wshackle.java4cpp;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

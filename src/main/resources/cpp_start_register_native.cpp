@@ -13,12 +13,10 @@ extern "C" {
     
 static void registerNativeMethods(JNIEnv *env) {
     
-        static JNINativeMethod methods[%MAX_METHOD_COUNT%];
-        jclass loaderclass = env->FindClass("java/lang/ClassLoader");
-        if(debug_j4cpp) std::cout << __FILE__ << ":" <<  __LINE__ << "registerNativeMethods() loaderclass = " << loaderclass << std::endl;
-        jmethodID mid = env->GetStaticMethodID(loaderclass,"getSystemClassLoader","()Ljava/lang/ClassLoader;");
-        if(debug_j4cpp) std::cout << __FILE__ << ":" << __LINE__ << "registerNativeMethods() mid = " << mid << std::endl;
-        jobject loader = env->CallStaticObjectMethod(loaderclass,mid);
-        if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__, "registerNativeMethods() loader = " ,loader );
-
-        
+    static JNINativeMethod methods[%MAX_METHOD_COUNT%];
+    jclass loaderclass = env->FindClass("java/lang/ClassLoader");
+    if(debug_j4cpp) std::cout << __FILE__ << ":" <<  __LINE__ << "registerNativeMethods() loaderclass = " << loaderclass << std::endl;
+    jmethodID mid = env->GetStaticMethodID(loaderclass,"getSystemClassLoader","()Ljava/lang/ClassLoader;");
+    if(debug_j4cpp) std::cout << __FILE__ << ":" << __LINE__ << "registerNativeMethods() mid = " << mid << std::endl;
+    jobject loader = env->CallStaticObjectMethod(loaderclass,mid);
+    if(debug_j4cpp) DebugPrintJObject(__FILE__,__LINE__, "registerNativeMethods() loader = " ,loader );

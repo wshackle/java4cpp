@@ -3,6 +3,7 @@ package testpackage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.DoubleUnaryOperator;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -20,7 +21,35 @@ public class Test {
     public static int staticIntField = 642;
     public static Integer staticIntegerField = Integer.valueOf(246);
 
-        private Runnable runnable = null;
+        private DoubleUnaryOperator doubleOp;
+
+    /**
+     * Get the value of doubleOp
+     *
+     * @return the value of doubleOp
+     */
+    public DoubleUnaryOperator getDoubleOp() {
+        return doubleOp;
+    }
+
+    /**
+     * Set the value of doubleOp
+     *
+     * @param doubleOp new value of doubleOp
+     */
+    public void setDoubleOp(DoubleUnaryOperator doubleOp) {
+        this.doubleOp = doubleOp;
+    }
+
+    private Runnable runnable = null;
+    
+    public double applyDoubleOp(double val) throws IllegalStateException {
+        if(null == doubleOp) {
+            throw new IllegalStateException("doubleOp not set or set to null");
+        }
+        return doubleOp.applyAsDouble(val);
+    }
+    
 
     /**
      * Get the value of runnable
@@ -42,14 +71,14 @@ public class Test {
     }
 
     public void runRunnable() {
-        if(this.runnable == null) {
+        if (this.runnable == null) {
             System.out.println("runnable == null");
         }
         System.out.println("Java Test.runRunnable() calling runnable ...");
         this.runnable.run();
-        System.out.println("Java Test.runRunnable() ran runnable.");   
+        System.out.println("Java Test.runRunnable() ran runnable.");
     }
-    
+
     public static enum MyEnum {
         A, B, C;
     }

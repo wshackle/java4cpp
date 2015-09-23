@@ -1,0 +1,5 @@
+    %RETURN_TYPE% %CLASS_NAME%::%METHOD_NAME%Native(%METHOD_ARGS%) {
+         %RETURN_VAR_DECLARE%
+         %METHOD_ONFAIL%
+    }
+

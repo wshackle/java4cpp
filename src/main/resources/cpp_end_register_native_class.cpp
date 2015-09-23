@@ -5,6 +5,6 @@
 //%%%% "%CLASS_NAME%" will be replaced with className (not including package)
 //%%%% "%JAR%" will be replaced with name of Jar this was created from.
 
-    jint rn_ret = env->RegisterNatives(rn_clss,methods,%NUM_NATIVE_METHODS%);
-    if(debug_j4cpp) std::cout << __FILE__ << ":" << __LINE__ << "registerNative%CLASS_NAME%() rn_ret = " << rn_ret << std::endl;
+    jint rn_%CLASS_NAME%_ret = env->RegisterNatives(rn_%CLASS_NAME%_clss,methods,%NUM_NATIVE_METHODS%);
+    if(debug_j4cpp) std::cout << __FILE__ << ":" << __LINE__ << "registerNative%CLASS_NAME%() rn_%CLASS_NAME%_ret = " << rn_%CLASS_NAME%_ret << std::endl;
 }

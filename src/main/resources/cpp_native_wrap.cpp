@@ -9,6 +9,7 @@
 //%%% "%METHOD_ONFAIL% will be replaced with the code to execute on failure eg return -1        
 //%%% "%METHOD_CALL_TYPE% will be replaced with the type of Call<Type>Method needed.  
 //%%% "%METHOD_RETURN%" will be replaced with "return" or "" for void functions.   
+%RETURN_VAR_DECLARE%
 if(jthis == NULL) {
     std::cerr << __FILE__ << ":" << __LINE__ <<" Call of method %METHOD_NAME% of %FULL_CLASS_NAME% with jthis == NULL." << std::endl;
     %METHOD_ONFAIL%
@@ -57,4 +58,5 @@ if(nativeAddress->jthis != jthis && !env->IsSameObject(nativeAddress->jthis,jthi
 }
 
 if(GetDebugJ4Cpp()) std::cout << __FILE__ << ":" << __LINE__ <<" Call of method %METHOD_NAME% of %FULL_CLASS_NAME% with nativeAddress=" << nativeAddress << std::endl;
-nativeAddress->%METHOD_NAME%Native();
+%METHOD_RETURN_STORE% nativeAddress->%METHOD_NAME%Native(%METHOD_ARGS%);
+%METHOD_RETURN_GET%

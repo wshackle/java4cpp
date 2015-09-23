@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <cstring>
+#include "test_nativerunnable.h"
 
 using namespace test::testpackage;
 using namespace test;
@@ -18,7 +19,21 @@ int main(int argc, const char **argv) {
         Test t1;
         NativeRunnable nr;
         t1.setRunnable(nr);
+        int start_number = nr.context->run_count;
         t1.runRunnable();
+        if(nr.context->run_count != start_number + 1) {
+            cerr << __FILE__ << ":" << __LINE__ << " (nr.context->run_count=" << nr.context->run_count << ") != (start_number + 1 = " << (start_number + 1) << ")" << endl;
+            exit(1);
+        }
+        
+        NativeDoubleOp ndo;
+        t1.setDoubleOp(ndo);
+        jdouble dout = t1.applyDoubleOp(3.4);
+        cout << "dout = " << dout << endl;
+        if(abs(dout-4.4)> 0.01) {
+            cerr << __FILE__ << ":" << __LINE__ << " (abs(dout-4.4)=" << abs(dout-4.4) << ") > 0.01 "  << endl;
+            exit(1);
+        }
         
         t1.setI(13);
         PrintObject("t1=", t1);
