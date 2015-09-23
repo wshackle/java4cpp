@@ -5,7 +5,7 @@ sudo: false
 jdk:
   - oraclejdk8
 
-install: true
+#install: true
 
 script:
   - echo skipping sudo apt-get update && echo skipping sudo apt-get install oracle-java8-installer
