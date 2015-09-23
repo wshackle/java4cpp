@@ -25,7 +25,7 @@ crclj_test
 crclj*.h
 test*.h
 crclj*.cpp
-test*.cpp
+test[0-9]*.cpp
 JavaForCpp*.h
 
 # Visual Studio generated files
@@ -52,6 +52,7 @@ private/*
 /src/test/resources/crclj*[0-9].h
 /src/test/resources/NativeRunnable.java
 /src/test/resources/NativeRunnable.h
+/src/test/resources/test
 nbactions.xml
 examples/test/java/Test/build/
 examples/test/java/Test/dist/
