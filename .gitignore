@@ -55,13 +55,14 @@ private/*
 nbactions.xml
 examples/test/java/Test/build/
 examples/test/java/Test/dist/
-examples/test/java/Test/nbproject/private/
+*/nbproject/private/*
 examples/NativeRunnable/JavaForCpp.h
 examples/NativeRunnable/JavaForCpp*.cpp
 examples/NativeRunnable/JavaForCpp*.h
 examples/NativeRunnable/NativeRunnable.java
 examples/NativeRunnable/nr
 examples/NativeRunnable/*.class
+examples/NbProjects/NativeRunnable/nbproject/private/*
 
 # CMake files to ignore
 CMakeCache.txt

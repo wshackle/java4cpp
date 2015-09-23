@@ -13,7 +13,7 @@ script:
   - uname -a
   - java -version
   - mvn -version
-  - mvn -U test
+  - mvn verify
   
 notifications:
   email:
