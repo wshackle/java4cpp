@@ -34,6 +34,9 @@
     <description>
         Utiliity to create C++ Wrapper for Java JAR library.
     </description>
+    <url>
+        https://github.com/wshackle/java4cpp
+    </url>
     <licenses>
         <license>
             <name>Public Domain(US Government Work)</name>
