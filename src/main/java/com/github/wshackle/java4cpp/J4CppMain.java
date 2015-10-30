@@ -375,12 +375,31 @@ public class J4CppMain {
         Method ma[] = m.getDeclaringClass().getMethods();
         int index = 0;
         boolean index_incremented = false;
+        boolean has_match = false;
+        for (int i = 0; i < ma.length; i++) {
+            Method method = ma[i];
+            if(method.getParameterCount() > 0 
+                    && m.getParameterCount() > 0 
+                    && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
+                continue;
+            }
+            if (!method.equals(m)
+                    && m.getName().equals(method.getName())
+                    && m.getParameterCount() == method.getParameterCount()) {
+                has_match=true;
+            }
+        }
         for (int i = 0; i < ma.length; i++) {
             Method method = ma[i];
             if (method.equals(m)) {
                 break;
             }
             if (method.getParameterCount() != m.getParameterCount()) {
+                continue;
+            }
+            if(method.getParameterCount() > 0 
+                    && m.getParameterCount() > 0 
+                    && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
                 continue;
             }
             if (m.getParameterCount() >= 1) {
@@ -409,7 +428,7 @@ public class J4CppMain {
             }
             start_index = index;
         }
-        if (index > 0) {
+        if (has_match) {
             mname = mname + index;
         }
         if (badNames.contains(mname)) {
@@ -1952,7 +1971,7 @@ public class J4CppMain {
                         if (checkMethod(method, classes)) {
                             pw.println();
                             pw.println(getCppMethodDefinitionStart(tabs, clssOnlyName, method, clss));
-                            map.put(METHOD_NAME, fixMethodName(method));
+                            map.put(METHOD_NAME, method.getName());
                             if (fixMethodName(method).contains("equals2")) {
                                 if (verbose) {
                                     System.out.println("debug me");

@@ -27,18 +27,18 @@ namespace test {
 
                      class ClassInDefaultPackage;
                         namespace testpackage{
-                            class Test;
-                           } // end namespace testpackage
+                            class A;
+                              class Test;
+                             } // end namespace testpackage
 
-                              namespace java{
-                                  namespace lang{
-                                      class Enum;
-                                     } // end namespace lang
-                                    } // end namespace java
+                                namespace java{
+                                    namespace lang{
+                                        class Enum;
+                                       } // end namespace lang
+                                      } // end namespace java
 
-                                       namespace testpackage{
-                                           class ExternalPublicEnum;
-                                             class A;
+                                         namespace testpackage{
+                                             class ExternalPublicEnum;
                                                class MyClient;
                                               } // end namespace testpackage
 
