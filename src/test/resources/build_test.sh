@@ -20,8 +20,10 @@ export TEST_PROJECT_DIR="${BASE_DIR}/examples/test/java/test";
 
 export TEST_JAR="${TEST_PROJECT_DIR}/target/test-1.0-SNAPSHOT.jar";
 
-if test "x${JAVA_HOME}" = "x"; then
-    export JAVA_HOME=/usr/local/jdk1.8.0_60/ ;
+if uname -m | grep 64 >/dev/null 2>/dev/null ; then
+    export JVM_LIBDIR="${JAVA_HOME}/jre/lib/amd64/server" ;
+else
+    export JVM_LIBDIR="${JAVA_HOME}/jre/lib/i386/server" ;
 fi
 
 echo JAVA_HOME="${JAVA_HOME}"

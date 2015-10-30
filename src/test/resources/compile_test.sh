@@ -6,7 +6,11 @@ if test "x${JAVA_HOME}" = "x"; then
 fi
 
 ls -ld "${JAVA_HOME}"; 
-export JVM_LIBDIR="${JAVA_HOME}/jre/lib/amd64/server" ; 
+if uname -m | grep 64 >/dev/null 2>/dev/null ; then
+    export JVM_LIBDIR="${JAVA_HOME}/jre/lib/amd64/server" ;
+else
+    export JVM_LIBDIR="${JAVA_HOME}/jre/lib/i386/server" ;
+fi 
 ls -ld "${JVM_LIBDIR}";
 ls -l "${JVM_LIBDIR}"; 
 

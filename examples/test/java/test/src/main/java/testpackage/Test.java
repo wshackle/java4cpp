@@ -182,6 +182,7 @@ public class Test {
      * @return the value of booleanArrayProp
      */
     public boolean[] getBooleanArrayProp() {
+        System.out.println("booleanArrayProp = " + booleanArrayProp);
         return booleanArrayProp;
     }
 
@@ -480,6 +481,7 @@ public class Test {
      * @return the value of strProp
      */
     public String getStrProp() {
+        System.out.println("Java Test.getStrProp() called.");
         return strProp;
     }
 

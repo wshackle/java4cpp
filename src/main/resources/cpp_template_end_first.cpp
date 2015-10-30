@@ -260,7 +260,7 @@ static JavaVM *jvm = NULL; /* denotes a Java VM */
             std::cout << prefix << "can not find toString method" << std::endl;
             return;
         }
-        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        jstring jobjstr = (jstring) env->CallStaticObjectMethod(clss, midToString,jobj);
         if(NULL == jobjstr) {
             std::cout << prefix << "toString() returned NULL" << std::endl;
             return;
@@ -283,7 +283,7 @@ static JavaVM *jvm = NULL; /* denotes a Java VM */
             std::cout << prefix << "can not find toString method" << std::endl;
             return;
         }
-        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        jstring jobjstr = (jstring) env->CallStaticObjectMethod(clss, midToString,jobj);
         if(NULL == jobjstr) {
             std::cout << prefix << "toString() returned NULL" << std::endl;
             return;
@@ -306,7 +306,7 @@ static JavaVM *jvm = NULL; /* denotes a Java VM */
             std::cout << prefix << "can not find toString method" << std::endl;
             return;
         }
-        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        jstring jobjstr = (jstring) env->CallStaticObjectMethod(clss, midToString,jobj);
         if(NULL == jobjstr) {
             std::cout << prefix << "toString() returned NULL" << std::endl;
             return;
@@ -329,7 +329,7 @@ static JavaVM *jvm = NULL; /* denotes a Java VM */
             std::cout << prefix << "can not find toString method" << std::endl;
             return;
         }
-        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        jstring jobjstr = (jstring) env->CallStaticObjectMethod(clss, midToString,jobj);
         if(NULL == jobjstr) {
             std::cout << prefix << "toString() returned NULL" << std::endl;
             return;
@@ -352,7 +352,7 @@ static JavaVM *jvm = NULL; /* denotes a Java VM */
             std::cout << prefix << "can not find toString method" << std::endl;
             return;
         }
-        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        jstring jobjstr = (jstring) env->CallStaticObjectMethod(clss, midToString,jobj);
         if(NULL == jobjstr) {
             std::cout << prefix << "toString() returned NULL" << std::endl;
             return;
@@ -375,7 +375,7 @@ static JavaVM *jvm = NULL; /* denotes a Java VM */
             std::cout << prefix << "can not find toString method" << std::endl;
             return;
         }
-        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        jstring jobjstr = (jstring) env->CallStaticObjectMethod(clss, midToString,jobj);
         if(NULL == jobjstr) {
             std::cout << prefix << "toString() returned NULL" << std::endl;
             return;
@@ -398,7 +398,7 @@ static JavaVM *jvm = NULL; /* denotes a Java VM */
             std::cout << prefix << "can not find toString method" << std::endl;
             return;
         }
-        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        jstring jobjstr = (jstring) env->CallStaticObjectMethod(clss, midToString,jobj);
         if(NULL == jobjstr) {
             std::cout << prefix << "toString() returned NULL" << std::endl;
             return;
@@ -421,7 +421,7 @@ static JavaVM *jvm = NULL; /* denotes a Java VM */
             std::cout << prefix << "can not find toString method" << std::endl;
             return;
         }
-        jstring jobjstr = (jstring) env->CallObjectMethod(jobj, midToString);
+        jstring jobjstr = (jstring) env->CallStaticObjectMethod(clss, midToString,jobj);
         if(NULL == jobjstr) {
             std::cout << prefix << "toString() returned NULL" << std::endl;
             return;

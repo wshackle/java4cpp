@@ -99,6 +99,7 @@ int main(int argc, const char **argv) {
         jboolean boola[3] = {JNI_TRUE, JNI_FALSE, JNI_TRUE};
         t1.setBooleanArrayProp(boola, 3);
         jbooleanArray jboola = t1.getBooleanArrayProp();
+        cout << "jboola=" << jboola << endl;
         PrintJBooleanArray("jboola=", jboola);
         jboolean *boolp = GetBooleanArrayElements(jboola);
         if (boola[0] != boolp[0] || boola[1] != boolp[1] || boola[2] != boolp[2]) {
