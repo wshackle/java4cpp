@@ -56,14 +56,12 @@
             <timezone>America/New_York</timezone>
         </developer>
     </developers>
-    <!-- FIXME SCM not setup yet.
     <scm>
-        <connection>scm:git:git@github.com:usnistgov/rcslib.git</connection>
-        <developerConnection>scm:git:git@github.com:usnistgov/rcslib.git</developerConnection>
-        <url>https://github.com/usnistgov/rcslib</url>
+        <connection>scm:git:git@github.com:wshackle/java4cpp.git</connection>
+        <developerConnection>scm:git:git@github.com:wshackle/java4cpp.git</developerConnection>
+        <url>https://github.com/wshackle/java4cpp</url>
         <tag>HEAD</tag>
     </scm>
-    -->
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
