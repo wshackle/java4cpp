@@ -1269,10 +1269,14 @@ public class J4CppMain {
         excludedClasses.add(Class.class);
         excludedClasses.add(Enum.class);
         Set<String> packagesSet = new TreeSet<>();
+        List<URL> urlsList = new ArrayList<>();
+        List<String> foundClassNames = new ArrayList<>();
         if (null != jar && jar.length() > 0) {
             Path jarPath = FileSystems.getDefault().getPath(jar);
             ZipInputStream zip = new ZipInputStream(Files.newInputStream(jarPath, StandardOpenOption.READ));
+
             URL[] urls = {new URL("jar:file:" + jar + "!/")};
+            urlsList.add(urls[0]);
             URLClassLoader cl = URLClassLoader.newInstance(urls);
             for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
                 if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
@@ -1322,6 +1326,14 @@ public class J4CppMain {
                         }
                         if (!classes.contains(clss)
                                 && isAddableClass(clss, excludedClasses)) {
+                            if (null != classnamesToFind
+                                    && classnamesToFind.contains(className)
+                                    && !foundClassNames.contains(className)) {
+                                foundClassNames.add(className);
+                                if (verbose) {
+                                    System.out.println("foundClassNames = " + foundClassNames);
+                                }
+                            }
 //                        if(verbose) System.out.println("clss = " + clss);
                             classes.add(clss);
 //                        Class superClass = clss.getSuperclass();
@@ -1346,21 +1358,51 @@ public class J4CppMain {
                 if (verbose) {
                     System.out.println("classname = " + classname);
                 }
+                if (foundClassNames.contains(classname)) {
+                    if (verbose) {
+                        System.out.println("foundClassNames.contains("+classname+")");
+                    }
+                    continue;
+                }
+                try {
+                    if (classes.contains(Class.forName(classname))) {
+                        if (verbose) {
+                            System.out.println("Classes list already contains:  " + classname);
+                        }
+                        continue;
+                    }
+                } catch (Exception e) {
+
+                }
+
                 if (null != classname && classname.length() > 0) {
                     URL url = new URL("file://" + System.getProperty("user.dir") + "/");
                     if (verbose) {
                         System.out.println("url = " + url);
                     }
                     URLClassLoader cl = URLClassLoader.newInstance(new URL[]{url});
-                    Class c = cl.loadClass(classname);
+                    Class c = null;
+                    try {
+                        c = cl.loadClass(classname);
+                    } catch (ClassNotFoundException e) {
+                        System.err.println("Class " + classname + " not found in " + url);
+                    }
                     if (verbose) {
                         System.out.println("c = " + c);
                     }
                     if (null == c) {
-                        c = ClassLoader.getSystemClassLoader().loadClass(classname);
+                        try {
+                            c = ClassLoader.getSystemClassLoader().loadClass(classname);
+                        } catch (ClassNotFoundException e) {
+                            if (verbose) {
+                                System.out.println("System ClassLoader failed to find " + classname);
+                            }
+                        }
                     }
                     if (null != c) {
                         classes.add(c);
+                    } else {
+                        System.err.println("Class " + classname + " not found");
                     }
                 }
             }
@@ -2208,8 +2250,8 @@ public class J4CppMain {
                                         && !method.isSynthetic()) {
                                     map.put("%METHOD_NUMBER%", Integer.toString(method_number));
                                     map.put(METHOD_NAME, method.getName());
-                                    
-                                    map.put(JNI_SIGNATURE,  "(" + getJNIParamSignature(method.getParameterTypes()) + ")" + classToJNISignature(method.getReturnType()));
+
+                                    map.put(JNI_SIGNATURE, "(" + getJNIParamSignature(method.getParameterTypes()) + ")" + classToJNISignature(method.getReturnType()));
                                     processTemplate(pw, map, "cpp_register_native_item.cpp", tabs);
                                     method_number++;
                                 }
@@ -2236,25 +2278,25 @@ public class J4CppMain {
                 tabs = "";
                 for (Entry<String, Class> e : nativesClassMap.entrySet()) {
                     String nativeClassName = e.getKey();
-                    File nativeClassHeaderFile = new File(namespace.toLowerCase()+"_"+nativeClassName.toLowerCase()+".h");
+                    File nativeClassHeaderFile = new File(namespace.toLowerCase() + "_" + nativeClassName.toLowerCase() + ".h");
                     map.put("%NATIVE_CLASS_HEADER%", nativeClassHeaderFile.getName());
                     map.put(CLASS_NAME, nativeClassName);
-                    if(nativeClassHeaderFile.exists()) {
-                        if(verbose) {
-                            System.out.println("skipping "+ nativeClassHeaderFile.getCanonicalPath() + " since it already exists.");
+                    if (nativeClassHeaderFile.exists()) {
+                        if (verbose) {
+                            System.out.println("skipping " + nativeClassHeaderFile.getCanonicalPath() + " since it already exists.");
                         }
                     } else {
-                        try(PrintWriter pw = new PrintWriter(new FileWriter(nativeClassHeaderFile))) {
+                        try (PrintWriter pw = new PrintWriter(new FileWriter(nativeClassHeaderFile))) {
                             processTemplate(pw, map, "header_native_imp.h", tabs);
                         }
                     }
-                    File nativeClassCppFile = new File(namespace.toLowerCase()+"_"+nativeClassName.toLowerCase()+".cpp");
-                    if(nativeClassCppFile.exists()) {
-                        if(verbose) {
-                            System.out.println("skipping "+ nativeClassCppFile.getCanonicalPath() + " since it already exists.");
+                    File nativeClassCppFile = new File(namespace.toLowerCase() + "_" + nativeClassName.toLowerCase() + ".cpp");
+                    if (nativeClassCppFile.exists()) {
+                        if (verbose) {
+                            System.out.println("skipping " + nativeClassCppFile.getCanonicalPath() + " since it already exists.");
                         }
                     } else {
-                        try(PrintWriter pw = new PrintWriter(new FileWriter(nativeClassCppFile))) {
+                        try (PrintWriter pw = new PrintWriter(new FileWriter(nativeClassCppFile))) {
                             processTemplate(pw, map, "cpp_native_imp_start.cpp", tabs);
                             Class javaClass = e.getValue();
                             Method methods[] = javaClass.getDeclaredMethods();
@@ -2273,7 +2315,7 @@ public class J4CppMain {
                                     Class[] paramClasses = method.getParameterTypes();
 //                                    String methodArgs = getCppParamNames(paramClasses);
                                     String paramDecls = getCppParamDeclarations(paramClasses, javaClass);
-                                    String methodArgs = method.getParameterCount() > 0 ?  paramDecls.substring(1, paramDecls.length() - 1) : "";
+                                    String methodArgs = method.getParameterCount() > 0 ? paramDecls.substring(1, paramDecls.length() - 1) : "";
                                     map.put(METHOD_ARGS, methodArgs);
                                     map.put(METHOD_NAME, method.getName());
                                     Class returnClass = method.getReturnType();
