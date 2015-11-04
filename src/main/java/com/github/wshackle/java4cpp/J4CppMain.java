@@ -378,15 +378,15 @@ public class J4CppMain {
         boolean has_match = false;
         for (int i = 0; i < ma.length; i++) {
             Method method = ma[i];
-            if(method.getParameterCount() > 0 
-                    && m.getParameterCount() > 0 
+            if (method.getParameterCount() > 0
+                    && m.getParameterCount() > 0
                     && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
                 continue;
             }
             if (!method.equals(m)
                     && m.getName().equals(method.getName())
                     && m.getParameterCount() == method.getParameterCount()) {
-                has_match=true;
+                has_match = true;
             }
         }
         for (int i = 0; i < ma.length; i++) {
@@ -397,8 +397,8 @@ public class J4CppMain {
             if (method.getParameterCount() != m.getParameterCount()) {
                 continue;
             }
-            if(method.getParameterCount() > 0 
-                    && m.getParameterCount() > 0 
+            if (method.getParameterCount() > 0
+                    && m.getParameterCount() > 0
                     && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
                 continue;
             }
@@ -1262,6 +1262,7 @@ public class J4CppMain {
         }
 
         Set<Class> excludedClasses = new HashSet<>();
+        Set<String> foundClassNames = new HashSet<>();
         excludedClasses.add(Object.class);
         excludedClasses.add(String.class);
         excludedClasses.add(void.class);
@@ -1270,13 +1271,53 @@ public class J4CppMain {
         excludedClasses.add(Enum.class);
         Set<String> packagesSet = new TreeSet<>();
         List<URL> urlsList = new ArrayList<>();
-        List<String> foundClassNames = new ArrayList<>();
+        String cp = System.getProperty("java.class.path");
+        if(verbose) {
+            System.out.println("System.getProperty(\"java.class.path\") = " + cp);
+        }
+        if (null != cp) {
+            for (String cpe : cp.split(File.pathSeparator)) {
+                if(verbose) {
+                    System.out.println("class path element = " + cpe);
+                }
+                File f = new File(cpe);
+                if (f.isDirectory()) {
+                    urlsList.add(new URL("file:" + f.getCanonicalPath()+File.separator));
+                } else if (cpe.endsWith(".jar")) {
+                    urlsList.add(new URL("jar:file:" + f.getCanonicalPath() + "!/"));
+                }
+            }
+        }
+        cp = System.getenv("CLASSPATH");
+        if(verbose) {
+            System.out.println("System.getenv(\"CLASSPATH\") = " + cp);
+        }
+        if (null != cp) {
+            for (String cpe : cp.split(File.pathSeparator)) {
+                if(verbose) {
+                    System.out.println("class path element = " + cpe);
+                }
+                File f = new File(cpe);
+                if (f.isDirectory()) {
+                    urlsList.add(new URL("file:" + f.getCanonicalPath()+File.separator));
+                } else if (cpe.endsWith(".jar")) {
+                    urlsList.add(new URL("jar:file:" + f.getCanonicalPath() + "!/"));
+                }
+            }
+        }
+        if (verbose) {
+            System.out.println("urlsList = " + urlsList);
+        }
         if (null != jar && jar.length() > 0) {
             Path jarPath = FileSystems.getDefault().getPath(jar);
             ZipInputStream zip = new ZipInputStream(Files.newInputStream(jarPath, StandardOpenOption.READ));
 
-            URL[] urls = {new URL("jar:file:" + jar + "!/")};
-            urlsList.add(urls[0]);
+            URL jarUrl = new URL("jar:file:" + jarPath.toFile().getCanonicalPath() + "!/");
+            urlsList.add(jarUrl);
+            URL[] urls = urlsList.toArray(new URL[urlsList.size()]);
+            if (verbose) {
+                System.out.println("urls = " + Arrays.toString(urls));
+            }
             URLClassLoader cl = URLClassLoader.newInstance(urls);
             for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
                 if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
@@ -1360,7 +1401,7 @@ public class J4CppMain {
                 }
                 if (foundClassNames.contains(classname)) {
                     if (verbose) {
-                        System.out.println("foundClassNames.contains("+classname+")");
+                        System.out.println("foundClassNames.contains(" + classname + ")");
                     }
                     continue;
                 }
@@ -1376,16 +1417,18 @@ public class J4CppMain {
                 }
 
                 if (null != classname && classname.length() > 0) {
-                    URL url = new URL("file://" + System.getProperty("user.dir") + "/");
+                    urlsList.add(new URL("file://" + System.getProperty("user.dir") + "/"));
+
+                    URL[] urls = urlsList.toArray(new URL[urlsList.size()]);
                     if (verbose) {
-                        System.out.println("url = " + url);
+                        System.out.println("urls = " + Arrays.toString(urls));
                     }
-                    URLClassLoader cl = URLClassLoader.newInstance(new URL[]{url});
+                    URLClassLoader cl = URLClassLoader.newInstance(urls);
                     Class c = null;
                     try {
                         c = cl.loadClass(classname);
                     } catch (ClassNotFoundException e) {
-                        System.err.println("Class " + classname + " not found in " + url);
+                        System.err.println("Class " + classname + " not found ");
                     }
                     if (verbose) {
                         System.out.println("c = " + c);
@@ -1437,15 +1480,20 @@ public class J4CppMain {
                 newClasses.add(superClass);
                 superClass = superClass.getSuperclass();
             }
-            for (Field f : clss.getDeclaredFields()) {
-                if (Modifier.isPublic(f.getModifiers())) {
-                    Class fClass = f.getType();
-                    if (!classes.contains(fClass)
-                            && !newClasses.contains(fClass)
-                            && isAddableClass(fClass, excludedClasses)) {
-                        newClasses.add(fClass);
+            try {
+                Field fa[] = clss.getDeclaredFields();
+                for (Field f : fa) {
+                    if (Modifier.isPublic(f.getModifiers())) {
+                        Class fClass = f.getType();
+                        if (!classes.contains(fClass)
+                                && !newClasses.contains(fClass)
+                                && isAddableClass(fClass, excludedClasses)) {
+                            newClasses.add(fClass);
+                        }
                     }
                 }
+            } catch (NoClassDefFoundError e) {
+                e.printStackTrace();
             }
             for (Method m : clss.getDeclaredMethods()) {
                 if (m.isSynthetic()) {
