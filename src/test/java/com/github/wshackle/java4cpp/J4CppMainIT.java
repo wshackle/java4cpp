@@ -147,7 +147,7 @@ public class J4CppMainIT {
                 assertEquals(testPrepRet, 0);
             }
             final String args[]
-                    = new String[]{"-v", "--natives", "NativeRunnable=java.lang.Runnable", "NativeDoubleOp=java.util.function.DoubleUnaryOperator","-n", "test", "-j", testJar};
+                    = new String[]{"-v", "--natives", "NativeRunnable=java.lang.Runnable","-n", "test", "-j", testJar};
             J4CppMain.main(args);
             assertTrue(J4CppMain.main_completed);
             final String testRunScript
