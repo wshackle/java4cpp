@@ -14,5 +14,5 @@ fi
 ls -ld "${JVM_LIBDIR}";
 ls -l "${JVM_LIBDIR}"; 
 
-"${JAVA_HOME}/bin/javac" -g *.java
-g++ -O0 -g -I "${JAVA_HOME}/include"  -I "${JAVA_HOME}/include/linux" test*.cpp use_test.cpp  -L "${JVM_LIBDIR}" -Wl,--rpath "${JVM_LIBDIR}" -ljvm -o test
+"${JAVA_HOME}/bin/javac" -g NativeRunnable.java
+g++ -O0 -g -I "${JAVA_HOME}/include"  -I "${JAVA_HOME}/include/linux" test_nativerunnable.cpp test0.cpp test1.cpp use_test.cpp  -L "${JVM_LIBDIR}" -Wl,--rpath "${JVM_LIBDIR}" -ljvm -o test

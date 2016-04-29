@@ -26,14 +26,14 @@ int main(int argc, const char **argv) {
             exit(1);
         }
         
-        NativeDoubleOp ndo;
-        t1.setDoubleOp(ndo);
-        jdouble dout = t1.applyDoubleOp(3.4);
-        cout << "dout = " << dout << endl;
-        if(abs(dout-4.4)> 0.01) {
-            cerr << __FILE__ << ":" << __LINE__ << " (abs(dout-4.4)=" << abs(dout-4.4) << ") > 0.01 "  << endl;
-            exit(1);
-        }
+//        NativeDoubleOp ndo;
+//        t1.setDoubleOp(ndo);
+//        jdouble dout = t1.applyDoubleOp(3.4);
+//        cout << "dout = " << dout << endl;
+//        if(abs(dout-4.4)> 0.01) {
+//            cerr << __FILE__ << ":" << __LINE__ << " (abs(dout-4.4)=" << abs(dout-4.4) << ") > 0.01 "  << endl;
+//            exit(1);
+//        }
         
         t1.setI(13);
         PrintObject("t1=", t1);

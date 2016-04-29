@@ -71,23 +71,6 @@ namespace test {
 #include "test0.h"
 #include "test1.h"
 
-    class NativeDoubleOpContext;
-
-    
-    class NativeDoubleOp : public ::test::java::util::function::DoubleUnaryOperator {
-    public:
-        NativeDoubleOp(jobject _jthis, bool copy);
-        NativeDoubleOp(const NativeDoubleOp &);
-        static NativeDoubleOp cast(const ::test::java::lang::Object &);
-            
-        NativeDoubleOpContext *context;
-        NativeDoubleOp();
-        ~NativeDoubleOp();
-        jdouble applyAsDoubleNative(jdouble double_0);
-        void initContext(NativeDoubleOpContext *ctx,bool isref);
-        void deleteContext();
-    }; // end class NativeDoubleOp
-
     class NativeRunnableContext;
 
     
