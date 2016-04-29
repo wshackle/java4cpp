@@ -398,7 +398,7 @@ public class J4CppMain {
             }
             if(method.getParameterTypes().length > 0 
                     && m.getParameterTypes().length > 0 
-                    && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
+                  && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
                 continue;
             }
             if (m.getParameterTypes().length >= 1) {
@@ -1291,6 +1291,7 @@ public class J4CppMain {
         }
 
         Set<Class> excludedClasses = new HashSet<>();
+        Set<String> foundClassNames = new HashSet<>();
         excludedClasses.add(Object.class);
         excludedClasses.add(String.class);
         excludedClasses.add(void.class);
@@ -1298,10 +1299,54 @@ public class J4CppMain {
         excludedClasses.add(Class.class);
         excludedClasses.add(Enum.class);
         Set<String> packagesSet = new TreeSet<>();
+        List<URL> urlsList = new ArrayList<>();
+        String cp = System.getProperty("java.class.path");
+        if(verbose) {
+            System.out.println("System.getProperty(\"java.class.path\") = " + cp);
+        }
+        if (null != cp) {
+            for (String cpe : cp.split(File.pathSeparator)) {
+                if(verbose) {
+                    System.out.println("class path element = " + cpe);
+                }
+                File f = new File(cpe);
+                if (f.isDirectory()) {
+                    urlsList.add(new URL("file:" + f.getCanonicalPath()+File.separator));
+                } else if (cpe.endsWith(".jar")) {
+                    urlsList.add(new URL("jar:file:" + f.getCanonicalPath() + "!/"));
+                }
+            }
+        }
+        cp = System.getenv("CLASSPATH");
+        if(verbose) {
+            System.out.println("System.getenv(\"CLASSPATH\") = " + cp);
+        }
+        if (null != cp) {
+            for (String cpe : cp.split(File.pathSeparator)) {
+                if(verbose) {
+                    System.out.println("class path element = " + cpe);
+                }
+                File f = new File(cpe);
+                if (f.isDirectory()) {
+                    urlsList.add(new URL("file:" + f.getCanonicalPath()+File.separator));
+                } else if (cpe.endsWith(".jar")) {
+                    urlsList.add(new URL("jar:file:" + f.getCanonicalPath() + "!/"));
+                }
+            }
+        }
+        if (verbose) {
+            System.out.println("urlsList = " + urlsList);
+        }
         if (null != jar && jar.length() > 0) {
             Path jarPath = FileSystems.getDefault().getPath(jar);
             ZipInputStream zip = new ZipInputStream(Files.newInputStream(jarPath, StandardOpenOption.READ));
-            URL[] urls = {new URL("jar:file:" + jar + "!/")};
+
+            URL jarUrl = new URL("jar:file:" + jarPath.toFile().getCanonicalPath() + "!/");
+            urlsList.add(jarUrl);
+            URL[] urls = urlsList.toArray(new URL[urlsList.size()]);
+            if (verbose) {
+                System.out.println("urls = " + Arrays.toString(urls));
+            }
             URLClassLoader cl = URLClassLoader.newInstance(urls);
             for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
                 if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
@@ -1358,6 +1403,14 @@ public class J4CppMain {
                         }
                         if (!classes.contains(clss)
                                 && isAddableClass(clss, excludedClasses)) {
+                            if (null != classnamesToFind
+                                    && classnamesToFind.contains(className)
+                                    && !foundClassNames.contains(className)) {
+                                foundClassNames.add(className);
+                                if (verbose) {
+                                    System.out.println("foundClassNames = " + foundClassNames);
+                                }
+                            }
 //                        if(verbose) System.out.println("clss = " + clss);
                             classes.add(clss);
 //                        Class superClass = clss.getSuperclass();
@@ -1382,21 +1435,53 @@ public class J4CppMain {
                 if (verbose) {
                     System.out.println("classname = " + classname);
                 }
-                if (null != classname && classname.length() > 0) {
-                    URL url = new URL("file://" + System.getProperty("user.dir") + "/");
+                if (foundClassNames.contains(classname)) {
                     if (verbose) {
-                        System.out.println("url = " + url);
+                        System.out.println("foundClassNames.contains(" + classname + ")");
                     }
-                    URLClassLoader cl = URLClassLoader.newInstance(new URL[]{url});
-                    Class c = cl.loadClass(classname);
+                    continue;
+                }
+                try {
+                    if (classes.contains(Class.forName(classname))) {
+                        if (verbose) {
+                            System.out.println("Classes list already contains:  " + classname);
+                        }
+                        continue;
+                    }
+                } catch (Exception e) {
+
+                }
+
+                if (null != classname && classname.length() > 0) {
+                    urlsList.add(new URL("file://" + System.getProperty("user.dir") + "/"));
+
+                    URL[] urls = urlsList.toArray(new URL[urlsList.size()]);
+                    if (verbose) {
+                        System.out.println("urls = " + Arrays.toString(urls));
+                    }
+                    URLClassLoader cl = URLClassLoader.newInstance(urls);
+                    Class c = null;
+                    try {
+                        c = cl.loadClass(classname);
+                    } catch (ClassNotFoundException e) {
+                        System.err.println("Class " + classname + " not found ");
+                    }
                     if (verbose) {
                         System.out.println("c = " + c);
                     }
                     if (null == c) {
-                        c = ClassLoader.getSystemClassLoader().loadClass(classname);
+                        try {
+                            c = ClassLoader.getSystemClassLoader().loadClass(classname);
+                        } catch (ClassNotFoundException e) {
+                            if (verbose) {
+                                System.out.println("System ClassLoader failed to find " + classname);
+                            }
+                        }
                     }
                     if (null != c) {
                         classes.add(c);
+                    } else {
+                        System.err.println("Class " + classname + " not found");
                     }
                 }
             }
@@ -1431,15 +1516,20 @@ public class J4CppMain {
                 newClasses.add(superClass);
                 superClass = superClass.getSuperclass();
             }
-            for (Field f : clss.getDeclaredFields()) {
-                if (Modifier.isPublic(f.getModifiers())) {
-                    Class fClass = f.getType();
-                    if (!classes.contains(fClass)
-                            && !newClasses.contains(fClass)
-                            && isAddableClass(fClass, excludedClasses)) {
-                        newClasses.add(fClass);
+            try {
+                Field fa[] = clss.getDeclaredFields();
+                for (Field f : fa) {
+                    if (Modifier.isPublic(f.getModifiers())) {
+                        Class fClass = f.getType();
+                        if (!classes.contains(fClass)
+                                && !newClasses.contains(fClass)
+                                && isAddableClass(fClass, excludedClasses)) {
+                            newClasses.add(fClass);
+                        }
                     }
                 }
+            } catch (NoClassDefFoundError e) {
+                e.printStackTrace();
             }
             for (Method m : clss.getDeclaredMethods()) {
                 if (m.isSynthetic()) {
@@ -2254,8 +2344,8 @@ public class J4CppMain {
                                         && !method.isSynthetic()) {
                                     map.put("%METHOD_NUMBER%", Integer.toString(method_number));
                                     map.put(METHOD_NAME, method.getName());
-                                    
-                                    map.put(JNI_SIGNATURE,  "(" + getJNIParamSignature(method.getParameterTypes()) + ")" + classToJNISignature(method.getReturnType()));
+
+                                    map.put(JNI_SIGNATURE, "(" + getJNIParamSignature(method.getParameterTypes()) + ")" + classToJNISignature(method.getReturnType()));
                                     processTemplate(pw, map, "cpp_register_native_item.cpp", tabs);
                                     method_number++;
                                 }
@@ -2282,25 +2372,25 @@ public class J4CppMain {
                 tabs = "";
                 for (Entry<String, Class> e : nativesClassMap.entrySet()) {
                     String nativeClassName = e.getKey();
-                    File nativeClassHeaderFile = new File(namespace.toLowerCase()+"_"+nativeClassName.toLowerCase()+".h");
+                    File nativeClassHeaderFile = new File(namespace.toLowerCase() + "_" + nativeClassName.toLowerCase() + ".h");
                     map.put("%NATIVE_CLASS_HEADER%", nativeClassHeaderFile.getName());
                     map.put(CLASS_NAME, nativeClassName);
-                    if(nativeClassHeaderFile.exists()) {
-                        if(verbose) {
-                            System.out.println("skipping "+ nativeClassHeaderFile.getCanonicalPath() + " since it already exists.");
+                    if (nativeClassHeaderFile.exists()) {
+                        if (verbose) {
+                            System.out.println("skipping " + nativeClassHeaderFile.getCanonicalPath() + " since it already exists.");
                         }
                     } else {
-                        try(PrintWriter pw = new PrintWriter(new FileWriter(nativeClassHeaderFile))) {
+                        try (PrintWriter pw = new PrintWriter(new FileWriter(nativeClassHeaderFile))) {
                             processTemplate(pw, map, "header_native_imp.h", tabs);
                         }
                     }
-                    File nativeClassCppFile = new File(namespace.toLowerCase()+"_"+nativeClassName.toLowerCase()+".cpp");
-                    if(nativeClassCppFile.exists()) {
-                        if(verbose) {
-                            System.out.println("skipping "+ nativeClassCppFile.getCanonicalPath() + " since it already exists.");
+                    File nativeClassCppFile = new File(namespace.toLowerCase() + "_" + nativeClassName.toLowerCase() + ".cpp");
+                    if (nativeClassCppFile.exists()) {
+                        if (verbose) {
+                            System.out.println("skipping " + nativeClassCppFile.getCanonicalPath() + " since it already exists.");
                         }
                     } else {
-                        try(PrintWriter pw = new PrintWriter(new FileWriter(nativeClassCppFile))) {
+                        try (PrintWriter pw = new PrintWriter(new FileWriter(nativeClassCppFile))) {
                             processTemplate(pw, map, "cpp_native_imp_start.cpp", tabs);
                             Class javaClass = e.getValue();
                             Method methods[] = javaClass.getDeclaredMethods();

@@ -26,7 +26,7 @@ Run
 
 Run directly with: 
 
-    java -jar target/java4cpp-1.0-SNAPSHOT-jar-with-dependencies.jar
+    java -jar target/java4cpp-1.2-SNAPSHOT-jar-with-dependencies.jar
     
 Possible options are:
 
