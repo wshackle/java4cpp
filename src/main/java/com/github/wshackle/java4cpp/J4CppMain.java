@@ -377,15 +377,15 @@ public class J4CppMain {
         boolean has_match = false;
         for (int i = 0; i < ma.length; i++) {
             Method method = ma[i];
-            if(method.getParameterTypes().length > 0 
-                    && m.getParameterTypes().length > 0 
+            if (method.getParameterTypes().length > 0
+                    && m.getParameterTypes().length > 0
                     && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
                 continue;
             }
             if (!method.equals(m)
                     && m.getName().equals(method.getName())
                     && m.getParameterTypes().length == method.getParameterTypes().length) {
-                has_match=true;
+                has_match = true;
             }
         }
         for (int i = 0; i < ma.length; i++) {
@@ -396,9 +396,9 @@ public class J4CppMain {
             if (method.getParameterTypes().length != m.getParameterTypes().length) {
                 continue;
             }
-            if(method.getParameterTypes().length > 0 
-                    && m.getParameterTypes().length > 0 
-                  && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
+            if (method.getParameterTypes().length > 0
+                    && m.getParameterTypes().length > 0
+                    && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
                 continue;
             }
             if (m.getParameterTypes().length >= 1) {
@@ -915,19 +915,19 @@ public class J4CppMain {
     }
 
     private static boolean isMethodToMakeEasy(Method m) {
-        if(Modifier.isStatic(m.getModifiers())) {
+        if (Modifier.isStatic(m.getModifiers())) {
             return false;
         }
         Class<?> types[] = m.getParameterTypes();
         for (int i = 0; i < types.length; i++) {
             Class<?> type = types[i];
-            if(type.isArray() && !type.getComponentType().isPrimitive()) {
+            if (type.isArray() && !type.getComponentType().isPrimitive()) {
                 return false;
             }
         }
         for (int i = 0; i < types.length; i++) {
             Class<?> type = types[i];
-            if(type.isArray() || isString(type)) {
+            if (type.isArray() || isString(type)) {
                 return true;
             }
         }
@@ -943,13 +943,13 @@ public class J4CppMain {
         Class<?> types[] = c.getParameterTypes();
         for (int i = 0; i < types.length; i++) {
             Class<?> type = types[i];
-            if(type.isArray() && !type.getComponentType().isPrimitive()) {
+            if (type.isArray() && !type.getComponentType().isPrimitive()) {
                 return false;
             }
         }
         for (int i = 0; i < types.length; i++) {
             Class<?> type = types[i];
-            if(type.isArray() || isString(type)) {
+            if (type.isArray() || isString(type)) {
                 return true;
             }
         }
@@ -1301,34 +1301,34 @@ public class J4CppMain {
         Set<String> packagesSet = new TreeSet<>();
         List<URL> urlsList = new ArrayList<>();
         String cp = System.getProperty("java.class.path");
-        if(verbose) {
+        if (verbose) {
             System.out.println("System.getProperty(\"java.class.path\") = " + cp);
         }
         if (null != cp) {
             for (String cpe : cp.split(File.pathSeparator)) {
-                if(verbose) {
+                if (verbose) {
                     System.out.println("class path element = " + cpe);
                 }
                 File f = new File(cpe);
                 if (f.isDirectory()) {
-                    urlsList.add(new URL("file:" + f.getCanonicalPath()+File.separator));
+                    urlsList.add(new URL("file:" + f.getCanonicalPath() + File.separator));
                 } else if (cpe.endsWith(".jar")) {
                     urlsList.add(new URL("jar:file:" + f.getCanonicalPath() + "!/"));
                 }
             }
         }
         cp = System.getenv("CLASSPATH");
-        if(verbose) {
+        if (verbose) {
             System.out.println("System.getenv(\"CLASSPATH\") = " + cp);
         }
         if (null != cp) {
             for (String cpe : cp.split(File.pathSeparator)) {
-                if(verbose) {
+                if (verbose) {
                     System.out.println("class path element = " + cpe);
                 }
                 File f = new File(cpe);
                 if (f.isDirectory()) {
-                    urlsList.add(new URL("file:" + f.getCanonicalPath()+File.separator));
+                    urlsList.add(new URL("file:" + f.getCanonicalPath() + File.separator));
                 } else if (cpe.endsWith(".jar")) {
                     urlsList.add(new URL("jar:file:" + f.getCanonicalPath() + "!/"));
                 }
@@ -1337,6 +1337,7 @@ public class J4CppMain {
         if (verbose) {
             System.out.println("urlsList = " + urlsList);
         }
+        
         if (null != jar && jar.length() > 0) {
             Path jarPath = FileSystems.getDefault().getPath(jar);
             ZipInputStream zip = new ZipInputStream(Files.newInputStream(jarPath, StandardOpenOption.READ));
@@ -1349,12 +1350,14 @@ public class J4CppMain {
             }
             URLClassLoader cl = URLClassLoader.newInstance(urls);
             for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
-                if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
-                    // This ZipEntry represents a class. Now, what class does it represent?
-                    String entryName = entry.getName();
-                    if (verbose) {
-                        System.out.println("entryName = " + entryName);
-                    }
+                // This ZipEntry represents a class. Now, what class does it represent?
+                String entryName = entry.getName();
+                if (verbose) {
+                    System.out.println("entryName = " + entryName);
+                }
+               
+                if (!entry.isDirectory() && entryName.endsWith(".class")) {
+
                     if (entryName.indexOf('$') >= 0) {
                         continue;
                     }
@@ -1387,14 +1390,14 @@ public class J4CppMain {
                             }
                             final String pkgName = clss.getPackage().getName();
                             boolean matchFound = false;
-                            for(String prefix: packageprefixes) {
-                                if(pkgName.startsWith(prefix)) {
+                            for (String prefix : packageprefixes) {
+                                if (pkgName.startsWith(prefix)) {
                                     matchFound = true;
                                     break;
                                 }
                             }
-                            if(!matchFound) {
-                                break;
+                            if (!matchFound) {
+                                continue;
                             }
                         }
                         Package p = clss.getPackage();
@@ -1678,21 +1681,21 @@ public class J4CppMain {
                         if (Modifier.isAbstract(modifiers)
                                 && Modifier.isPublic(modifiers)
                                 && !Modifier.isStatic(modifiers)
-//                                && !m.isDefault()
+                                //                                && !m.isDefault()
                                 && !m.isSynthetic()) {
                             pw.println();
                             pw.println(TAB_STRING + "@Override");
                             String params = "";
-                            for(int i = 0; i < m.getParameterTypes().length; i++) {
-                                params += m.getParameterTypes()[i].getCanonicalName()+" param"+i;
-                                if(i < m.getParameterTypes().length-1) {
-                                    params +=",";
+                            for (int i = 0; i < m.getParameterTypes().length; i++) {
+                                params += m.getParameterTypes()[i].getCanonicalName() + " param" + i;
+                                if (i < m.getParameterTypes().length - 1) {
+                                    params += ",";
                                 }
                             }
-                            pw.println(TAB_STRING + "native public " 
-                                    + m.getReturnType().getCanonicalName() 
+                            pw.println(TAB_STRING + "native public "
+                                    + m.getReturnType().getCanonicalName()
                                     + " " + m.getName() + "("
-                                    + params +");");
+                                    + params + ");");
 //                                    + IntStream.range(0, m.getParameterTypes().length)
 //                                    .mapToObj(i -> m.getParameterTypes()[i].getCanonicalName() + " param" + i)
 //                                    .collect(Collectors.joining(",")) + ");");
@@ -1780,7 +1783,7 @@ public class J4CppMain {
                         if (Modifier.isAbstract(modifiers)
                                 && Modifier.isPublic(modifiers)
                                 && !Modifier.isStatic(modifiers)
-//                                && !method.isDefault()
+                                //                                && !method.isDefault()
                                 && !method.isSynthetic()) {
                             pw.println(tabs + getNativeMethodCppDeclaration(method, javaClass));
                         }
@@ -2284,7 +2287,7 @@ public class J4CppMain {
                                 if (Modifier.isAbstract(modifiers)
                                         && Modifier.isPublic(modifiers)
                                         && !Modifier.isStatic(modifiers)
-//                                        && !method.isDefault()
+                                        //                                        && !method.isDefault()
                                         && !method.isSynthetic()) {
                                     Class[] paramClasses = method.getParameterTypes();
                                     String methodArgs = getCppParamNames(paramClasses);
@@ -2340,7 +2343,7 @@ public class J4CppMain {
                                 if (Modifier.isAbstract(modifiers)
                                         && Modifier.isPublic(modifiers)
                                         && !Modifier.isStatic(modifiers)
-//                                        && !method.isDefault()
+                                        //                                        && !method.isDefault()
                                         && !method.isSynthetic()) {
                                     map.put("%METHOD_NUMBER%", Integer.toString(method_number));
                                     map.put(METHOD_NAME, method.getName());
@@ -2404,12 +2407,12 @@ public class J4CppMain {
                                 if (Modifier.isAbstract(modifiers)
                                         && Modifier.isPublic(modifiers)
                                         && !Modifier.isStatic(modifiers)
-//                                        && !method.isDefault()
+                                        //                                        && !method.isDefault()
                                         && !method.isSynthetic()) {
                                     Class[] paramClasses = method.getParameterTypes();
 //                                    String methodArgs = getCppParamNames(paramClasses);
                                     String paramDecls = getCppParamDeclarations(paramClasses, javaClass);
-                                    String methodArgs = method.getParameterTypes().length > 0 ?  paramDecls.substring(1, paramDecls.length() - 1) : "";
+                                    String methodArgs = method.getParameterTypes().length > 0 ? paramDecls.substring(1, paramDecls.length() - 1) : "";
                                     map.put(METHOD_ARGS, methodArgs);
                                     map.put(METHOD_NAME, method.getName());
                                     Class returnClass = method.getReturnType();
@@ -2568,7 +2571,7 @@ public class J4CppMain {
     private static final String[] emptypkgs = {};
 
     private static String[] classToPackages(Class clss) {
-        if(null != clss
+        if (null != clss
                 && null != clss.getPackage()
                 && null != clss.getPackage().getName()) {
             return clss.getPackage().getName().split("\\.");
@@ -2616,10 +2619,10 @@ public class J4CppMain {
 
         try (BufferedReader br
                 = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream(resourceName), StandardCharsets.UTF_8))) {
-            
+
             String s = null;
-            while(null != (s = br.readLine())) {
-                if(!s.trim().startsWith(TEMPLATE_COMMENT_MARK)) {
+            while (null != (s = br.readLine())) {
+                if (!s.trim().startsWith(TEMPLATE_COMMENT_MARK)) {
                     s = s.replace("\t", TAB_STRING);
                     pw.println(tabs + replaceVars(map, s));
                 }
