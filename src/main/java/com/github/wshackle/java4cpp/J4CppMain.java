@@ -1834,7 +1834,7 @@ public class J4CppMain {
                     if (!hasNoArgConstructor(constructors)) {
                         if (Modifier.isAbstract(clss.getModifiers())
                                 || clss.isInterface()) {
-                            pw.println(tabs + "private:");
+                            pw.println(tabs + "protected:");
                             pw.println(tabs + clssOnlyName + "() {};");
                             pw.println(tabs + "public:");
                         } else {
