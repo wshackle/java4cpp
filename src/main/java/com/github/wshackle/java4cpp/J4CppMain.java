@@ -1621,7 +1621,7 @@ public class J4CppMain {
         String forward_header = header.substring(0, header.lastIndexOf('.')) + "_fwd.h";
         Map<String, String> map = new HashMap<>();
         map.put(JAR, jar != null ? jar : "");
-        map.put("%CLASSPATH_PREFIX%", getCurrentDir() + ((jar != null) ? (File.pathSeparator + jar) : ""));
+        map.put("%CLASSPATH_PREFIX%", getCurrentDir() + ((jar != null) ? (File.pathSeparator+((new File(jar).getCanonicalPath()).replace("\\", "\\\\"))) : ""));
         map.put("%FORWARD_HEADER%", forward_header);
         map.put("%HEADER%", header);
         map.put("%PATH_SEPERATOR%", File.pathSeparator);

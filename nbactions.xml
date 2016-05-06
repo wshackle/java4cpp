@@ -62,4 +62,15 @@
                 <exec.workingdir>/home/shackle/usnistgov/crcl/tools/java/crcl4java/examples/C++/generated</exec.workingdir>
             </properties>
         </action>
+        <action>
+            <actionName>CUSTOM-quick_deploy</actionName>
+            <displayName>quick_deploy</displayName>
+            <goals>
+                <goal>deploy</goal>
+            </goals>
+            <activatedProfiles>
+                <activatedProfile>skip_tests</activatedProfile>
+                <activatedProfile>release</activatedProfile>
+            </activatedProfiles>
+        </action>
     </actions>
