@@ -10,4 +10,5 @@ public:
     %CLASS_NAME%(jobject _jthis, bool copy);
     %CLASS_NAME%(const %CLASS_NAME% &);
     static %CLASS_NAME% cast(const %OBJECT_CLASS_FULL_NAME% &);
+    static bool instanceof(const %OBJECT_CLASS_FULL_NAME% &);
         

@@ -33,3 +33,10 @@ static inline jclass get%CLASS_NAME%Class();
     %CLASS_NAME% retVal(objref.jthis,true);
     return retVal;
 }
+
+bool %CLASS_NAME%::instanceof(const %OBJECT_CLASS_FULL_NAME% &objref) {
+    JNIEnv *env =getEnv();
+    static jclass cls = get%CLASS_NAME%Class(); 
+    jclass objcls = env->GetObjectClass(objref.jthis);
+    return env->IsAssignableFrom(objcls,cls);
+}

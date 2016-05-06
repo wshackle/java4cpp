@@ -21,7 +21,7 @@ public class Test {
     public static int staticIntField = 642;
     public static Integer staticIntegerField = Integer.valueOf(246);
 
-////        private DoubleUnaryOperator doubleOp;
+////        private DoubleUnaryOperator doubleOp;bt
 //
 //    /**
 //     * Get the value of doubleOp

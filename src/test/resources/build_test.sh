@@ -36,8 +36,10 @@ fi
 echo TEST_JAR="${TEST_JAR}"
 ls -l "${TEST_JAR}"
 
+export JAVA4CPP_JAR=`find ../../../target/ -name java4cpp*-with-dependencies.jar | head -n 1`;
+
 #"${JAVA_HOME}/bin/java" -jar ../../../target/java4cpp-1.0-SNAPSHOT-jar-with-dependencies.jar -v --natives NativeRunnable=java.lang.Runnable NativeDoubleOp=java.util.function.DoubleUnaryOperator -n test -j "${TEST_JAR}";
-"${JAVA_HOME}/bin/java" -jar ../../../target/java4cpp-1.0-SNAPSHOT-jar-with-dependencies.jar -v --natives NativeRunnable=java.lang.Runnable -n test -j "${TEST_JAR}";
+"${JAVA_HOME}/bin/java" -jar "${JAVA4CPP_JAR}" -v --natives NativeRunnable=java.lang.Runnable -n test -j "${TEST_JAR}";
 "${JAVA_HOME}/bin/javac" -g NativeRunnable.java
 
 

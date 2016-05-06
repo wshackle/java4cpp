@@ -1,10 +1,10 @@
-#ifndef test_h
-#define test_h
+#ifndef crclj_h
+#define crclj_h
 
 #include <jni.h>
-#include "test_fwd.h"
+#include "crclj_fwd.h"
 
-namespace test {
+namespace crclj {
 
     extern JNIEnv *getEnv();
     extern void releaseEnv(JNIEnv *);
@@ -21,7 +21,7 @@ namespace test {
     extern void DebugPrintJObject(const char *file, int lineno, const char *prefix, jobject jobj);
     extern void SetDebugJ4Cpp(bool debug);
     extern bool GetDebugJ4Cpp();
-    extern void PrintObject(const char *prefix, const ::test::java::lang::Object &objref);
+    extern void PrintObject(const char *prefix, const ::crclj::java::lang::Object &objref);
     extern jclass getStringClass();
     extern jclass getClassClass();
     extern jstring getEmptyString();
@@ -68,31 +68,26 @@ namespace test {
 
 
     
-#include "test0.h"
-#include "test1.h"
-
-    class NativeRunnableContext;
-
-    
-    class NativeRunnable : public ::test::java::lang::Runnable {
-    public:
-        NativeRunnable(jobject _jthis, bool copy);
-        NativeRunnable(const NativeRunnable &);
-        static NativeRunnable cast(const ::test::java::lang::Object &);
-        static bool instanceof(const ::test::java::lang::Object &);
-            
-        NativeRunnableContext *context;
-        NativeRunnable();
-        ~NativeRunnable();
-        void runNative();
-        void initContext(NativeRunnableContext *ctx,bool isref);
-        void deleteContext();
-    }; // end class NativeRunnable
+#include "crclj00.h"
+#include "crclj01.h"
+#include "crclj02.h"
+#include "crclj03.h"
+#include "crclj04.h"
+#include "crclj05.h"
+#include "crclj06.h"
+#include "crclj07.h"
+#include "crclj08.h"
+#include "crclj09.h"
+#include "crclj10.h"
+#include "crclj11.h"
+#include "crclj12.h"
+#include "crclj13.h"
+#include "crclj14.h"
 
 
-// end namespace test
+// end namespace crclj
 }
 
-// end #ifndef test_h
+// end #ifndef crclj_h
 #endif
 

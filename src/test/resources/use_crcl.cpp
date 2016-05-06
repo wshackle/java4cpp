@@ -31,9 +31,9 @@ int main(int argc, const char **argv) {
         moveTo.setCommandID(BigInteger::valueOf(8));
         PoseType pose;
         PointType pt;
-        pt.setX(BigDecimal::valueOf(1.1));
-        pt.setY(BigDecimal::valueOf(0.0));
-        pt.setZ(BigDecimal::valueOf(0.1));
+        pt.setX(BigDecimal::valueOf1(1.1));
+        pt.setY(BigDecimal::valueOf1(0.0));
+        pt.setZ(BigDecimal::valueOf1(0.1));
         pose.setPoint(pt);
         VectorType xAxis;
         xAxis.setI(BigDecimal::getONE());
@@ -60,7 +60,7 @@ int main(int argc, const char **argv) {
         BigInteger IDback = cmdStat.getCommandID();
         PrintObject("Command ID=", IDback);
         PrintObject("stat=",stat);
-        pose = stat.getPose();
+        pose = stat.getPoseStatus().getPose();
         PrintObject("pose=",pose);
         pt = pose.getPoint();
         PrintObject("X:",pt.getX());
