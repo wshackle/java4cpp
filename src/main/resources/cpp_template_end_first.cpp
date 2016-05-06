@@ -489,6 +489,7 @@ static JavaVM *jvm = NULL; /* denotes a Java VM */
         if(NULL != iscopy) {
             *iscopy = iscopy2;
         }
+        return ret;
     }
     
     jbyte *GetByteArrayElements(jbyteArray  jarray,jboolean *iscopy) {
