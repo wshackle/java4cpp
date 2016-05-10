@@ -31,9 +31,9 @@ int main(int argc, const char **argv) {
         moveTo.setCommandID(BigInteger::valueOf(8));
         PoseType pose;
         PointType pt;
-        pt.setX(BigDecimal::valueOf1(1.1));
-        pt.setY(BigDecimal::valueOf1(0.0));
-        pt.setZ(BigDecimal::valueOf1(0.1));
+        pt.setX(BigDecimal::valueOfdouble(1.1));
+        pt.setY(BigDecimal::valueOfdouble(0.0));
+        pt.setZ(BigDecimal::valueOfdouble(0.1));
         pose.setPoint(pt);
         VectorType xAxis;
         xAxis.setI(BigDecimal::getONE());

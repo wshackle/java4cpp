@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -368,72 +369,109 @@ public class J4CppMain {
         return badNamesSet;
     }
 
+    private static boolean fixMultipleOverrides = Boolean.getBoolean("fixMultipleOverrides");
+
     private static String fixMethodName(Method m) {
         String mname = m.getName();
 
-        Method ma[] = m.getDeclaringClass().getMethods();
-        int index = 0;
-        boolean index_incremented = false;
-        boolean has_match = false;
-        for (int i = 0; i < ma.length; i++) {
-            Method method = ma[i];
-            if (method.getParameterTypes().length > 0
-                    && m.getParameterTypes().length > 0
-                    && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
-                continue;
-            }
-            if (!method.equals(m)
-                    && m.getName().equals(method.getName())
-                    && m.getParameterTypes().length == method.getParameterTypes().length) {
-                has_match = true;
-            }
-        }
-        for (int i = 0; i < ma.length; i++) {
-            Method method = ma[i];
-            if (method.equals(m)) {
-                break;
-            }
-            if (method.getParameterTypes().length != m.getParameterTypes().length) {
-                continue;
-            }
-            if (method.getParameterTypes().length > 0
-                    && m.getParameterTypes().length > 0
-                    && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
-                continue;
-            }
-            if (m.getParameterTypes().length >= 1) {
-                if (String.class.isAssignableFrom(m.getParameterTypes()[0])
-                        != String.class.isAssignableFrom(method.getParameterTypes()[0])) {
-                    continue;
+        if (fixMultipleOverrides) {
+            Method ma[] = m.getDeclaringClass().getMethods();
+            int index = 0;
+            boolean index_incremented = false;
+            boolean has_match = false;
+            Arrays.sort(ma, new Comparator<Method>() {
+                @Override
+                public int compare(Method o1, Method o2) {
+                    return Arrays.toString(o1.getParameterTypes()).compareTo(Arrays.toString(o2.getParameterTypes()));
                 }
-            }
-            if (method.getName().equals(m.getName())) {
-                index++;
-                index_incremented = true;
-            }
-        }
-        int start_index = 0;
-        while (index_incremented) {
-            index_incremented = false;
+            });
+            List<Method> matchingMethods = new ArrayList<>();
             for (int i = 0; i < ma.length; i++) {
                 Method method = ma[i];
-                for (int j = start_index; j <= index; j++) {
-                    if (method.getName().equals(m.getName() + j)
-                            && m.getParameterTypes().length == method.getParameterTypes().length) {
-                        index++;
-                        index_incremented = true;
-                    }
+                if (method.getParameterTypes().length > 0
+                        && m.getParameterTypes().length > 0
+                        && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
+                    continue;
+                }
+                if (!method.equals(m)
+                        && m.getName().equals(method.getName())
+                        && m.getParameterTypes().length == method.getParameterTypes().length) {
+                    has_match = true;
+                    matchingMethods.add(method);
                 }
             }
-            start_index = index;
+            for (int i = 0; i < ma.length; i++) {
+                Method method = ma[i];
+                if (method.equals(m)) {
+                    break;
+                }
+                if (method.getParameterTypes().length != m.getParameterTypes().length) {
+                    continue;
+                }
+                if (method.getParameterTypes().length > 0
+                        && m.getParameterTypes().length > 0
+                        && m.getParameterTypes()[0].isPrimitive() != method.getParameterTypes()[0].isPrimitive()) {
+                    continue;
+                }
+                if (m.getParameterTypes().length >= 1) {
+                    if (String.class.isAssignableFrom(m.getParameterTypes()[0])
+                            != String.class.isAssignableFrom(method.getParameterTypes()[0])) {
+                        continue;
+                    }
+                }
+                if (method.getName().equals(m.getName())) {
+                    index++;
+                    index_incremented = true;
+                }
+            }
+            int start_index = 0;
+            while (index_incremented) {
+                index_incremented = false;
+                for (int i = 0; i < ma.length; i++) {
+                    Method method = ma[i];
+                    for (int j = start_index; j <= index; j++) {
+                        if (method.getName().equals(m.getName() + j)
+                                && m.getParameterTypes().length == method.getParameterTypes().length) {
+                            index++;
+                            index_incremented = true;
+                        }
+                    }
+                }
+                start_index = index;
+            }
+            if (has_match) {
+                String paramstring = "";
+                Class[] paramclasses = m.getParameterTypes();
+                for (int i = 0; i < paramclasses.length; i++) {
+                    paramstring += classToMethodAppendage(paramclasses[i]);
+                }
+                mname = mname + paramstring;
+                if (mname.contains(";")) {
+                    System.out.println("paramclasses = " + paramclasses);
+                }
+            }
         }
-        if (has_match) {
-            mname = mname + index;
-        }
+
         if (badNames.contains(mname)) {
             return mname + "Method";
         }
         return mname;
+    }
+    
+    private static String classToMethodAppendage(Class clzz) {
+        return clzz
+                .getName()
+                .replace("Ljava.lang", "")
+                .replace("Ljava.io", "")
+                .replace("Ljava.util", "")
+                .replace("Ljava.net", "")
+                .replace("Ljava.math", "")
+                .replace("java.lang", "")
+                .replace("java.io", "")
+                .replace("java.util", "")
+                .replace("java.net", "")
+                .replace("java.math", "")
+                .replaceAll("[.\\[\\]\\$_;]+", "");
     }
 
     private static String getCppDeclaration(Method m, Class<?> relClass) {
@@ -1337,7 +1375,7 @@ public class J4CppMain {
         if (verbose) {
             System.out.println("urlsList = " + urlsList);
         }
-        
+
         if (null != jar && jar.length() > 0) {
             Path jarPath = FileSystems.getDefault().getPath(jar);
             ZipInputStream zip = new ZipInputStream(Files.newInputStream(jarPath, StandardOpenOption.READ));
@@ -1355,7 +1393,7 @@ public class J4CppMain {
                 if (verbose) {
                     System.out.println("entryName = " + entryName);
                 }
-               
+
                 if (!entry.isDirectory() && entryName.endsWith(".class")) {
 
                     if (entryName.indexOf('$') >= 0) {
@@ -1621,7 +1659,7 @@ public class J4CppMain {
         String forward_header = header.substring(0, header.lastIndexOf('.')) + "_fwd.h";
         Map<String, String> map = new HashMap<>();
         map.put(JAR, jar != null ? jar : "");
-        map.put("%CLASSPATH_PREFIX%", getCurrentDir() + ((jar != null) ? (File.pathSeparator+((new File(jar).getCanonicalPath()).replace("\\", "\\\\"))) : ""));
+        map.put("%CLASSPATH_PREFIX%", getCurrentDir() + ((jar != null) ? (File.pathSeparator + ((new File(jar).getCanonicalPath()).replace("\\", "\\\\"))) : ""));
         map.put("%FORWARD_HEADER%", forward_header);
         map.put("%HEADER%", header);
         map.put("%PATH_SEPERATOR%", File.pathSeparator);
