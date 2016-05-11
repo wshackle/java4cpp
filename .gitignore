@@ -123,7 +123,10 @@ Doxyfile
 /src/test/resources/projects/Test/build/
 /src/test/resources/projects/Test/dist/
 /src/test/resources/projects/Test/nbproject/private/
-/examples/test/java/test/target/
 /nbproject/
 /NativeRunnable.java
 /src/test/resources/test
+examples/test/java/test/target/classes/
+examples/test/java/test/target/maven-archiver/
+examples/test/java/test/target/test-classes/
+
