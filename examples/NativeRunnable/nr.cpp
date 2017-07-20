@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include "JavaForCpp.h"
+#include "javaforcpp.h"
 
 
-namespace JavaForCpp {
+namespace javaforcpp {
 
     class NativeRunnableContext {
         // add any data to store per object

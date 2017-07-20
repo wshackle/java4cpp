@@ -24,6 +24,6 @@ if test "x${JVM_LIB_DIR}" = "x" ; then
     export JVM_LIB_DIR=`find ${JAVA_HOME} -name libjvm.so | head -n 1 | sed 's#libjvm.so##g'`;
 fi
 
-g++ -shared -fPIC -D_REENTRANT -D_POSIX_C_SOURCE -I "${JAVA_HOME}/include" -I "${JAVA_HOME}/include/linux" nr.cpp JavaForCpp*.cpp -o libnr.so
+g++ -shared -fPIC -D_REENTRANT -D_POSIX_C_SOURCE -I "${JAVA_HOME}/include" -I "${JAVA_HOME}/include/linux" nr.cpp javaforcpp*.cpp -o libnr.so
 
 g++ -D_REENTRANT -D_POSIX_C_SOURCE -I "${JAVA_HOME}/include" -I "${JAVA_HOME}/include/linux"  main.cpp -L `pwd`  -Wl,--rpath `pwd` -lnr  -L "${JVM_LIB_DIR}" -Wl,--rpath "${JVM_LIB_DIR}" -ljvm -o nr

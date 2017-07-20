@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "JavaForCpp.h"
+#include "javaforcpp.h"
 
-using namespace JavaForCpp;
+using namespace javaforcpp;
 
 int main(int argc, const char **argv) {
     NativeRunnable nr;
