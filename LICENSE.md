@@ -17,3 +17,6 @@ that any derivative works bear some notice that they are derived from it,
 and any modified versions bear some notice that they have been modified.
 
  See http://www.copyright.gov/title17/92chap1.html#105
+
+The licensing of any generated code is left to the discretion of the user.
+
