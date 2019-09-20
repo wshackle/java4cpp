@@ -66,7 +66,10 @@ namespace %NAMESPACE% {
             };
         }
     }
-    
+
+// end namespace %NAMESPACE%
+}
+
     
     
     

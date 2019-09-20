@@ -61,7 +61,10 @@ namespace test {
             };
         }
     }
-    
+
+// end namespace test
+}
+
     
     
     
@@ -70,6 +73,9 @@ namespace test {
     
 #include "test0.h"
 #include "test1.h"
+
+namespace test {
+
 
     class NativeRunnableContext;
 
