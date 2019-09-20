@@ -130,3 +130,4 @@ examples/test/java/test/target/classes/
 examples/test/java/test/target/maven-archiver/
 examples/test/java/test/target/test-classes/
 
+/examples/test/java/test/target/

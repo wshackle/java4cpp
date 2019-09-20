@@ -1175,6 +1175,11 @@ public class J4CppMain {
                 .desc("library name for System.loadLibrary(...) for native extension classes")
                 .longOpt("loadlibname")
                 .build());
+        options.addOption(Option.builder()
+                .hasArg()
+                .desc("Generate a utility java class for cloning.")
+                .longOpt("javacloner")
+                .build());
         String output = null;
         String header = null;
         String jar = null;
@@ -1265,21 +1270,7 @@ public class J4CppMain {
                     System.out.println("classnamesToFind = " + classnamesToFind);
                 }
             }
-//                if (!line.hasOption("namespace")) {
-//                    if (classname != null && classname.length() > 0) {
-//                        namespace = classname.toLowerCase().replace(".", "_");
-//                    } else if (jar != null && jar.length() > 0) {
-//                        int lastSep = jar.lastIndexOf(File.separator);
-//                        int start = Math.max(0, lastSep + 1);
-//                        int period = jar.indexOf('.', start + 1);
-//                        int end = Math.max(start + 1, period);
-//                        namespace = jar.substring(start, end).toLowerCase();
-//                        namespace = namespace.replace(" ", "_");
-//                        if (namespace.indexOf("-") > 0) {
-//                            namespace = namespace.substring(0, namespace.indexOf("-"));
-//                        }
-//                    }
-//                }
+
 
             namespace = line.getOptionValue("namespace", namespace);
             if (verbose) {

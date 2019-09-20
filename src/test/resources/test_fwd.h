@@ -19,10 +19,10 @@ namespace test {
         } // end namespace lang
     } // end namespace java
 
-    class ClassInDefaultPackage;
     namespace testpackage{
-        class A;
         class Test;
+        class MyClient;
+        class A;
     } // end namespace testpackage
 
     namespace java{
@@ -33,9 +33,10 @@ namespace test {
 
     namespace testpackage{
         class ExternalPublicEnum;
-        class MyClient;
     } // end namespace testpackage
 
+    namespace {
+        class ClassInDefaultPackage;
     namespace java{
         namespace lang{
             class Number;
