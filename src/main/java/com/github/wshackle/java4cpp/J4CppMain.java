@@ -1186,6 +1186,7 @@ public class J4CppMain {
         Set<String> classnamesToFind = null;
         Set<String> packageprefixes = null;
         String loadlibname = null;
+        String javacloner = null;
         
         Map<String, String> nativesNameMap = null;
         Map<String, Class> nativesClassMap = null;
@@ -1200,6 +1201,7 @@ public class J4CppMain {
             System.out.println("args = " + Arrays.toString(args));
             CommandLine line = new DefaultParser().parse(options, args);
             loadlibname = line.getOptionValue("loadlibname");
+            javacloner = line.getOptionValue("javacloner");
             verbose = line.hasOption("verbose");
             if (line.hasOption(CLASSESPEROUTPUT)) {
                 String cpoStr = line.getOptionValue(CLASSESPEROUTPUT);
@@ -1239,11 +1241,7 @@ public class J4CppMain {
                     }
                 }
             }
-//            // validate that block-size has been set
-//            if (line.hasOption("block-size")) {
-//                // print the value of block-size
-//                if(verbose) System.out.println(line.getOptionValue("block-size"));
-//            }
+
             jar = line.getOptionValue("jar", jar);
             if (verbose) {
                 System.out.println("jar = " + jar);
@@ -1649,6 +1647,22 @@ public class J4CppMain {
         if (verbose) {
             System.out.println("Total number of classes = " + classes.size());
             System.out.println("classes = " + classes);
+        }
+        if(null != javacloner && javacloner.length() > 1) {
+            JavaCloneUtilGenerator generator = new JavaCloneUtilGenerator();
+            File dir;
+            if(null != output && output.length() > 0) {
+                File outFile = new File(output);
+                File outFileParent = outFile.getParentFile();
+                if(null != outFileParent) {
+                    dir = outFileParent;
+                } else {
+                    dir = null;
+                }
+            } else {
+                dir = null;
+            }
+            generator.generateCloneUtil(javacloner,dir, classes);
         }
         
         String forward_header = header.substring(0, header.lastIndexOf('.')) + "_fwd.h";
